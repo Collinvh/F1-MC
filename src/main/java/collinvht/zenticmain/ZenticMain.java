@@ -1,9 +1,6 @@
 package collinvht.zenticmain;
 
-import collinvht.zenticmain.command.DSQ;
-import collinvht.zenticmain.command.Penalty;
-import collinvht.zenticmain.command.Warning;
-import collinvht.zenticmain.command.flag;
+import collinvht.zenticmain.command.*;
 import collinvht.zenticmain.discord.DiscordManager;
 import collinvht.zenticmain.event.VPPEvents;
 import lombok.Getter;
@@ -29,6 +26,7 @@ public final class ZenticMain extends JavaPlugin {
         this.getCommand("penalty").setExecutor(new Penalty());
         this.getCommand("dsq").setExecutor(new DSQ());
         this.getCommand("flag").setExecutor(new flag());
+        this.getCommand("lights").setExecutor(new lights());
     }
 
     @Override

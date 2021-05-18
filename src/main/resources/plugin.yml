@@ -17,3 +17,7 @@ commands:
   dsq:
     description: Give people a dsq
     permission: zentic.fia
+  flag:
+    aliases: vlag
+    description: Bring out a flag
+    permission: zentic.fia

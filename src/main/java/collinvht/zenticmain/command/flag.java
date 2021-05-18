@@ -8,7 +8,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 
 import java.util.Locale;
 
@@ -17,7 +16,7 @@ public class flag implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (sender instanceof Player && sender.hasPermission("zenticRacing.flag")) {
+        if (sender instanceof Player && sender.hasPermission("zentic.fia")) {
             String currentCircuit = plugin.getConfig().getString("circuit");
             String world1 = plugin.getConfig().getString(currentCircuit + ".world");
 

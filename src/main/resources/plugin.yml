@@ -1,0 +1,19 @@
+name: ZenticMain
+version: ${project.version}
+main: collinvht.zenticmain.ZenticMain
+depend:
+  - VehiclesPlusPro
+  - JDA
+api-version: 1.16
+authors: [ Collinvht ]
+commands:
+  warning:
+    aliases: warn
+    description: Warn people
+    permission: zentic.fia
+  penalty:
+    description: Give people a penalty
+    permission: zentic.fia
+  dsq:
+    description: Give people a dsq
+    permission: zentic.fia

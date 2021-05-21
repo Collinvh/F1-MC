@@ -21,3 +21,7 @@ commands:
     aliases: vlag
     description: Bring out a flag
     permission: zentic.fia
+  lights:
+    aliases: lichten
+    description: regel de lichten
+    permission: zentic.fia

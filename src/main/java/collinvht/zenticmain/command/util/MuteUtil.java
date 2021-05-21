@@ -71,11 +71,11 @@ public class MuteUtil implements CommandExecutor, Listener {
                         if(args.length > 1) {
                             Player player = Bukkit.getPlayer(args[1]);
                             if(player != null) {
-                                if(obj.getPlayers().contains(player)) {
-                                    obj.getPlayers().remove(player);
+                                if(obj.getPlayers().contains(player.getUniqueId())) {
+                                    obj.getPlayers().remove(player.getUniqueId());
                                     sender.sendMessage(zentic + "Speler geunmute");
                                 } else {
-                                    obj.getPlayers().add(player);
+                                    obj.getPlayers().add(player.getUniqueId());
                                     sender.sendMessage(zentic + "Speler gemute");
                                 }
                             }
@@ -112,6 +112,7 @@ public class MuteUtil implements CommandExecutor, Listener {
             }
 
             for(UUID uuid : obj.getPlayers()) {
+                assert player != null;
                 if(obj.getPlayers().contains(player.getUniqueId())) {
                     Player p = Bukkit.getPlayer(uuid);
                     assert p != null;

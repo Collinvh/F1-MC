@@ -1,6 +1,7 @@
 package collinvht.zenticmain.command.util;
 
 import collinvht.zenticmain.ZenticMain;
+import collinvht.zenticmain.obj.MutedOBJ;
 import collinvht.zenticmain.obj.TeamObj;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -27,9 +28,7 @@ import static collinvht.zenticmain.command.util.Team.readJson;
 
 public class MuteUtil implements CommandExecutor, Listener {
 
-    private static final HashMap<UUID, ArrayList<Player>> mutedPlayers = new HashMap<>();
-    private static final HashMap<UUID, ArrayList<String>> mutedWords = new HashMap<>();
-    private static final ArrayList<Player> hasChatMuted = new ArrayList<>();
+    private static final HashMap<UUID, MutedOBJ> mutedObjs = new HashMap<>();
 
     private static final String zentic = "" + ChatColor.RED + ChatColor.BOLD + "ZT > " + ChatColor.RESET;
 
@@ -37,27 +36,21 @@ public class MuteUtil implements CommandExecutor, Listener {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if(sender instanceof Player) {
-            ArrayList<Player> mutedPlayers = MuteUtil.mutedPlayers.get(((Player) sender).getUniqueId());
-            ArrayList<String> mutedWords = MuteUtil.mutedWords.get(((Player) sender).getUniqueId());
-            if(mutedPlayers == null) {
-                mutedPlayers = new ArrayList<>();
-                MuteUtil.mutedPlayers.put(((Player) sender).getUniqueId(), mutedPlayers);
-            }
-
-            if(mutedWords == null) {
-                mutedWords = new ArrayList<>();
-                MuteUtil.mutedWords.put(((Player) sender).getUniqueId(), mutedWords);
+            MutedOBJ obj = mutedObjs.get(((Player) sender).getUniqueId());
+            if(obj == null) {
+                obj = new MutedOBJ(((Player) sender).getUniqueId());
+                mutedObjs.put(((Player) sender).getUniqueId(), obj);
             }
 
             if(args.length > 0) {
                 switch (args[0]) {
                     case "word":
                         if(args.length > 1) {
-                            if(mutedWords.contains(args[1].toLowerCase())) {
-                                mutedWords.remove(args[1].toLowerCase());
+                            if(obj.getWords().contains(args[1].toLowerCase())) {
+                                obj.getWords().remove(args[1].toLowerCase());
                                 sender.sendMessage(zentic + "Woord geremoved");
                             } else {
-                                mutedWords.add(args[1].toLowerCase());
+                                obj.getWords().add(args[1].toLowerCase());
                                 sender.sendMessage(zentic + "Woord geadd!");
                             }
                         } else {
@@ -65,11 +58,11 @@ public class MuteUtil implements CommandExecutor, Listener {
                         }
                         return true;
                     case "chat":
-                        if(hasChatMuted.contains(((Player) sender).getPlayer())) {
-                            hasChatMuted.remove(((Player) sender).getPlayer());
+                        if(obj.isChatMuted()) {
+                            obj.setChatMuted(false);
                             sender.sendMessage(zentic + "Chat geunmute.");
                         } else {
-                            hasChatMuted.add(((Player) sender).getPlayer());
+                            obj.setChatMuted(true);
                             sender.sendMessage(zentic + "Chat gemute");
                         }
 
@@ -78,11 +71,11 @@ public class MuteUtil implements CommandExecutor, Listener {
                         if(args.length > 1) {
                             Player player = Bukkit.getPlayer(args[1]);
                             if(player != null) {
-                                if(mutedPlayers.contains(player)) {
-                                    mutedPlayers.remove(player);
+                                if(obj.getPlayers().contains(player)) {
+                                    obj.getPlayers().remove(player);
                                     sender.sendMessage(zentic + "Speler geunmute");
                                 } else {
-                                    mutedPlayers.add(player);
+                                    obj.getPlayers().add(player);
                                     sender.sendMessage(zentic + "Speler gemute");
                                 }
                             }
@@ -109,31 +102,35 @@ public class MuteUtil implements CommandExecutor, Listener {
         String message = event.getMessage();
         Set<Player> playerSet = event.getRecipients();
 
-        for(Player p : hasChatMuted) {
-            playerSet.remove(p);
-            return;
-        }
-
-
-        for(UUID uuid : mutedPlayers.keySet()) {
-            ArrayList<Player> players = mutedPlayers.get(uuid);
-            ArrayList<String> woorden = mutedWords.get(uuid);
-            if(players.contains(player)) {
-                Player p = Bukkit.getPlayer(uuid);
-                assert p != null;
-                playerSet.remove(p);
+        for (MutedOBJ obj : mutedObjs.values()) {
+            if(obj.isChatMuted()) {
+                Player p = obj.getPlayer();
+                if(p != null) {
+                    playerSet.remove(p);
+                }
+                return;
             }
 
-            for(String woord : woorden) {
-                if(message.contains(woord)) {
+            for(UUID uuid : obj.getPlayers()) {
+                if(obj.getPlayers().contains(player.getUniqueId())) {
+                    Player p = Bukkit.getPlayer(uuid);
+                    assert p != null;
+                    playerSet.remove(p);
+                }
+            }
+
+            for (String word : obj.getWords()) {
+                if(message.contains(word)) {
                     StringBuilder stars = new StringBuilder();
-                    for(int i = 0; i<woord.length(); i++) {
+                    for(int i = 0; i<word.length(); i++) {
                         stars.append("*");
                     }
-                    Player p = Bukkit.getPlayer(uuid);
-                    if(p != null) {
-                        playerSet.remove(p);
-                        p.sendMessage(event.getFormat().replace("%1$s", p.getDisplayName()).replace("%2$s", "") + message.replace(woord, stars.toString()));
+
+                    player = obj.getPlayer();
+
+                    if(player != null) {
+                        playerSet.remove(player);
+                        player.sendMessage(event.getFormat().replace("%1$s", player.getDisplayName()).replace("%2$s", "") + message.replace(word, stars.toString()));
                     }
                 }
             }
@@ -144,33 +141,25 @@ public class MuteUtil implements CommandExecutor, Listener {
         File racesLoc = Paths.get(ZenticMain.getInstance().getDataFolder().toString() + "/muteutil" + ".json").toFile();
         File path = Paths.get(ZenticMain.getInstance().getDataFolder().toString()).toFile();
         JsonObject main = new JsonObject();
-        JsonObject muted = new JsonObject();
-        JsonObject mutedWords = new JsonObject();
+        JsonArray mainArray = new JsonArray();
 
-        mutedPlayers.forEach((uuid, players) -> {
-            JsonArray playerArray = new JsonArray();
-            players.forEach(player ->  {
-                JsonObject object = new JsonObject();
-                object.addProperty("uuid", player.getUniqueId().toString());
-                playerArray.add(object);
-            });
+        mutedObjs.forEach((uuid, mutedOBJ) ->  {
+            JsonObject object = new JsonObject();
+            object.addProperty("uuid", uuid.toString());
+            JsonArray words = new JsonArray();
+            mutedOBJ.getWords().forEach(words::add);
 
-            muted.add(uuid.toString(), playerArray);
+            JsonArray uuids = new JsonArray();
+            mutedOBJ.getPlayers().forEach(uuid1 -> uuids.add(uuid1.toString()));
+
+            object.add("MutedWords", words);
+            object.add("MutedUUIDs", uuids);
+
+            mainArray.add(object);
         });
 
-        MuteUtil.mutedWords.forEach((uuid, strings) -> {
-            JsonArray playerArray = new JsonArray();
-            strings.forEach(player ->  {
-                JsonObject object = new JsonObject();
-                object.addProperty("word", player);
-                playerArray.add(object);
-            });
 
-            mutedWords.add(uuid.toString(), playerArray);
-        });
-
-        main.add("MutedPlayers", muted);
-        main.add("MutedWords", mutedWords);
+        main.add("Players", mainArray);
 
         try {
             if (path.mkdir() || racesLoc.createNewFile() || racesLoc.exists()) {
@@ -194,8 +183,32 @@ public class MuteUtil implements CommandExecutor, Listener {
             }
 
             if(jsonObject != null) {
-                JsonObject players = jsonObject.getAsJsonObject("MutedPlayers");
-                JsonObject words = jsonObject.getAsJsonObject("MutedWords");
+                JsonArray players = jsonObject.getAsJsonArray("Players");
+
+                players.forEach(jsonElement -> {
+                    JsonObject object = jsonElement.getAsJsonObject();
+                    UUID uuid = UUID.fromString(object.get("uuid").getAsString());
+                    MutedOBJ obj = new MutedOBJ(uuid);
+
+                    ArrayList<String> words = new ArrayList<>();
+                    JsonArray array = object.getAsJsonArray("MutedWords");
+                    array.forEach(jsonElement1 -> {
+                        words.add(jsonElement1.getAsString());
+                    });
+
+                    obj.setWords(words);
+
+                    ArrayList<UUID> playerz = new ArrayList<>();
+                    JsonArray array2 = object.getAsJsonArray("MutedUUIDs");
+                    array2.forEach(jsonElement1 -> {
+                        playerz.add(UUID.fromString(jsonElement1.getAsString()));
+                    });
+
+                    obj.setPlayers(playerz);
+
+                    mutedObjs.put(uuid, obj);
+                });
+
             }
         }
     }

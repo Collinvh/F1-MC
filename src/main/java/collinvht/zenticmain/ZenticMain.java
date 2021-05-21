@@ -4,6 +4,7 @@ import collinvht.zenticmain.command.race.*;
 import collinvht.zenticmain.command.util.*;
 import collinvht.zenticmain.discord.DiscordManager;
 import collinvht.zenticmain.event.VPPEvents;
+import collinvht.zenticmain.obj.MutedOBJ;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -34,6 +35,7 @@ public final class ZenticMain extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(util, this);
 
         Team.loadTeams();
+        MuteUtil.loadUtil();
 
         this.getCommand("warning").setExecutor(new Warning());
         this.getCommand("penalty").setExecutor(new Penalty());
@@ -43,12 +45,13 @@ public final class ZenticMain extends JavaPlugin {
         this.getCommand("clearchat").setExecutor(new ClearChat());
         this.getCommand("garage").setExecutor(new SpawnCar());
         this.getCommand("muteutil").setExecutor(new MuteUtil());
-        this.getCommand("team").setExecutor(new Team());
+        this.getCommand("raceteam").setExecutor(new Team());
     }
 
     @Override
     public void onDisable() {
         Team.saveTeams();
+        MuteUtil.saveUtil();
     }
 
 

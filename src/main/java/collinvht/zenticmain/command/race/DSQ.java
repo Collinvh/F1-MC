@@ -1,5 +1,6 @@
-package collinvht.zenticmain.command;
+package collinvht.zenticmain.command.race;
 
+import collinvht.zenticmain.command.CommandUtil;
 import collinvht.zenticmain.discord.DiscordManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import org.bukkit.Bukkit;
@@ -12,9 +13,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 
-public class Warning implements CommandExecutor, CommandUtil {
-    private static final String prefix = ChatColor.DARK_RED + "FIA |" + ChatColor.RED + " Warn >> ";
-    private static final String zentic = "" + ChatColor.RED + ChatColor.BOLD + "ZT > ";
+public class DSQ implements CommandExecutor, CommandUtil {
+    private static final String prefix = ChatColor.DARK_RED + "FIA |" + ChatColor.DARK_RED + " DSQ >> ";
+    private static final String zentic = "" + ChatColor.RED + ChatColor.BOLD + "ZT > " + ChatColor.RESET;
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if(sender.hasPermission("zentic.fia")) {
@@ -30,8 +31,8 @@ public class Warning implements CommandExecutor, CommandUtil {
                         sendMessageToServer(prefix + player.getDisplayName() + " | " + builder.toString());
 
                         EmbedBuilder embedBuilder = new EmbedBuilder();
-                        embedBuilder.setTitle("Waarschuwing", null);
-                        embedBuilder.setColor(Color.RED);
+                        embedBuilder.setTitle("DSQ", null);
+                        embedBuilder.setColor(new Color(0,0,0));
                         embedBuilder.setDescription(player.getName());
 
                         embedBuilder.addField("Reden", builder.toString(), false);

@@ -4,6 +4,7 @@ main: collinvht.zenticmain.ZenticMain
 depend:
   - VehiclesPlusPro
   - JDA
+  - LuckPerms
 api-version: 1.16
 authors: [ Collinvht ]
 commands:
@@ -12,12 +13,29 @@ commands:
     description: Warn people
     permission: zentic.fia
   penalty:
+    aliases: penalty
     description: Give people a penalty
     permission: zentic.fia
   dsq:
+    aliases: dsq
     description: Give people a dsq
     permission: zentic.fia
   flag:
     aliases: vlag
     description: Bring out a flag
     permission: zentic.fia
+  lights:
+    aliases: lichten
+    description: Start de lichten
+    permission: zentic.fia
+  garage:
+    aliases: spawnkart, spawncar
+    description: Spawn a kart
+    permission: zentic.fia
+  clearchat:
+    description: ClearChat
+    permission: zentic.fia
+  muteutil:
+    description: MuteUtil
+  team:
+    description: Team

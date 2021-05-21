@@ -1,5 +1,6 @@
-package collinvht.zenticmain.command;
+package collinvht.zenticmain.command.race;
 
+import collinvht.zenticmain.command.CommandUtil;
 import collinvht.zenticmain.discord.DiscordManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import org.bukkit.Bukkit;

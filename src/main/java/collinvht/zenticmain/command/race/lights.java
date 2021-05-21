@@ -1,4 +1,4 @@
-package collinvht.zenticmain.command;
+package collinvht.zenticmain.command.race;
 
 import collinvht.zenticmain.ZenticMain;
 import org.bukkit.*;
@@ -12,42 +12,42 @@ import java.util.Locale;
 
 public class lights implements CommandExecutor {
 
-    private ZenticMain plugin = ZenticMain.getPlugin(ZenticMain.class);
+    private final ZenticMain plugin = ZenticMain.getInstance();
 
-    private String currentCircuit = plugin.getConfig().getString("circuit");
+    private final String currentCircuit = plugin.getConfig().getString("circuit");
 
-    private int y1 = plugin.getConfig().getInt(currentCircuit + ".grid.y1");
-    private int y2 = plugin.getConfig().getInt(currentCircuit + ".grid.y2");
+    private final int y1 = plugin.getConfig().getInt(currentCircuit + ".grid.y1");
+    private final int y2 = plugin.getConfig().getInt(currentCircuit + ".grid.y2");
 
-    private int grid_1x = plugin.getConfig().getInt(currentCircuit + ".grid.1.x");
-    private int grid_2x = plugin.getConfig().getInt(currentCircuit + ".grid.2.x");
-    private int grid_3x = plugin.getConfig().getInt(currentCircuit + ".grid.3.x");
-    private int grid_4x = plugin.getConfig().getInt(currentCircuit + ".grid.4.x");
-    private int grid_5x = plugin.getConfig().getInt(currentCircuit + ".grid.5.x");
+    private final int grid_1x = plugin.getConfig().getInt(currentCircuit + ".grid.1.x");
+    private final int grid_2x = plugin.getConfig().getInt(currentCircuit + ".grid.2.x");
+    private final int grid_3x = plugin.getConfig().getInt(currentCircuit + ".grid.3.x");
+    private final int grid_4x = plugin.getConfig().getInt(currentCircuit + ".grid.4.x");
+    private final int grid_5x = plugin.getConfig().getInt(currentCircuit + ".grid.5.x");
 
-    private int grid_1z = plugin.getConfig().getInt(currentCircuit + ".grid.1.z");
-    private int grid_2z = plugin.getConfig().getInt(currentCircuit + ".grid.2.z");
-    private int grid_3z = plugin.getConfig().getInt(currentCircuit + ".grid.3.z");
-    private int grid_4z = plugin.getConfig().getInt(currentCircuit + ".grid.4.z");
-    private int grid_5z = plugin.getConfig().getInt(currentCircuit + ".grid.5.z");
+    private final int grid_1z = plugin.getConfig().getInt(currentCircuit + ".grid.1.z");
+    private final int grid_2z = plugin.getConfig().getInt(currentCircuit + ".grid.2.z");
+    private final int grid_3z = plugin.getConfig().getInt(currentCircuit + ".grid.3.z");
+    private final int grid_4z = plugin.getConfig().getInt(currentCircuit + ".grid.4.z");
+    private final int grid_5z = plugin.getConfig().getInt(currentCircuit + ".grid.5.z");
 
-    private int supporty = plugin.getConfig().getInt(currentCircuit + ".grid-support.y");
+    private final int supporty = plugin.getConfig().getInt(currentCircuit + ".grid-support.y");
 
-    private int supportx1 = plugin.getConfig().getInt(currentCircuit + ".grid-support.1.x");
-    private int supportx2 = plugin.getConfig().getInt(currentCircuit + ".grid-support.2.x");
-    private int supportx3 = plugin.getConfig().getInt(currentCircuit + ".grid-support.3.x");
+    private final int supportx1 = plugin.getConfig().getInt(currentCircuit + ".grid-support.1.x");
+    private final int supportx2 = plugin.getConfig().getInt(currentCircuit + ".grid-support.2.x");
+    private final int supportx3 = plugin.getConfig().getInt(currentCircuit + ".grid-support.3.x");
 
-    private int supportz1 = plugin.getConfig().getInt(currentCircuit + ".grid-support.1.z");
-    private int supportz2 = plugin.getConfig().getInt(currentCircuit + ".grid-support.2.z");
-    private int supportz3 = plugin.getConfig().getInt(currentCircuit + ".grid-support.3.z");
+    private final int supportz1 = plugin.getConfig().getInt(currentCircuit + ".grid-support.1.z");
+    private final int supportz2 = plugin.getConfig().getInt(currentCircuit + ".grid-support.2.z");
+    private final int supportz3 = plugin.getConfig().getInt(currentCircuit + ".grid-support.3.z");
 
-    private int pitentryx = plugin.getConfig().getInt(currentCircuit + ".pit.entry.x");
-    private int pitentryy = plugin.getConfig().getInt(currentCircuit + ".pit.entry.y");
-    private int pitentryz = plugin.getConfig().getInt(currentCircuit + ".pit.entry.z");
+    private final int pitentryx = plugin.getConfig().getInt(currentCircuit + ".pit.entry.x");
+    private final int pitentryy = plugin.getConfig().getInt(currentCircuit + ".pit.entry.y");
+    private final int pitentryz = plugin.getConfig().getInt(currentCircuit + ".pit.entry.z");
 
-    private int pitexitx = plugin.getConfig().getInt(currentCircuit + ".pit.exit.x");
-    private int pitexity = plugin.getConfig().getInt(currentCircuit + ".pit.exit.y");
-    private int pitexitz = plugin.getConfig().getInt(currentCircuit + ".pit.exit.z");
+    private final int pitexitx = plugin.getConfig().getInt(currentCircuit + ".pit.exit.x");
+    private final int pitexity = plugin.getConfig().getInt(currentCircuit + ".pit.exit.y");
+    private final int pitexitz = plugin.getConfig().getInt(currentCircuit + ".pit.exit.z");
 
     private int time;
 

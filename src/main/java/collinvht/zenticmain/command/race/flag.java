@@ -1,4 +1,4 @@
-package collinvht.zenticmain.command;
+package collinvht.zenticmain.command.race;
 
 import collinvht.zenticmain.ZenticMain;
 import net.md_5.bungee.api.ChatMessageType;
@@ -12,7 +12,7 @@ import org.bukkit.entity.Player;
 import java.util.Locale;
 
 public class flag implements CommandExecutor {
-    private ZenticMain plugin = ZenticMain.getPlugin(ZenticMain.class);
+    private final ZenticMain plugin = ZenticMain.getInstance();
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {

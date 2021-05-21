@@ -94,5 +94,11 @@
             <scope>system</scope>
             <systemPath>${pom.basedir}/lib/JDA-4.2.0_227.jar</systemPath>
         </dependency>
+        <dependency>
+            <groupId>net.luckperms</groupId>
+            <artifactId>api</artifactId>
+            <version>5.3</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 </project>

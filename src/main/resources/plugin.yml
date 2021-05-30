@@ -1,17 +1,23 @@
-name: ZenticMain
+name: ZenticRacing
 version: ${project.version}
-main: collinvht.zenticmain.ZenticMain
-depend:
-  - VehiclesPlusPro
-  - JDA
-  - LuckPerms
+main: collinvht.zenticracing.ZenticRacing
 api-version: 1.16
+depend: [ VehiclesPlusPro, WorldEdit, LuckPerms, JDA ]
 authors: [ Collinvht ]
 commands:
   warning:
     aliases: warn
     description: Warn people
     permission: zentic.fia
+  race:
+    permission: zentic.fia
+    description: Starts races
+  persoonlijkrecord:
+    description: Persoonlijk Record
+  snelste:
+    description: Snelste tijden
+  stand:
+    description: Stand
   penalty:
     aliases: penalty
     description: Give people a penalty
@@ -37,5 +43,10 @@ commands:
     permission: zentic.fia
   muteutil:
     description: MuteUtil
+  teambaan:
+    description: Teambaan
   raceteam:
     description: Team
+  golfkar:
+    description: Spawn golfkar
+    permission: zentic.spawngolf

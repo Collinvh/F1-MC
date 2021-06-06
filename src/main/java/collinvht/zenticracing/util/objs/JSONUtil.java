@@ -33,13 +33,17 @@ public class JSONUtil {
 
     public static void unload() {
         try {
-            Team.saveTeams();
             TeamBaan.saveRaces();
-            RaceManager.saveRaces();
-            MuteUtil.loadUtil();
         } catch (IOException e) {
             e.printStackTrace();
         }
+        try {
+            RaceManager.saveRaces();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        MuteUtil.loadUtil();
+        Team.saveTeams();
     }
 
 }

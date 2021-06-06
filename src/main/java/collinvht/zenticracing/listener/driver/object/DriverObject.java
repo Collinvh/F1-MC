@@ -1,5 +1,7 @@
 package collinvht.zenticracing.listener.driver.object;
 
+import collinvht.zenticracing.commands.racing.computer.RaceCar;
+import collinvht.zenticracing.commands.racing.object.ERSStorage;
 import lombok.Getter;
 import lombok.Setter;
 import me.legofreak107.vehiclesplus.vehicles.vehicles.objects.SpawnedVehicle;
@@ -19,6 +21,9 @@ public class DriverObject {
     @Getter
     private LaptimeStorage lapstorage;
 
+    @Getter @Setter
+    private boolean blackFlagged = false;
+
     @Getter
     private RaceStorage raceStorage;
 
@@ -26,7 +31,9 @@ public class DriverObject {
     private Player player;
 
     @Getter @Setter
-    private SpawnedVehicle vehicle;
+    private RaceCar vehicle;
+    @Getter @Setter
+    private SpawnedVehicle curvehicle;
 
     public DriverObject(UUID uuid) {
         this.playerUUID = uuid;
@@ -37,6 +44,7 @@ public class DriverObject {
     public void resetStorage() {
         this.lapstorage = new LaptimeStorage();
         this.raceStorage = new RaceStorage();
+        this.blackFlagged = false;
     }
 
 }

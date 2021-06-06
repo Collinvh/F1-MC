@@ -1,6 +1,7 @@
 package collinvht.zenticracing.commands.team.object;
 
 import collinvht.zenticracing.ZenticRacing;
+import collinvht.zenticracing.commands.racing.computer.RaceCar;
 import collinvht.zenticracing.util.objs.LuckPermsUtil;
 import lombok.Getter;
 import lombok.Setter;
@@ -36,6 +37,9 @@ public class TeamObject {
 
     @Getter @Setter
     private ArrayList<UUID> invited = new ArrayList<>();
+
+    @Getter
+    private final ArrayList<RaceCar> raceCars = new ArrayList<>();
 
     @Getter @Setter
     private SpawnedVehicle golfKart;
@@ -179,5 +183,18 @@ public class TeamObject {
                 api.getGroupManager().saveGroup(group);
             }
         }
+    }
+
+    public RaceCar getRaceCarFromVehicle(SpawnedVehicle vehicle) {
+        for (RaceCar raceCar : raceCars) {
+            if(raceCar.getSpawnedVehicle().getStorageVehicle().getUuid().equals(vehicle.getStorageVehicle().getUuid())) {
+                return raceCar;
+            }
+        }
+        return null;
+    }
+
+    public void addRaceCar(RaceCar car) {
+        this.raceCars.add(car);
     }
 }

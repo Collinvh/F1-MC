@@ -217,7 +217,7 @@ public class Team implements CommandUtil, Listener {
 
                                     TeamObject team = teamObj.get(args[1].toLowerCase());
                                     if (team != null) {
-                                        switch (args[1]) {
+                                        switch (args[2]) {
                                             case "remove":
                                                 Player p = Bukkit.getPlayer(args[3]);
 

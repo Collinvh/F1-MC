@@ -56,7 +56,6 @@ public class LaptimeListener {
     }
 
     public void startTiming() {
-        Bukkit.getLogger().warning("STARTED P3");
         listenerID = new BukkitRunnable() {
             @Override
             public void run() {
@@ -65,9 +64,9 @@ public class LaptimeListener {
                     DriverManager.getDrivers().forEach((uuid, object1) -> {
                         DriverObject driver = DriverManager.getDriver(uuid);
                         Player player = driver.getPlayer();
-                        SpawnedVehicle vehicle = driver.getVehicle();
+                        SpawnedVehicle vehicle = driver.getCurvehicle();
                         if(player != null) {
-                            if (object1.isDriving()) {
+                            if (object1.isDriving() || !object1.isBlackFlagged()) {
                                 Location location = player.getLocation();
 
                                 Laptime laptime = driver.getLapstorage().getCurrentLap();

@@ -6,9 +6,9 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 
 import java.util.Locale;
+import java.util.Random;
 
 public class Lights implements CommandExecutor {
 
@@ -28,7 +28,9 @@ public class Lights implements CommandExecutor {
         Material black = Material.BLACK_SHULKER_BOX;
         Material orange = Material.ORANGE_SHULKER_BOX;
 
-        if (sender instanceof Player && sender.hasPermission("Zentic.fia")) {
+        Random random = new Random();
+
+        if (sender instanceof Player && sender.hasPermission("zentic.fia")) {
             if (args.length > 2) {
                 switch (args[1].toLowerCase(Locale.ROOT)) {
                     case "grid" :
@@ -55,16 +57,16 @@ public class Lights implements CommandExecutor {
                                                 runLights(plugin.getConfig().getInt(args[0] + ".grid.5.x"), plugin.getConfig().getInt(args[0] + ".grid.y1"), plugin.getConfig().getInt(args[0] + ".grid.5.z"), world, red);
                                                 runLights(plugin.getConfig().getInt(args[0] + ".grid.5.x"), plugin.getConfig().getInt(args[0] + ".grid.y2"), plugin.getConfig().getInt(args[0] + ".grid.5.z"), world, red);
 
-                                                int max = 3000;
-                                                int min = 500;
+                                                int max = 60;
+                                                int min = 10;
                                                 int range = max - min + 1;
 
                                                 // generate random numbers within 1 to 10
                                                 for (int i = 0; i < 10; i++) {
-                                                    int rand = (int) (Math.random() * range) + min;
+                                                    int rand = random.nextInt(max) + min;
 
                                                     // Output is different everytime this code is executed
-                                                    this.time = rand + 120;
+                                                    this.time = rand;
 
                                                     Bukkit.getScheduler().runTaskLater(plugin, () -> {
                                                         runLights(plugin.getConfig().getInt(args[0] + ".grid.1.x"), plugin.getConfig().getInt(args[0] + ".grid.y1"), plugin.getConfig().getInt(args[0] + ".grid.1.z"), world, black);
@@ -79,10 +81,10 @@ public class Lights implements CommandExecutor {
                                                         runLights(plugin.getConfig().getInt(args[0] + ".grid.5.x"), plugin.getConfig().getInt(args[0] + ".grid.y2"), plugin.getConfig().getInt(args[0] + ".grid.5.z"), world, black);
                                                     }, time);
                                                 }
-                                            }, 30L);
-                                        }, 30L);
-                                    }, 30L);
-                                }, 30L);
+                                            }, 15L);
+                                        }, 15L);
+                                    }, 15L);
+                                }, 15L);
 
 
 

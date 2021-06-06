@@ -50,3 +50,6 @@ commands:
   golfkar:
     description: Spawn golfkar
     permission: zentic.spawngolf
+  testpc:
+    description: Test voor pc
+    permission: zentic.test

@@ -1,6 +1,10 @@
 package collinvht.zenticracing.commands.fia;
 
 import collinvht.zenticracing.commands.CommandUtil;
+import collinvht.zenticracing.commands.racing.RaceManager;
+import collinvht.zenticracing.commands.racing.object.RaceObject;
+import collinvht.zenticracing.listener.driver.DriverManager;
+import collinvht.zenticracing.listener.driver.object.DriverObject;
 import collinvht.zenticracing.util.objs.DiscordUtil;
 import net.dv8tion.jda.api.EmbedBuilder;
 import org.bukkit.Bukkit;
@@ -22,27 +26,36 @@ public class DSQ implements CommandUtil {
             if(args.length > 1) {
                 Player player = Bukkit.getPlayer(args[0]);
                 if (player != null) {
-                    StringBuilder builder = new StringBuilder();
-                    for (int i = 1; i < args.length; i++) {
-                        builder.append(args[i] + " ");
-                    }
+                    DriverObject driver = DriverManager.getDriver(player.getUniqueId());
+                    if(RaceManager.getRunningRace() != null) {
+                        RaceObject object = RaceManager.getRunningRace();
+                        StringBuilder builder = new StringBuilder();
+                        for (int i = 1; i < args.length; i++) {
+                            builder.append(args[i] + " ");
+                        }
 
-                    if (builder.length() != 0) {
-                        sendMessageToServer(prefix + player.getDisplayName() + " | " + builder.toString());
+                        if (builder.length() != 0) {
+                            sendMessageToServer(prefix + player.getDisplayName() + " | " + builder.toString());
 
-                        EmbedBuilder embedBuilder = new EmbedBuilder();
-                        embedBuilder.setTitle("DSQ", null);
-                        embedBuilder.setColor(new Color(0,0,0));
-                        embedBuilder.setDescription(player.getName());
+                            EmbedBuilder embedBuilder = new EmbedBuilder();
+                            embedBuilder.setTitle("DSQ", null);
+                            embedBuilder.setColor(new Color(0, 0, 0));
+                            embedBuilder.setDescription(player.getName());
 
-                        embedBuilder.addField("Reden", builder.toString(), false);
+                            embedBuilder.addField("Reden", builder.toString(), false);
 
-                        embedBuilder.setFooter("ZenticRacing");
+                            embedBuilder.setFooter("ZenticRacing | " + object.getRaceName());
 
 
-                        DiscordUtil.getChannelByID(844159011666526208L).sendMessage(embedBuilder.build()).queue();
+                            DiscordUtil.getChannelByID(844159011666526208L).sendMessage(embedBuilder.build()).queue();
+
+                            driver.setBlackFlagged(true);
+                        } else {
+                            sender.sendMessage(zentic + "Je moet wel een reden invoeren.");
+                        }
                     } else {
-                        sender.sendMessage(zentic + "Je moet wel een reden invoeren.");
+                        sender.sendMessage(zentic + "Er is geen sessie bezig?");
+                        return true;
                     }
                 } else {
                     sender.sendMessage(zentic + "Die speler bestaat niet");

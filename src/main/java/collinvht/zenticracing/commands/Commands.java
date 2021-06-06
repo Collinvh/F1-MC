@@ -35,6 +35,7 @@ public class Commands {
         addCommand("penalty", new Penalty());
         addCommand("warning", new Warning());
         addCommand("golfkar", new Golfkar());
+        addCommand("testpc", new TestPc());
     }
 
 

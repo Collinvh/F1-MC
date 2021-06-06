@@ -59,7 +59,6 @@ public class TeamBaan implements CommandUtil {
                                     }
 
                                     baan.getObject().startRace(RaceMode.TRAINING_TEAM);
-                                    Bukkit.getLogger().warning("STARTED P1");
                                     sender.sendMessage(prefix + "Race gestart!");
                                     return true;
                                 case "stop":

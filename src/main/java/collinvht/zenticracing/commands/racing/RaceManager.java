@@ -2,6 +2,7 @@ package collinvht.zenticracing.commands.racing;
 
 import collinvht.zenticracing.ZenticRacing;
 import collinvht.zenticracing.commands.CommandUtil;
+import collinvht.zenticracing.commands.fia.Warning;
 import collinvht.zenticracing.commands.racing.object.RaceMode;
 import collinvht.zenticracing.commands.racing.object.RaceObject;
 import collinvht.zenticracing.commands.team.TeamBaan;
@@ -251,9 +252,7 @@ public class RaceManager implements CommandUtil {
                                 RaceObject object = races.get(args[1].toLowerCase());
                                 RaceMode mode = RaceMode.getModeFromString(args[2]);
 
-                                TeamBaan.getTeamBanen().forEach((s, teamBaanObject) -> {
-                                    teamBaanObject.stopRace();
-                                });
+                                TeamBaan.getTeamBanen().forEach((s, teamBaanObject) -> teamBaanObject.stopRace());
 
                                 if (runningRace != null) {
                                     runningRace.stopRace(false);
@@ -374,11 +373,22 @@ public class RaceManager implements CommandUtil {
         });
 
         RaceObject raceObj = new RaceObject(name, Math.toIntExact(laps));
-        raceObj.getStorage().setS3(createCuboid(finish));
-        raceObj.getStorage().setS1(createCuboid(sector1));
-        raceObj.getStorage().setS2(createCuboid(sector2));
-        raceObj.getStorage().setPit(createCuboid(pit));
-        raceObj.getStorage().setPitexit(createCuboid(pitexit));
+
+        Cuboid finishcuboid = createCuboid(finish);
+        Cuboid sector1cuboid = createCuboid(sector1);
+        Cuboid sector2cuboid = createCuboid(sector2);
+        Cuboid pitcuboid = createCuboid(finish);
+        Cuboid pitexitcuboid = createCuboid(pitexit);
+
+        if(finishcuboid.isDisabled() || sector1cuboid.isDisabled() || sector2cuboid.isDisabled() || pitcuboid.isDisabled() || pitexitcuboid.isDisabled()) {
+            raceObj.setDisabled(true);
+        }
+
+        raceObj.getStorage().setS3(finishcuboid);
+        raceObj.getStorage().setS1(sector1cuboid);
+        raceObj.getStorage().setS2(sector2cuboid);
+        raceObj.getStorage().setPit(pitcuboid);
+        raceObj.getStorage().setPitexit(pitexitcuboid);
         raceObj.getStorage().setDetecties(detectieZones);
 
         races.put(name.toLowerCase(), raceObj);
@@ -416,7 +426,6 @@ public class RaceManager implements CommandUtil {
         long x = obj.get("x").getAsBigDecimal().longValue();
         long y = obj.get("y").getAsBigDecimal().longValue();
         long z = obj.get("z").getAsBigDecimal().longValue();
-
         location = new Location(Bukkit.getServer().getWorld(obj.get("world").getAsString()), x, y, z);
         return location;
     }

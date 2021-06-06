@@ -3,6 +3,7 @@ package collinvht.zenticracing.listener.driver;
 import collinvht.zenticracing.ZenticRacing;
 import collinvht.zenticracing.commands.racing.RaceManager;
 import collinvht.zenticracing.commands.racing.laptime.object.Laptime;
+import collinvht.zenticracing.commands.racing.object.RaceObject;
 import collinvht.zenticracing.commands.team.Team;
 import collinvht.zenticracing.commands.team.TeamBaan;
 import collinvht.zenticracing.commands.team.object.TeamBaanObject;
@@ -59,11 +60,20 @@ public class DriverManager {
                 }
 
                 if (RaceManager.getRunningRace() != null || object != null) {
-                    if(object != null) {
+                    if(object != null && RaceManager.getRunningRace() == null) {
                         if (!object.getObject().isRunning()) {
                             return;
                         }
                     }
+                    RaceObject raceObject = RaceManager.getRunningRace();
+                    if(raceObject == null && object != null) {
+                        raceObject = object.getObject();
+                    }
+
+                    if(raceObject == null) {
+                        return;
+                    }
+
                     if (driver.isDriving()) {
                         Scoreboard scoreboard = manager.getNewScoreboard();
 
@@ -84,6 +94,12 @@ public class DriverManager {
 
                         LinkedHashMap<DriverObject, Integer> treeMap = sortByValueDesc(sectors);
 
+                        if(raceObject.getRunningMode() != null) {
+                            if(raceObject.getRunningMode().isHasLaps()) {
+                                Score score = o.getScore(ChatColor.GRAY + "Lap : " + driver.getRaceStorage().getLap() + " / " +  raceObject.getLapCount());
+                                score.setScore(15);
+                            }
+                        }
 
                         AtomicInteger number = new AtomicInteger(1);
                         treeMap.forEach((driver, integer) -> {
@@ -101,7 +117,7 @@ public class DriverManager {
 
                         String fastestTime = "";
                         try {
-                            fastestTime = Laptime.millisToTimeString(RaceManager.getRunningRace().getListener().getBestLapTime().getLapData().getSectorLength());
+                            fastestTime = Laptime.millisToTimeString(raceObject.getListener().getBestLapTime().getLapData().getSectorLength());
                         } catch (Exception ignored) {
                         }
 
@@ -146,7 +162,7 @@ public class DriverManager {
     }
 
     public static String millisToTimeString(final long mSec) {
-        final String pattern = "sss.SSS";
+        final String pattern = "ss.SSS";
         final SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
         return simpleDateFormat.format(new Date(mSec));
     }

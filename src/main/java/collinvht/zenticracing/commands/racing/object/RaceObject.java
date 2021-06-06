@@ -1,23 +1,31 @@
 package collinvht.zenticracing.commands.racing.object;
 
+import collinvht.zenticracing.commands.fia.Warning;
 import collinvht.zenticracing.commands.racing.SnelsteCommand;
 import collinvht.zenticracing.commands.racing.laptime.LaptimeListener;
 import collinvht.zenticracing.commands.racing.laptime.object.Laptime;
+import collinvht.zenticracing.commands.team.Team;
+import collinvht.zenticracing.commands.team.object.TeamObject;
 import collinvht.zenticracing.listener.driver.DriverManager;
 import collinvht.zenticracing.listener.driver.object.DriverObject;
 import collinvht.zenticracing.listener.driver.object.FinishData;
 import collinvht.zenticracing.util.objs.DiscordUtil;
 import lombok.Getter;
 import lombok.Setter;
+import me.danieljunek17.racingcommission.objects.VehicleData;
+import me.danieljunek17.racingcommission.objects.WheelsData;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
-import org.bukkit.Bukkit;
 
 import java.awt.*;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static jdk.internal.org.jline.terminal.MouseEvent.Type.Wheel;
 
 public class RaceObject {
 
@@ -32,6 +40,9 @@ public class RaceObject {
 
     @Getter
     private RaceMode runningMode = RaceMode.TRAINING;
+
+    @Getter @Setter
+    private boolean disabled;
 
     @Getter
     private boolean isRunning;
@@ -55,7 +66,6 @@ public class RaceObject {
         this.isRunning = true;
 
         listener.startTiming();
-        Bukkit.getLogger().warning("STARTED P2");
     }
 
     public void stopRace(boolean runDiscord) {
@@ -63,31 +73,35 @@ public class RaceObject {
 
         this.isRunning = false;
 
-        if(runningMode != RaceMode.TRAINING_TEAM || runDiscord) {
-            JDA jda = DiscordUtil.getJda();
-            jda.getPresence().setActivity(Activity.streaming("ZenticTwitch", "https://www.twitch.tv/zentictwitch"));
-            jda.getPresence().setStatus(OnlineStatus.ONLINE);
+        if(runDiscord) {
+            if (runningMode != RaceMode.TRAINING_TEAM) {
+                JDA jda = DiscordUtil.getJda();
+                jda.getPresence().setActivity(Activity.streaming("ZenticTwitch", "https://www.twitch.tv/zentictwitch"));
+                jda.getPresence().setStatus(OnlineStatus.ONLINE);
 
-            EmbedBuilder embedBuilder = new EmbedBuilder();
-            embedBuilder.setTitle("Race result", null);
-            embedBuilder.setDescription(getRaceName());
-            embedBuilder.setColor(new Color(23, 213, 187));
+                EmbedBuilder embedBuilder = new EmbedBuilder();
+                embedBuilder.setTitle("Race result", null);
+                embedBuilder.setDescription(getRaceName());
+                embedBuilder.setColor(new Color(23, 213, 187));
 
-            if(runningMode != null) {
                 if (runningMode.isHasLaps()) {
+
                     ArrayList<FinishData> data = getFinishedDrivers();
 
-                    data.sort(Comparator.comparingDouble(FinishData::getFinishPosition));
+                    if(data.size() > 0 && getListener().getBestLapTime() != null) {
 
-                    StringBuilder builder = new StringBuilder();
-                    for (FinishData d : data) {
-                        builder.append(d.getFinishPosition() + "." + " : " + d.getDriver().getPlayer().getName() + "\n");
+                        data.sort(Comparator.comparingDouble(FinishData::getFinishPosition));
+
+                        StringBuilder builder = new StringBuilder();
+                        for (FinishData d : data) {
+                            builder.append(d.getFinishPosition() + "." + " : " + d.getDriver().getPlayer().getName() + "\n");
+                        }
+
+                        embedBuilder.addField("Finish posities", builder.toString(), false);
+
+
+                        embedBuilder.addField("Fastest lap : ", Laptime.millisToTimeString(getListener().getBestLapTime().getLapData().getSectorLength()), true);
                     }
-
-                    embedBuilder.addField("Finish posities", builder.toString(), false);
-
-
-                    embedBuilder.addField("Fastest lap : ", Laptime.millisToTimeString(getListener().getBestLapTime().getLapData().getSectorLength()), true);
 
                 } else {
                     LinkedHashMap<DriverObject, Long> sectors = new LinkedHashMap<>();
@@ -112,25 +126,23 @@ public class RaceObject {
                             builder.append(pos.get() + "." + " : " + driver.getPlayer().getName() + "  : " + Laptime.millisToTimeString(driver.getLapstorage().getBestTime().getLapData().getSectorLength()) + "\n");
                         }
                     });
+
                     embedBuilder.addField("Posities", builder.toString(), false);
                 }
 
 
+                embedBuilder.setFooter("ZenticRacing");
+
+                DiscordUtil.getChannelByID(844159011666526208L).sendMessage(embedBuilder.build()).queue();
             }
-
-
-            embedBuilder.setFooter("ZenticRacing");
-
-            DiscordUtil.getChannelByID(844159011666526208L).sendMessage(embedBuilder.build()).queue();
         }
 
         this.runningMode = null;
         listener = new LaptimeListener(this);
-
-        DriverManager.getDrivers().forEach((uuid, object) -> object.resetStorage());
     }
 
     public void resetRace() {
+        Warning.setWarningCount(new HashMap<>());
         DriverManager.getDrivers().forEach((uuid, object) -> object.resetStorage());
         listener.stopTiming();
         listener = new LaptimeListener(this);

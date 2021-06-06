@@ -2,6 +2,7 @@ package collinvht.zenticracing;
 
 import collinvht.zenticracing.commands.Commands;
 import collinvht.zenticracing.listener.Listeners;
+import collinvht.zenticracing.listener.VPPListener;
 import collinvht.zenticracing.util.Utils;
 import collinvht.zenticracing.util.objs.JSONUtil;
 import lombok.Getter;
@@ -25,5 +26,6 @@ public final class ZenticRacing extends JavaPlugin {
     @Override
     public void onDisable() {
         JSONUtil.unload();
+        VPPListener.cancel();
     }
 }

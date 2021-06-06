@@ -1,5 +1,6 @@
 package collinvht.zenticracing.util.objs;
 
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -15,7 +16,10 @@ public class Cuboid implements Cloneable, ConfigurationSerializable, Iterable<Bl
      */
 
     protected String worldName;
-    protected final Vector minimumPoint, maximumPoint;
+    protected Vector minimumPoint, maximumPoint;
+
+    @Getter
+    private boolean disabled;
 
     private Location loc1, loc2;
 
@@ -31,21 +35,24 @@ public class Cuboid implements Cloneable, ConfigurationSerializable, Iterable<Bl
         if (loc1 != null && loc2 != null) {
             if (loc1.getWorld() != null && loc2.getWorld() != null) {
                 if (!loc1.getWorld().getUID().equals(loc2.getWorld().getUID()))
-                    throw new IllegalStateException("The 2 locations of the cuboid must be in the same world!");
+                    this.disabled = true;
             } else {
-                throw new NullPointerException("One/both of the worlds is/are null!");
+                this.disabled = true;
             }
-            this.worldName = loc1.getWorld().getName();
-            this.loc1 = loc1;
-            this.loc2 = loc2;
-            double xPos1 = Math.min(loc1.getX(), loc2.getX());
-            double yPos1 = Math.min(loc1.getY(), loc2.getY());
-            double zPos1 = Math.min(loc1.getZ(), loc2.getZ());
-            double xPos2 = Math.max(loc1.getX(), loc2.getX());
-            double yPos2 = Math.max(loc1.getY(), loc2.getY());
-            double zPos2 = Math.max(loc1.getZ(), loc2.getZ());
-            this.minimumPoint = new Vector(xPos1, yPos1, zPos1);
-            this.maximumPoint = new Vector(xPos2, yPos2, zPos2);
+
+            if(!disabled) {
+                this.worldName = loc1.getWorld().getName();
+                this.loc1 = loc1;
+                this.loc2 = loc2;
+                double xPos1 = Math.min(loc1.getX(), loc2.getX());
+                double yPos1 = Math.min(loc1.getY(), loc2.getY());
+                double zPos1 = Math.min(loc1.getZ(), loc2.getZ());
+                double xPos2 = Math.max(loc1.getX(), loc2.getX());
+                double yPos2 = Math.max(loc1.getY(), loc2.getY());
+                double zPos2 = Math.max(loc1.getZ(), loc2.getZ());
+                this.minimumPoint = new Vector(xPos1, yPos1, zPos1);
+                this.maximumPoint = new Vector(xPos2, yPos2, zPos2);
+            }
         } else {
             throw new NullPointerException("One/both of the locations is/are null!");
         }

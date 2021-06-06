@@ -2,6 +2,7 @@ package collinvht.zenticracing.commands.racing;
 
 import collinvht.zenticracing.commands.racing.laptime.LaptimeListener;
 import collinvht.zenticracing.commands.racing.laptime.object.Laptime;
+import collinvht.zenticracing.commands.racing.object.RaceObject;
 import collinvht.zenticracing.commands.team.Team;
 import collinvht.zenticracing.commands.team.TeamBaan;
 import collinvht.zenticracing.commands.team.object.TeamBaanObject;
@@ -67,9 +68,11 @@ public class SnelsteCommand implements CommandExecutor {
                                     sender.spigot().sendMessage(component);
                                 }
                             });
-                            LaptimeListener raceOBJ = RaceManager.getRunningRace().getListener();
+                            RaceObject raceOBJ = RaceManager.getRunningRace();
+
                             if (raceOBJ != null) {
-                                sender.sendMessage("\nTheoretical best : " + Laptime.millisToTimeString(raceOBJ.getBestS1() + raceOBJ.getBestS2() + raceOBJ.getBestS3()));
+                                LaptimeListener listener = raceOBJ.getListener();
+                                sender.sendMessage("\nTheoretical best : " + Laptime.millisToTimeString(listener.getBestS1() + listener.getBestS2() + listener.getBestS3()));
                             }
                             return true;
                         }

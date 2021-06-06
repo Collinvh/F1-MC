@@ -4,6 +4,7 @@ import lombok.Getter;
 
 public enum RaceMode {
     TRAINING(false, "training", 0),
+    RACING(true, "racing", 1),
     TRAINING_TEAM(false, "team_training", 420);
 
 

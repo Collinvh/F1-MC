@@ -73,46 +73,49 @@ public class RaceObject {
             embedBuilder.setDescription(getRaceName());
             embedBuilder.setColor(new Color(23, 213, 187));
 
-            if (runningMode.isHasLaps()) {
-                ArrayList<FinishData> data = getFinishedDrivers();
+            if(runningMode != null) {
+                if (runningMode.isHasLaps()) {
+                    ArrayList<FinishData> data = getFinishedDrivers();
 
-                data.sort(Comparator.comparingDouble(FinishData::getFinishPosition));
+                    data.sort(Comparator.comparingDouble(FinishData::getFinishPosition));
 
-                StringBuilder builder = new StringBuilder();
-                for (FinishData d : data) {
-                    builder.append(d.getFinishPosition() + "." + " : " + d.getDriver().getPlayer().getName() + "\n");
+                    StringBuilder builder = new StringBuilder();
+                    for (FinishData d : data) {
+                        builder.append(d.getFinishPosition() + "." + " : " + d.getDriver().getPlayer().getName() + "\n");
+                    }
+
+                    embedBuilder.addField("Finish posities", builder.toString(), false);
+
+
+                    embedBuilder.addField("Fastest lap : ", Laptime.millisToTimeString(getListener().getBestLapTime().getLapData().getSectorLength()), true);
+
+                } else {
+                    LinkedHashMap<DriverObject, Long> sectors = new LinkedHashMap<>();
+
+
+                    HashMap<UUID, DriverObject> drivers = DriverManager.getDrivers();
+
+                    drivers.forEach((unused, driver) -> {
+                        if (driver.getLapstorage().getBestTime() != null) {
+                            sectors.put(driver, driver.getLapstorage().getBestTime().getLaptime());
+                        }
+                    });
+
+                    LinkedHashMap<DriverObject, Long> treeMap = SnelsteCommand.sortByValueDesc(sectors);
+
+                    StringBuilder builder = new StringBuilder();
+
+                    AtomicInteger pos = new AtomicInteger();
+                    treeMap.forEach((driver, aLong) -> {
+                        pos.getAndIncrement();
+                        if (driver.getLapstorage().getBestTime() != null) {
+                            builder.append(pos.get() + "." + " : " + driver.getPlayer().getName() + "  : " + Laptime.millisToTimeString(driver.getLapstorage().getBestTime().getLapData().getSectorLength()) + "\n");
+                        }
+                    });
+                    embedBuilder.addField("Posities", builder.toString(), false);
                 }
 
-                embedBuilder.addField("Finish posities", builder.toString(), false);
 
-
-                embedBuilder.addField("Fastest lap : ", Laptime.millisToTimeString(getListener().getBestLapTime().getLapData().getSectorLength()), true);
-
-            } else {
-                LinkedHashMap<DriverObject, Long> sectors = new LinkedHashMap<>();
-
-
-                HashMap<UUID, DriverObject> drivers = DriverManager.getDrivers();
-
-                drivers.forEach((unused, driver) -> {
-                    if (driver.getLapstorage().getBestTime() != null) {
-                        sectors.put(driver, driver.getLapstorage().getBestTime().getLaptime());
-                    }
-                });
-
-                LinkedHashMap<DriverObject, Long> treeMap = SnelsteCommand.sortByValueDesc(sectors);
-
-                StringBuilder builder = new StringBuilder();
-
-                AtomicInteger pos = new AtomicInteger();
-                treeMap.forEach((driver, aLong) -> {
-                    pos.getAndIncrement();
-                    if (driver.getLapstorage().getBestTime() != null) {
-                        builder.append(pos.get() + "." + " : " + driver.getPlayer().getName() + "  : " + Laptime.millisToTimeString(driver.getLapstorage().getBestTime().getLapData().getSectorLength()) + "\n");
-                    }
-                });
-
-                embedBuilder.addField("Posities", builder.toString(), false);
             }
 
 

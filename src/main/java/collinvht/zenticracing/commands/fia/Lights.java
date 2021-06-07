@@ -20,8 +20,9 @@ public class Lights implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
-        //plugin.getConfig().getString(args[0] + ".world")
-        World world = Bukkit.getWorld("spawn");
+        String world1 = plugin.getConfig().getString(args[0] + ".world");
+        assert world1 != null;
+        World world = Bukkit.getWorld(world1);
         Material red = Material.RED_SHULKER_BOX;
         Material green = Material.GREEN_SHULKER_BOX;
         Material yellow = Material.YELLOW_SHULKER_BOX;
@@ -38,6 +39,10 @@ public class Lights implements CommandExecutor {
                             case "resetcfg" :
                                 plugin.saveDefaultConfig();
                             case "start" :
+                                for (Player p : Bukkit.getOnlinePlayers()) {
+                                    p.sendMessage("Pas gaan als alle lichten UIT zijn!");
+                                }
+
                                 runLights(plugin.getConfig().getInt(args[0] + ".grid.1.x"), plugin.getConfig().getInt(args[0] + ".grid.y1"), plugin.getConfig().getInt(args[0] + ".grid.1.z"), world, red);
                                 runLights(plugin.getConfig().getInt(args[0] + ".grid.1.x"), plugin.getConfig().getInt(args[0] + ".grid.y2"), plugin.getConfig().getInt(args[0] + ".grid.1.z"), world, red);
 
@@ -63,24 +68,28 @@ public class Lights implements CommandExecutor {
 
                                                 // generate random numbers within 1 to 10
                                                 for (int i = 0; i < 10; i++) {
-                                                    int rand = random.nextInt(max) + min;
+                                                    int rand = (int) (Math.random() * range) + min;
 
                                                     // Output is different everytime this code is executed
                                                     this.time = rand;
-
-                                                    Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                                                        runLights(plugin.getConfig().getInt(args[0] + ".grid.1.x"), plugin.getConfig().getInt(args[0] + ".grid.y1"), plugin.getConfig().getInt(args[0] + ".grid.1.z"), world, black);
-                                                        runLights(plugin.getConfig().getInt(args[0] + ".grid.1.x"), plugin.getConfig().getInt(args[0] + ".grid.y2"), plugin.getConfig().getInt(args[0] + ".grid.1.z"), world, black);
-                                                        runLights(plugin.getConfig().getInt(args[0] + ".grid.2.x"), plugin.getConfig().getInt(args[0] + ".grid.y1"), plugin.getConfig().getInt(args[0] + ".grid.2.z"), world, black);
-                                                        runLights(plugin.getConfig().getInt(args[0] + ".grid.2.x"), plugin.getConfig().getInt(args[0] + ".grid.y2"), plugin.getConfig().getInt(args[0] + ".grid.2.z"), world, black);
-                                                        runLights(plugin.getConfig().getInt(args[0] + ".grid.3.x"), plugin.getConfig().getInt(args[0] + ".grid.y1"), plugin.getConfig().getInt(args[0] + ".grid.3.z"), world, black);
-                                                        runLights(plugin.getConfig().getInt(args[0] + ".grid.3.x"), plugin.getConfig().getInt(args[0] + ".grid.y2"), plugin.getConfig().getInt(args[0] + ".grid.3.z"), world, black);
-                                                        runLights(plugin.getConfig().getInt(args[0] + ".grid.4.x"), plugin.getConfig().getInt(args[0] + ".grid.y1"), plugin.getConfig().getInt(args[0] + ".grid.4.z"), world, black);
-                                                        runLights(plugin.getConfig().getInt(args[0] + ".grid.4.x"), plugin.getConfig().getInt(args[0] + ".grid.y2"), plugin.getConfig().getInt(args[0] + ".grid.4.z"), world, black);
-                                                        runLights(plugin.getConfig().getInt(args[0] + ".grid.5.x"), plugin.getConfig().getInt(args[0] + ".grid.y1"), plugin.getConfig().getInt(args[0] + ".grid.5.z"), world, black);
-                                                        runLights(plugin.getConfig().getInt(args[0] + ".grid.5.x"), plugin.getConfig().getInt(args[0] + ".grid.y2"), plugin.getConfig().getInt(args[0] + ".grid.5.z"), world, black);
-                                                    }, time);
                                                 }
+
+                                                Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                                                    runLights(plugin.getConfig().getInt(args[0] + ".grid.1.x"), plugin.getConfig().getInt(args[0] + ".grid.y1"), plugin.getConfig().getInt(args[0] + ".grid.1.z"), world, black);
+                                                    runLights(plugin.getConfig().getInt(args[0] + ".grid.1.x"), plugin.getConfig().getInt(args[0] + ".grid.y2"), plugin.getConfig().getInt(args[0] + ".grid.1.z"), world, black);
+                                                    runLights(plugin.getConfig().getInt(args[0] + ".grid.2.x"), plugin.getConfig().getInt(args[0] + ".grid.y1"), plugin.getConfig().getInt(args[0] + ".grid.2.z"), world, black);
+                                                    runLights(plugin.getConfig().getInt(args[0] + ".grid.2.x"), plugin.getConfig().getInt(args[0] + ".grid.y2"), plugin.getConfig().getInt(args[0] + ".grid.2.z"), world, black);
+                                                    runLights(plugin.getConfig().getInt(args[0] + ".grid.3.x"), plugin.getConfig().getInt(args[0] + ".grid.y1"), plugin.getConfig().getInt(args[0] + ".grid.3.z"), world, black);
+                                                    runLights(plugin.getConfig().getInt(args[0] + ".grid.3.x"), plugin.getConfig().getInt(args[0] + ".grid.y2"), plugin.getConfig().getInt(args[0] + ".grid.3.z"), world, black);
+                                                    runLights(plugin.getConfig().getInt(args[0] + ".grid.4.x"), plugin.getConfig().getInt(args[0] + ".grid.y1"), plugin.getConfig().getInt(args[0] + ".grid.4.z"), world, black);
+                                                    runLights(plugin.getConfig().getInt(args[0] + ".grid.4.x"), plugin.getConfig().getInt(args[0] + ".grid.y2"), plugin.getConfig().getInt(args[0] + ".grid.4.z"), world, black);
+                                                    runLights(plugin.getConfig().getInt(args[0] + ".grid.5.x"), plugin.getConfig().getInt(args[0] + ".grid.y1"), plugin.getConfig().getInt(args[0] + ".grid.5.z"), world, black);
+                                                    runLights(plugin.getConfig().getInt(args[0] + ".grid.5.x"), plugin.getConfig().getInt(args[0] + ".grid.y2"), plugin.getConfig().getInt(args[0] + ".grid.5.z"), world, black);
+
+                                                    for (Player p : Bukkit.getOnlinePlayers()) {
+                                                        p.sendMessage("Race gestart!");
+                                                    }
+                                                }, time);
                                             }, 15L);
                                         }, 15L);
                                     }, 15L);

@@ -3,10 +3,14 @@ package collinvht.zenticracing.commands.racing.computer.ers;
 import collinvht.zenticracing.commands.racing.computer.RaceCar;
 import collinvht.zenticracing.commands.team.Team;
 import collinvht.zenticracing.commands.team.object.TeamObject;
+import collinvht.zenticracing.listener.driver.DriverManager;
+import collinvht.zenticracing.listener.driver.object.DriverObject;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -89,5 +93,55 @@ public class ERSComputer {
         meta.setDisplayName(name);
         pane.setItemMeta(meta);
         return pane;
+    }
+
+    public static void runEvent(InventoryClickEvent event) {
+        if(event.getView().getTitle().equalsIgnoreCase(ERSComputer.preTitle)) {
+            if(event.getCurrentItem() != null) {
+                if(event.getCurrentItem().getItemMeta() != null) {
+                    String name = event.getCurrentItem().getItemMeta().getDisplayName();
+                    Player player = Bukkit.getPlayer(name);
+                    if(player != null) {
+                        DriverObject object = DriverManager.getDriver(player.getUniqueId());
+                        ERSComputer.openRace(object.getPlayer(), object.getVehicle());
+                    }
+                }
+            }
+            event.setCancelled(true);
+        }
+
+        if(event.getView().getTitle().equalsIgnoreCase(ERSComputer.title)) {
+            if(event.getCurrentItem() != null) {
+                ItemMeta meta = event.getCurrentItem().getItemMeta();
+                if(meta != null) {
+                    Player player = Bukkit.getPlayer(event.getClickedInventory().getItem(0).getItemMeta().getDisplayName());
+                    DriverObject object = DriverManager.getDriver(player.getUniqueId());
+                    if(object != null) {
+                        RaceCar car = object.getVehicle();
+                        if(car != null) {
+                            if (meta.getDisplayName().contains("ERS")) {
+                                if (meta.getDisplayName().contains("OFF")) {
+                                    car.getStorage().setERSMODE(0);
+                                } else if (meta.getDisplayName().contains("REGULAR")) {
+                                    car.getStorage().setERSMODE(1);
+                                } else if(meta.getDisplayName().contains("PUSH")) {
+                                    car.getStorage().setERSMODE(2);
+                                }
+                            } else if (meta.getDisplayName().contains("FM")) {
+                                if (meta.getDisplayName().contains("LOW")) {
+                                    car.getStorage().setFMMode(0);
+                                } else if (meta.getDisplayName().contains("REGULAR")) {
+                                    car.getStorage().setFMMode(1);
+                                } else if(meta.getDisplayName().contains("PUSH")) {
+                                    car.getStorage().setFMMode(2);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            event.setCancelled(true);
+        }
     }
 }

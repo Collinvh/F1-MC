@@ -271,7 +271,7 @@ public class TeamBaan implements CommandUtil {
         return new Location(world, vector3.getBlockX(), vector3.getBlockY(), vector3.getBlockZ());
     }
 
-    public static void saveRaces() throws IOException {
+    public static void saveRaces() {
         File racesLoc = Paths.get(ZenticRacing.getRacing().getDataFolder().toString() + "/storage/teambanen" + ".json").toFile();
         File path = Paths.get(ZenticRacing.getRacing().getDataFolder().toString()).toFile();
         JsonObject main = new JsonObject();
@@ -315,22 +315,30 @@ public class TeamBaan implements CommandUtil {
         }
         main.add("Races", raceArray);
 
-        if (path.mkdir() || racesLoc.createNewFile() || racesLoc.exists()) {
-            FileWriter writer = new FileWriter(racesLoc);
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        try {
+            if (path.mkdir() || racesLoc.createNewFile() || racesLoc.exists()) {
+                FileWriter writer = new FileWriter(racesLoc);
+                Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-            writer.write(gson.toJson(main));
-            writer.flush();
+                writer.write(gson.toJson(main));
+                writer.flush();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
-    public static void loadRaces() throws Exception {
+    public static void loadRaces() {
         File teamLoc = Paths.get(ZenticRacing.getRacing().getDataFolder().toString() + "/storage/teambanen" + ".json").toFile();
         if(teamLoc.exists()) {
-            JsonObject jsonObject = (JsonObject) readJson(ZenticRacing.getRacing().getDataFolder().toString() + "/storage/teambanen" + ".json");
-
-            JsonArray array = (JsonArray) jsonObject.get("Races");
-            array.forEach(team -> parseRace((JsonObject) team));
+            JsonObject jsonObject = null;
+            try {
+                jsonObject = (JsonObject) readJson(ZenticRacing.getRacing().getDataFolder().toString() + "/storage/teambanen" + ".json");
+                JsonArray array = (JsonArray) jsonObject.get("Races");
+                array.forEach(team -> parseRace((JsonObject) team));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 

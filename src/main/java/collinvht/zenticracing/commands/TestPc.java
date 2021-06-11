@@ -1,6 +1,7 @@
 package collinvht.zenticracing.commands;
 
 import collinvht.zenticracing.commands.racing.computer.ers.ERSComputer;
+import collinvht.zenticracing.commands.racing.setup.gui.SetupPC;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -12,7 +13,7 @@ public class TestPc implements CommandExecutor {
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if(sender.hasPermission("zentic.test")) {
             if(sender instanceof Player) {
-                ERSComputer.openInventory(((Player) sender).getPlayer());
+                SetupPC.openFirst(((Player) sender).getPlayer());
             }
         }
         return true;

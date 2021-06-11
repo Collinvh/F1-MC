@@ -2,6 +2,8 @@ package collinvht.zenticracing.listener;
 
 import collinvht.zenticracing.commands.racing.computer.RaceCar;
 import collinvht.zenticracing.commands.racing.computer.ers.ERSComputer;
+import collinvht.zenticracing.commands.racing.setup.SetupManager;
+import collinvht.zenticracing.commands.racing.setup.gui.SetupPC;
 import collinvht.zenticracing.listener.driver.DriverManager;
 import collinvht.zenticracing.listener.driver.object.DriverObject;
 import org.bukkit.Bukkit;
@@ -45,57 +47,15 @@ public class PlayerListener implements Listener {
             obj.setPlayer(event.getPlayer());
             DriverManager.addDriver(obj);
         }
+
+
+        SetupManager.createSetupForPlayer(event.getPlayer().getUniqueId());
     }
 
     @EventHandler
     public static void inventoryListener(InventoryClickEvent event) {
-        if(event.getView().getTitle().equalsIgnoreCase(ERSComputer.preTitle)) {
-            if(event.getCurrentItem() != null) {
-                if(event.getCurrentItem().getItemMeta() != null) {
-                    String name = event.getCurrentItem().getItemMeta().getDisplayName();
-                    Player player = Bukkit.getPlayer(name);
-                    if(player != null) {
-                        DriverObject object = DriverManager.getDriver(player.getUniqueId());
-                        ERSComputer.openRace(object.getPlayer(), object.getVehicle());
-                    }
-                }
-            }
-            event.setCancelled(true);
-        }
-
-        if(event.getView().getTitle().equalsIgnoreCase(ERSComputer.title)) {
-            if(event.getCurrentItem() != null) {
-                ItemMeta meta = event.getCurrentItem().getItemMeta();
-                if(meta != null) {
-                    Player player = Bukkit.getPlayer(event.getClickedInventory().getItem(0).getItemMeta().getDisplayName());
-                    DriverObject object = DriverManager.getDriver(player.getUniqueId());
-                    if(object != null) {
-                        RaceCar car = object.getVehicle();
-                        if(car != null) {
-                            if (meta.getDisplayName().contains("ERS")) {
-                                if (meta.getDisplayName().contains("OFF")) {
-                                    car.getStorage().setERSMODE(0);
-                                } else if (meta.getDisplayName().contains("REGULAR")) {
-                                    car.getStorage().setERSMODE(1);
-                                } else if(meta.getDisplayName().contains("PUSH")) {
-                                    car.getStorage().setERSMODE(2);
-                                }
-                            } else if (meta.getDisplayName().contains("FM")) {
-                                if (meta.getDisplayName().contains("LOW")) {
-                                    car.getStorage().setFMMode(0);
-                                } else if (meta.getDisplayName().contains("REGULAR")) {
-                                    car.getStorage().setFMMode(1);
-                                } else if(meta.getDisplayName().contains("PUSH")) {
-                                    car.getStorage().setFMMode(2);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            event.setCancelled(true);
-        }
+        ERSComputer.runEvent(event);
+        SetupPC.runEvent(event);
     }
 
     @EventHandler
@@ -122,7 +82,7 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public static void playerChat(AsyncPlayerChatEvent event) {
-
+        SetupPC.chatEvent(event);
     }
 
     private static boolean equals(InventoryClickEvent event, String text) {

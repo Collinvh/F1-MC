@@ -1,4 +1,4 @@
-package collinvht.zenticracing.commands.racing.setup;
+package collinvht.zenticracing.commands.racing.setup.obj;
 
 import lombok.Getter;
 
@@ -6,10 +6,13 @@ public class LimitedInteger {
 
     @Getter
     private int integer;
+    @Getter
     private final int bottomLimit;
+    @Getter
     private final int topLimit;
 
     public LimitedInteger(int bottomLimit, int topLimit) {
+        this.integer = bottomLimit;
         this.bottomLimit = bottomLimit;
         this.topLimit = topLimit;
     }

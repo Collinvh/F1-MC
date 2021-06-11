@@ -66,108 +66,110 @@ public class LaptimeListener {
                         Player player = driver.getPlayer();
                         SpawnedVehicle vehicle = driver.getCurvehicle();
                         if(player != null) {
-                            if (object1.isDriving() || !object1.isBlackFlagged()) {
-                                Location location = player.getLocation();
+                            if (object1.isDriving()) {
+                                if (!object1.isBlackFlagged()) {
+                                    Location location = player.getLocation();
 
-                                Laptime laptime = driver.getLapstorage().getCurrentLap();
+                                    Laptime laptime = driver.getLapstorage().getCurrentLap();
 
-                                if (laptime == null) {
-                                    driver.getLapstorage().setCurrentLap(new Laptime(driver, object));
-                                    laptime = driver.getLapstorage().getCurrentLap();
-                                }
-
-                                if (storage.getPit().containsLocation(location)) {
-                                }
-
-                                if (storage.getPitexit().containsLocation(location) && !driver.getLapstorage().isPastPitExit()) {
-                                    laptime.setS1s(System.currentTimeMillis());
-                                    if (driver.getLapstorage().isPastS1()) {
-                                        driver.getLapstorage().addSector();
-
-                                        driver.getLapstorage().setPastS1(false);
-                                        driver.getLapstorage().setPastS2(false);
-
-                                        driver.getRaceStorage().setLap(driver.getRaceStorage().getLap() + 1);
+                                    if (laptime == null) {
+                                        driver.getLapstorage().setCurrentLap(new Laptime(driver, object));
+                                        laptime = driver.getLapstorage().getCurrentLap();
                                     }
 
-                                    if (driver.getLapstorage().isInvalidated()) {
-                                        driver.getLapstorage().setInvalidated(false);
+                                    if (storage.getPit().containsLocation(location)) {
                                     }
 
-                                    driver.getLapstorage().setPastPitExit(true);
-                                }
+                                    if (storage.getPitexit().containsLocation(location) && !driver.getLapstorage().isPastPitExit()) {
+                                        laptime.setS1s(System.currentTimeMillis());
+                                        if (driver.getLapstorage().isPastS1()) {
+                                            driver.getLapstorage().addSector();
 
-                                if (storage.getS1().containsLocation(location) && !driver.getLapstorage().isPastS1()) {
-                                    driver.getLapstorage().setPastS1(true);
-                                    driver.getLapstorage().setPastPitExit(false);
-                                    if (!driver.getLapstorage().isInvalidated()) {
-                                        laptime.setS1(System.currentTimeMillis());
+                                            driver.getLapstorage().setPastS1(false);
+                                            driver.getLapstorage().setPastS2(false);
 
-                                        player.sendMessage(ChatColor.GRAY + " Je tijd in sector 1 was " + laptime.getS1Color() + Laptime.millisToTimeString(laptime.getS1()) + "\n");
-                                    }
-                                    driver.getLapstorage().addSector();
-                                }
+                                            driver.getRaceStorage().setLap(driver.getRaceStorage().getLap() + 1);
+                                        }
 
-                                if (storage.getS2().containsLocation(location) && driver.getLapstorage().isPastS1() && !driver.getLapstorage().isPastS2()) {
-                                    driver.getLapstorage().setPastS2(true);
-                                    if (!driver.getLapstorage().isInvalidated()) {
-                                        laptime.setS2(System.currentTimeMillis());
-
-                                        player.sendMessage(ChatColor.GRAY + " Je tijd in sector 2 was " + laptime.getS2Color() + Laptime.millisToTimeString(laptime.getS2()) + "\n");
-                                    }
-                                    driver.getLapstorage().addSector();
-                                }
-
-                                if (storage.getS3().containsLocation(location)) {
-                                    laptime.setS1s(System.currentTimeMillis());
-                                    if (driver.getLapstorage().isPastS1() && driver.getLapstorage().isPastS2()) {
-                                        if (!driver.getLapstorage().isInvalidated()) {
-                                            laptime.setS3(System.currentTimeMillis());
-                                            player.sendMessage(ChatColor.GRAY + " Je tijd in sector 3 was " + laptime.getS3Color() + Laptime.millisToTimeString(laptime.getS3()) + "\n");
-
-                                            laptime.createLaptime();
-                                            Laptime clone = laptime.clone();
-                                            laptimeHash.put(driver.getPlayerUUID(), clone);
-                                            driver.getLapstorage().addLaptime(clone);
-
-                                            player.sendMessage(ChatColor.GRAY + " Je laptijd was een " + laptime.getLapColor(true) + Laptime.millisToTimeString(laptime.getLaptime()) + "\n");
-                                        } else {
-                                            player.sendMessage(ChatColor.RED + " Je laptijd was INVALIDATED.");
+                                        if (driver.getLapstorage().isInvalidated()) {
                                             driver.getLapstorage().setInvalidated(false);
                                         }
+
+                                        driver.getLapstorage().setPastPitExit(true);
+                                    }
+
+                                    if (storage.getS1().containsLocation(location) && !driver.getLapstorage().isPastS1()) {
+                                        driver.getLapstorage().setPastS1(true);
+                                        driver.getLapstorage().setPastPitExit(false);
+                                        if (!driver.getLapstorage().isInvalidated()) {
+                                            laptime.setS1(System.currentTimeMillis());
+
+                                            player.sendMessage(ChatColor.GRAY + " Je tijd in sector 1 was " + laptime.getS1Color() + Laptime.millisToTimeString(laptime.getS1()) + "\n");
+                                        }
                                         driver.getLapstorage().addSector();
+                                    }
 
-                                        driver.getLapstorage().setPastS1(false);
-                                        driver.getLapstorage().setPastS2(false);
+                                    if (storage.getS2().containsLocation(location) && driver.getLapstorage().isPastS1() && !driver.getLapstorage().isPastS2()) {
+                                        driver.getLapstorage().setPastS2(true);
+                                        if (!driver.getLapstorage().isInvalidated()) {
+                                            laptime.setS2(System.currentTimeMillis());
 
-                                        driver.getRaceStorage().setLap(driver.getRaceStorage().getLap() + 1);
-                                        if (object.getRunningMode().isHasLaps()) {
-                                            if (driver.getRaceStorage().getLap() >= object.getLapCount()) {
-                                                driver.getRaceStorage().setFinished(true);
-                                                FinishData data = new FinishData(driver, object.getFinishedDrivers().size() + 1);
-                                                object.addFinishedDriver(data);
+                                            player.sendMessage(ChatColor.GRAY + " Je tijd in sector 2 was " + laptime.getS2Color() + Laptime.millisToTimeString(laptime.getS2()) + "\n");
+                                        }
+                                        driver.getLapstorage().addSector();
+                                    }
 
-                                                player.sendMessage(ChatColor.GRAY + "Je bent gefinished op plek " + data.getFinishPosition());
+                                    if (storage.getS3().containsLocation(location)) {
+                                        laptime.setS1s(System.currentTimeMillis());
+                                        if (driver.getLapstorage().isPastS1() && driver.getLapstorage().isPastS2()) {
+                                            if (!driver.getLapstorage().isInvalidated()) {
+                                                laptime.setS3(System.currentTimeMillis());
+                                                player.sendMessage(ChatColor.GRAY + " Je tijd in sector 3 was " + laptime.getS3Color() + Laptime.millisToTimeString(laptime.getS3()) + "\n");
 
-                                                for (Player p : Bukkit.getOnlinePlayers()) {
-                                                    if (p.hasPermission("zentic.fia.race") || p.hasPermission("zentic.admin")) {
-                                                        p.sendMessage(player.getDisplayName() + " is gefinished op plek " + data.getFinishPosition());
+                                                laptime.createLaptime();
+                                                Laptime clone = laptime.clone();
+                                                laptimeHash.put(driver.getPlayerUUID(), clone);
+                                                driver.getLapstorage().addLaptime(clone);
+
+                                                player.sendMessage(ChatColor.GRAY + " Je laptijd was een " + laptime.getLapColor(true) + Laptime.millisToTimeString(laptime.getLaptime()) + "\n");
+                                            } else {
+                                                player.sendMessage(ChatColor.RED + " Je laptijd was INVALIDATED.");
+                                                driver.getLapstorage().setInvalidated(false);
+                                            }
+                                            driver.getLapstorage().addSector();
+
+                                            driver.getLapstorage().setPastS1(false);
+                                            driver.getLapstorage().setPastS2(false);
+
+                                            driver.getRaceStorage().setLap(driver.getRaceStorage().getLap() + 1);
+                                            if (object.getRunningMode().isHasLaps()) {
+                                                if (driver.getRaceStorage().getLap() >= object.getLapCount()) {
+                                                    driver.getRaceStorage().setFinished(true);
+                                                    FinishData data = new FinishData(driver, object.getFinishedDrivers().size() + 1);
+                                                    object.addFinishedDriver(data);
+
+                                                    player.sendMessage(ChatColor.GRAY + "Je bent gefinished op plek " + data.getFinishPosition());
+
+                                                    for (Player p : Bukkit.getOnlinePlayers()) {
+                                                        if (p.hasPermission("zentic.fia.race") || p.hasPermission("zentic.admin")) {
+                                                            p.sendMessage(player.getDisplayName() + " is gefinished op plek " + data.getFinishPosition());
+                                                        }
                                                     }
                                                 }
                                             }
                                         }
                                     }
-                                }
 
-                                for (Cuboid detectie : storage.getDetecties().values()) {
-                                    if (detectie.containsLocation(location)) {
-                                        if (!driver.getLapstorage().isInvalidated()) {
-                                            player.sendMessage(ChatColor.RED + " Je laptijd is geinvalidated.");
-                                            driver.getLapstorage().setInvalidated(true);
+                                    for (Cuboid detectie : storage.getDetecties().values()) {
+                                        if (detectie.containsLocation(location)) {
+                                            if (!driver.getLapstorage().isInvalidated()) {
+                                                player.sendMessage(ChatColor.RED + " Je laptijd is geinvalidated.");
+                                                driver.getLapstorage().setInvalidated(true);
+                                            }
                                         }
                                     }
-                                }
 
+                                }
                             }
                         }
                     });

@@ -1,6 +1,5 @@
 package collinvht.zenticracing.commands;
 
-import collinvht.zenticracing.commands.racing.computer.ers.ERSComputer;
 import collinvht.zenticracing.commands.racing.setup.gui.SetupPC;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;

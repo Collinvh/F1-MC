@@ -9,8 +9,6 @@ import collinvht.zenticracing.commands.util.MuteUtil;
 import com.google.gson.Gson;
 import lombok.Getter;
 
-import java.io.IOException;
-
 public class JSONUtil {
 
     @Getter
@@ -30,11 +28,13 @@ public class JSONUtil {
 
 
     public static void unload() {
-        TeamBaan.saveRaces();
         RaceManager.saveRaces();
         MuteUtil.loadUtil();
         Team.saveTeams();
         SetupManager.saveSetups();
+
+
+        TeamBaan.saveRaces();
     }
 
 }

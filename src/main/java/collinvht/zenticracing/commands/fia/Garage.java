@@ -9,9 +9,7 @@ import me.legofreak107.vehiclesplus.vehicles.api.objects.spawn.SpawnMode;
 import me.legofreak107.vehiclesplus.vehicles.vehicles.objects.BaseVehicle;
 import me.legofreak107.vehiclesplus.vehicles.vehicles.objects.SpawnedVehicle;
 import me.legofreak107.vehiclesplus.vehicles.vehicles.objects.StorageVehicle;
-import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -42,7 +40,7 @@ public class Garage implements CommandUtil {
                             if (args.length > 1) {
                                 TeamObject object = Team.getTeamObj().get(args[1].toLowerCase());
                                 if (object != null) {
-                                    object.addRaceCar(new RaceCar(vehicle1));
+                                    object.addRaceCar(new RaceCar(vehicle1, object));
                                 } else {
                                     sender.sendMessage(prefix + "Dat team bestaat niet!");
                                     return false;

@@ -2,14 +2,15 @@ package collinvht.zenticracing.commands.team;
 
 import collinvht.zenticracing.ZenticRacing;
 import collinvht.zenticracing.commands.CommandUtil;
+import collinvht.zenticracing.commands.team.object.Bestelling;
 import collinvht.zenticracing.commands.team.object.TeamObject;
+import collinvht.zenticracing.util.ConfigUtil;
 import com.google.gson.*;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
@@ -21,8 +22,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.UUID;
 
 public class Team implements CommandUtil, Listener {
@@ -41,7 +42,7 @@ public class Team implements CommandUtil, Listener {
                         if (args.length > 0) {
                             switch (args[0]) {
                                 case "add":
-                                    if (obj.getOwnerUUID().equals(((Player) sender).getUniqueId())) {
+                                    if (obj.getOwnerUUID().contains(((Player) sender).getUniqueId())) {
                                         if (args.length > 1) {
                                             Player member = Bukkit.getPlayer(args[1]);
                                             if (member != null) {
@@ -67,7 +68,7 @@ public class Team implements CommandUtil, Listener {
                                     return true;
                                 case "kick":
                                 case "remove":
-                                    if (obj.getOwnerUUID().equals(((Player) sender).getUniqueId())) {
+                                    if (obj.getOwnerUUID().contains(((Player) sender).getUniqueId())) {
                                         if (args.length > 1) {
                                             Player member = Bukkit.getPlayer(args[1]);
                                             if (member != null) {
@@ -91,7 +92,7 @@ public class Team implements CommandUtil, Listener {
                                     sender.sendMessage(prefix + "Team Info \n " + obj.getTeamName() + " \n" + "Owner : " + owner.getName() + "\n" + "Membercount : " + obj.getTeamMembers().size() + "\n");
                                     return true;
                                 case "leave":
-                                    if (!obj.getOwnerUUID().equals(((Player) sender).getUniqueId())) {
+                                    if (!obj.getOwnerUUID().contains(((Player) sender).getUniqueId())) {
                                         obj.removeMember(null, ((Player) sender).getUniqueId());
                                         sender.sendMessage(prefix + "Je hebt het team verlaten...");
                                     } else {
@@ -123,14 +124,46 @@ public class Team implements CommandUtil, Listener {
                     }
                 } else {
                     if (args.length > 0) {
-                        switch (args[0]) {
+                        switch (args[0].toLowerCase()) {
+                            case "bestelling":
+                                if(args.length > 3) {
+                                    switch (args[1].toLowerCase()) {
+                                        case "get":
+                                            TeamObject teamObject = teamObj.get(args[2]);
+                                            if(teamObject != null) {
+                                                if(teamObject.getBestelling() != null) {
+                                                    sender.sendMessage(prefix + "Bestelling || " + teamObject.getTeamName());
+                                                    sender.sendMessage(teamObject.getBestelling().getString());
+                                                } else {
+                                                    sender.sendMessage(prefix + "Team heeft niks besteld");
+                                                }
+                                            } else {
+                                                sender.sendMessage(prefix + "Team bestaat niet.");
+                                            }
+                                            return false;
+                                        case "reset":
+                                            teamObj.forEach((s, teamObject1) -> teamObject1.setBestelling(null));
+                                            sender.sendMessage(prefix + "Bestellingen gereset!");
+                                            return false;
+                                        case "disable":
+                                            ConfigUtil.setBestellenEnabled(false);
+                                            sender.sendMessage("Bestellen gedisabled!");
+                                            return false;
+                                        case "enable":
+                                            ConfigUtil.setBestellenEnabled(true);
+                                            sender.sendMessage("Bestellen geenabled.");
+                                            return false;
+                                    }
+                                }
                             case "create":
                                 if (args.length > 3) {
                                     Player newp = Bukkit.getPlayer(args[1]);
                                     if (newp != null) {
                                         ChatColor color = ChatColor.getByChar(args[3]);
                                         if (color != null) {
-                                            TeamObject obj1 = new TeamObject(newp.getUniqueId(), args[2], color);
+                                            ArrayList<UUID> o = new ArrayList<>();
+                                            o.add(newp.getUniqueId());
+                                            TeamObject obj1 = new TeamObject(o, args[2], color);
                                             addTeam(obj1);
                                         } else {
                                             sender.sendMessage(prefix + args[3] + " is geen valid color code!");
@@ -173,8 +206,13 @@ public class Team implements CommandUtil, Listener {
                                                 if (args.length > 3) {
                                                     Player owner = Bukkit.getPlayer(args[3]);
                                                     if (owner != null) {
-                                                        team.setOwnerUUID(owner.getUniqueId());
-                                                        sender.sendMessage(prefix + "Owner is aangepast.");
+                                                        if (team.getOwnerUUID().contains(owner.getUniqueId())) {
+                                                            team.getOwnerUUID().remove(owner.getUniqueId());
+                                                            sender.sendMessage(prefix + "Owner is verwijderd.");
+                                                        } else {
+                                                            team.getOwnerUUID().add(owner.getUniqueId());
+                                                            sender.sendMessage(prefix + "Owner is toegevoegd.");
+                                                        }
                                                     } else {
                                                         sender.sendMessage(prefix + args[3] + " is geen geldige speler!");
                                                     }
@@ -281,6 +319,11 @@ public class Team implements CommandUtil, Listener {
 
             JsonArray array = new JsonArray();
 
+            if(teamObj.getBestelling() != null) {
+                JsonObject bestelling = Bestelling.getArray(teamObj.getBestelling());
+                team.add("Bestelling", bestelling);
+            }
+
             teamObj.getTeamMembers().forEach(uuid -> {
                 JsonObject obj = new JsonObject();
                 obj.addProperty("uuid", uuid.toString());
@@ -337,7 +380,24 @@ public class Team implements CommandUtil, Listener {
         String teamName = team.get("Name").getAsString();
         String ownerUUID = team.get("OwnerUUID").getAsString();
 
+        ownerUUID = ownerUUID.replace("[", "");
+        ownerUUID = ownerUUID.replace("]", "");
+
+        ArrayList<String> strings = new ArrayList<>(Arrays.asList(ownerUUID.split(",")));
+        ArrayList<UUID> owners = new ArrayList<>();
+        for (String string : strings) {
+            owners.add(UUID.fromString(string));
+        }
+
         char chatColor = team.get("ChatColor").getAsCharacter();
+
+        Bestelling bestelling = null;
+        try {
+            JsonObject object = team.get("Bestelling").getAsJsonObject();
+            if(object != null) {
+                bestelling = Bestelling.readBestelling(object);
+            }
+        } catch (Exception ignored) {}
 
         ArrayList<UUID> members = new ArrayList<>();
         JsonArray array = team.get("Members").getAsJsonArray();
@@ -353,11 +413,10 @@ public class Team implements CommandUtil, Listener {
             invited.add(UUID.fromString(object.get("uuid").getAsString()));
         });
 
-        UUID owner = UUID.fromString(ownerUUID);
-
-        TeamObject obj = new TeamObject(owner, teamName, ChatColor.getByChar(chatColor));
+        TeamObject obj = new TeamObject(owners, teamName, ChatColor.getByChar(chatColor));
         obj.setTeamMembers(members);
         obj.setInvited(invited);
+        obj.setBestelling(bestelling);
 
 
         teamObj.put(obj.getTeamName().toLowerCase(), obj);

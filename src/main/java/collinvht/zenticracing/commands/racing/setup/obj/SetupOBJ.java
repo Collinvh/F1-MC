@@ -1,13 +1,34 @@
 package collinvht.zenticracing.commands.racing.setup.obj;
 
+import collinvht.zenticracing.commands.fia.Weer;
+import collinvht.zenticracing.commands.racing.RaceManager;
+import collinvht.zenticracing.commands.racing.computer.RaceCar;
+import collinvht.zenticracing.commands.racing.object.RaceObject;
+import collinvht.zenticracing.listener.VPPListener;
+import collinvht.zenticracing.listener.vehicle.VehicleUtil;
+import collinvht.zenticracing.manager.tyre.TyreData;
+import collinvht.zenticracing.manager.tyre.TyreManager;
+import collinvht.zenticracing.manager.tyre.Tyres;
+import collinvht.zenticracing.util.objs.DiscordUtil;
+import collinvht.zenticracing.util.objs.WeatherType;
 import lombok.Getter;
+import lombok.Setter;
 import me.legofreak107.vehiclesplus.vehicles.vehicles.objects.SpawnedVehicle;
 import me.legofreak107.vehiclesplus.vehicles.vehicles.objects.VehicleStats;
+import net.dv8tion.jda.api.EmbedBuilder;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
+import java.awt.*;
 import java.util.UUID;
 
 public class SetupOBJ {
+
+    @Getter @Setter
+    private TyreData prevTyre;
 
     @Getter
     private final UUID linkedPlayer;
@@ -40,35 +61,123 @@ public class SetupOBJ {
         linkedPlayer = uuid;
     }
 
-    public void updateCar(SpawnedVehicle vehicle) {
+    public void updateCar(Player player, SpawnedVehicle vehicle, RaceCar raceCar) {
         VehicleStats stats = vehicle.getStorageVehicle().getVehicleStats();
+        VehicleUtil util = VPPListener.getUtil().get(vehicle.getStorageVehicle().getUuid());
 
         if(stats != null) {
-            int topspeed = vehicle.getBaseVehicle().getSpeedSettings().getBase();
+            int baseSpeed = vehicle.getBaseVehicle().getSpeedSettings().getBase();
+            int baseFuel = vehicle.getBaseVehicle().getFuelTankSettings().getBase();
+            int baseAcceleration= vehicle.getBaseVehicle().getAccelerationSettings().getBase();
+            int baseTurn = vehicle.getBaseVehicle().getTurningRadiusSettings().getBase();
 
-            float angleCombo = frontWingAngle.getInteger() + rearWingAngle.getInteger();
-            float rideCombo = frontRideHeight.getInteger() + rearRideHeight.getInteger();
-            float camberCombo = frontCamber.getAFloat() + rearCamber.getAFloat();
-            float toeCombo = frontToe.getAFloat() + rearToe.getAFloat();
+            float curSteer = vehicle.getBaseVehicle().getTurningRadiusSettings().getBase();
+            float curSteerInput = stats.getCurrentSteer();
 
-            float limit = frontWingAngle.getTopLimit() + rearWingAngle.getTopLimit();
+            ItemStack stack = raceCar.getBandGui().getItem(13);
+            if(stack != null) {
+                TyreData tyre = TyreManager.getDataFromTyre(stack);
 
-            float percentage = ((angleCombo*2) / limit) * 100;
+                if (tyre.getTyre() != Tyres.NULLTYRE && tyre.getDura() > 0) {
+                    if(prevTyre != null) {
+                        if (prevTyre.getTyre() != tyre.getTyre()) {
+                            if (RaceManager.getRunningRace() != null) {
+                                RaceObject object = RaceManager.getRunningRace();
+                                EmbedBuilder embedBuilder = new EmbedBuilder();
+                                embedBuilder.setTitle("Banden Wissel", null);
+                                embedBuilder.setColor(Color.GREEN);
+                                embedBuilder.setDescription(player.getName());
 
-            percentage = percentage / rideCombo;
+                                embedBuilder.addField("Team", raceCar.getTeamObject().getTeamName(), false);
+                                embedBuilder.addField("Vorige band", prevTyre.getTyre().getName(), false);
+                                embedBuilder.addField("Nieuwe band", tyre.getTyre().getName(), false);
 
-            percentage *= toeCombo;
-            percentage += camberCombo;
+                                embedBuilder.setFooter("ZenticRacing | " + object.getRaceName());
+
+                                DiscordUtil.getChannelByID(844159011666526208L).sendMessage(embedBuilder.build()).queue();
+                                Bukkit.getLogger().warning("Message sent?");
+                            } else {
+                                Bukkit.getLogger().warning("RACE NULL");
+                            }
+                        }
+                    }
+                    prevTyre = tyre;
 
 
+                    boolean isRaining = (Weer.getType() != WeatherType.OFF);
+                    WeatherType type = Weer.getType();
 
-            topspeed *= ((100 - percentage) / 150);
-            topspeed += 100 - (percentage * 4);
+                    baseSpeed += isRaining ? tyre.getTyre().getData().getWetspeed() : tyre.getTyre().getData().getExtraspeed();
+                    curSteer *= tyre.getTyre().getData().getSteering();
 
-            Bukkit.getLogger().warning(String.valueOf(percentage));
+                    if (isRaining) {
+                        if (tyre.getTyre() != Tyres.WET || tyre.getTyre() != Tyres.INTER) {
+                            baseTurn -= 1;
+                            baseAcceleration -= 1;
+                            baseSpeed -= type.getDry();
+                        } else if(tyre.getTyre() == Tyres.WET) {
+                            baseSpeed = type.getWet();
+                        } else if(tyre.getTyre() == Tyres.INTER) {
+                            baseSpeed = type.getInter();
+                        }
+                    } else {
+                        if(tyre.getTyre() == Tyres.WET) {
+                            baseTurn -= 1;
+                            baseSpeed = type.getWet();
+                        } else if(tyre.getTyre() == Tyres.INTER) {
+                            baseTurn -= 1;
+                            baseSpeed = type.getInter();
+                        }
+                    }
 
-            stats.setSteering(1 + (int) (50 * (percentage / 200)));
-            stats.setSpeed(topspeed);
+                    if (raceCar.getDriverObject() != null) {
+                        if (raceCar.getDriverObject().isHasDRS() && raceCar.getDriverObject().isInDrsZone()) {
+                            baseSpeed += 10;
+                        }
+                    }
+                } else {
+                    baseSpeed = 35;
+                }
+            } else {
+                baseSpeed = 35;
+            }
+
+            if(util != null) {
+                baseSpeed += util.getMaxSpeed();
+                baseFuel += util.getFuelUsage();
+            }
+
+            Location location = player.getLocation();
+            if(location.getWorld() != null) {
+                Block block = location.getWorld().getBlockAt(location);
+                switch (block.getType()) {
+                    case GREEN_CONCRETE_POWDER:
+                    case GRASS_BLOCK:
+                        baseSpeed *= 0.8F;
+                        break;
+                    case ANDESITE:
+                    case LIGHT_GRAY_CONCRETE_POWDER:
+                    case LIGHT_GRAY_CONCRETE:
+                    case COBBLESTONE:
+                    case GRAVEL:
+                        baseSpeed *= 0.5F;
+                        break;
+                    case TERRACOTTA:
+                    case STONE:
+                        baseSpeed *= 0.9F;
+                        break;
+                    case GRAY_CONCRETE_POWDER:
+                        baseSpeed = 60;
+                        break;
+                }
+            }
+
+
+            stats.setSteering((int) curSteer);
+            stats.setSpeed(baseSpeed);
+            stats.setFuelTank(baseFuel);
+            stats.setAcceleration(baseAcceleration);
+            stats.setSteering(baseTurn);
         }
     }
 }

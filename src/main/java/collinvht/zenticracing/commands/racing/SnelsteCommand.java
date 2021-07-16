@@ -8,6 +8,7 @@ import collinvht.zenticracing.commands.team.object.TeamBaanObject;
 import collinvht.zenticracing.commands.team.object.TeamObject;
 import collinvht.zenticracing.listener.driver.DriverManager;
 import collinvht.zenticracing.listener.driver.object.DriverObject;
+import collinvht.zenticracing.manager.tyre.Tyres;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.chat.hover.content.Text;
@@ -62,14 +63,23 @@ public class SnelsteCommand implements CommandExecutor {
                                 pos.getAndIncrement();
                                 if (driver.getLapstorage().getBestTime() != null) {
                                     TextComponent component = new TextComponent();
-                                    component.setText(pos.get() + ". " + driver.getPlayer().getDisplayName() + " " + Laptime.millisToTimeString(driver.getLapstorage().getBestTime().getLapData().getSectorLength()));
+                                    String tyre;
+                                    if(driver.getLapstorage().getBestTime().getTyre() != Tyres.NULLTYRE) {
+                                        tyre = " [" + driver.getLapstorage().getBestTime().getTyre().getColor() + driver.getLapstorage().getBestTime().getTyre().getName().charAt(0) + ChatColor.RESET +  "]";
+                                    } else {
+                                        tyre = " [" + ChatColor.BLACK + "?" + ChatColor.RESET + "]";
+                                    }
+
+                                    component.setText(pos.get() + ". " + driver.getPlayer().getDisplayName() + " " + Laptime.millisToTimeString(driver.getLapstorage().getBestTime().getLapData().getSectorLength()) + tyre);
                                     component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(Laptime.millisToTimeString(driver.getLapstorage().getBestTime().getS1data().getSectorLength()) + " | " + Laptime.millisToTimeString(driver.getLapstorage().getBestTime().getS2data().getSectorLength()) + " | " + Laptime.millisToTimeString(driver.getLapstorage().getBestTime().getS3data().getSectorLength()))));
                                     sender.spigot().sendMessage(component);
                                 }
                             });
-                            LaptimeListener raceOBJ = RaceManager.getRunningRace().getListener();
-                            if (raceOBJ != null) {
-                                sender.sendMessage("\nTheoretical best : " + Laptime.millisToTimeString(raceOBJ.getBestS1() + raceOBJ.getBestS2() + raceOBJ.getBestS3()));
+                            if(RaceManager.getRunningRace() != null) {
+                                LaptimeListener raceOBJ = RaceManager.getRunningRace().getListener();
+                                if (raceOBJ != null) {
+                                    sender.sendMessage("\nTheoretical best : " + Laptime.millisToTimeString(raceOBJ.getBestS1() + raceOBJ.getBestS2() + raceOBJ.getBestS3()));
+                                }
                             }
                             return true;
                         }
@@ -92,6 +102,7 @@ public class SnelsteCommand implements CommandExecutor {
                         sender.sendMessage(prefix + " " + driver.getPlayer().getDisplayName() + " :");
                         sender.sendMessage("Fastest Lap : " + Laptime.millisToTimeString(driver.getLapstorage().getBestTime().getLaptime()));
                         sender.sendMessage("S1/S2/S3 : " + Laptime.millisToTimeString(driver.getLapstorage().getBestTime().getS1data().getSectorLength()) + "/" + Laptime.millisToTimeString(driver.getLapstorage().getBestTime().getS2data().getSectorLength()) + "/" + Laptime.millisToTimeString(driver.getLapstorage().getBestTime().getS3data().getSectorLength()));
+                        sender.sendMessage("Gebruikte Band : " + driver.getLapstorage().getBestTime().getTyre().getName());
                         sender.sendMessage(" ");
                         return true;
                     }

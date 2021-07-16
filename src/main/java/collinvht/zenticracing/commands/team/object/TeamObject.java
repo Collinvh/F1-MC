@@ -22,6 +22,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
+import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
@@ -30,13 +31,19 @@ public class TeamObject {
     private static final String zentic = "" + ChatColor.RED + ChatColor.BOLD + "ZT > " + ChatColor.RESET;
 
     @Getter @Setter
-    private UUID ownerUUID;
+    private ArrayList<UUID> ownerUUID;
 
     @Getter @Setter
     private ArrayList<UUID> teamMembers = new ArrayList<>();
 
     @Getter @Setter
     private ArrayList<UUID> invited = new ArrayList<>();
+
+    @Getter @Setter
+    private Bestelling bestelling;
+
+    @Getter
+    private final boolean heeftBesteld = bestelling == null;
 
     @Getter
     private final ArrayList<RaceCar> raceCars = new ArrayList<>();
@@ -55,12 +62,13 @@ public class TeamObject {
     @Getter @Setter
     private String teamName;
 
-    public TeamObject(UUID ownerUUID, String teamName, ChatColor color) {
+    public TeamObject(ArrayList<UUID> ownerUUID, String teamName, ChatColor color) {
         this.ownerUUID = ownerUUID;
+
         this.teamName = teamName;
         this.color = color;
 
-        addMember(null, ownerUUID);
+        addMember(null, ownerUUID.get(0));
     }
 
     public void inviteMember(CommandSender sender, UUID uuid) {
@@ -153,7 +161,7 @@ public class TeamObject {
     }
 
     public OfflinePlayer getOwner() {
-        return Bukkit.getOfflinePlayer(ownerUUID);
+        return Bukkit.getOfflinePlayer(ownerUUID.get(0));
     }
 
     public void setGolfcooldown(int cooldown) {

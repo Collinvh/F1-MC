@@ -2,15 +2,12 @@ package collinvht.zenticracing.commands;
 
 import collinvht.zenticracing.ZenticRacing;
 import collinvht.zenticracing.commands.fia.*;
-import collinvht.zenticracing.commands.racing.PersoonlijkRecord;
-import collinvht.zenticracing.commands.racing.RaceManager;
-import collinvht.zenticracing.commands.racing.SnelsteCommand;
-import collinvht.zenticracing.commands.racing.StandCommand;
+import collinvht.zenticracing.commands.racing.*;
 import collinvht.zenticracing.commands.team.Golfkar;
 import collinvht.zenticracing.commands.team.Team;
 import collinvht.zenticracing.commands.team.TeamBaan;
+import collinvht.zenticracing.commands.tyre.GetTyre;
 import collinvht.zenticracing.commands.util.MuteUtil;
-import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabCompleter;
@@ -36,6 +33,9 @@ public class Commands {
         addCommand("warning", new Warning());
         addCommand("golfkar", new Golfkar());
         addCommand("testpc", new TestPc());
+        addCommand("getband", new GetTyre());
+        addCommand("fia", new FIA());
+        addCommand("weer", new Weer());
     }
 
 

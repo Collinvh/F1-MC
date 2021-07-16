@@ -8,5 +8,11 @@ public class RaceStorage {
     private int lap;
 
     @Getter @Setter
+    private boolean pastDRSPoint;
+
+    @Getter @Setter
     private boolean finished;
+
+    @Getter @Setter
+    private boolean inPit;
 }

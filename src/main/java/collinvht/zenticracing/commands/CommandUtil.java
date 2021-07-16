@@ -17,9 +17,17 @@ public interface CommandUtil extends CommandExecutor {
         sender.sendMessage(prefix + "Usage is \n" + Arrays.toString(usages));
     }
 
-    default void sendMessageToServer(String mesage) {
+    static void sendMessageToServer(String mesage) {
         for(Player player : Bukkit.getOnlinePlayers()) {
             player.sendMessage(mesage);
+        }
+    }
+
+    static void sendMessageToServerWithPermission(String mesage, String permission) {
+        for(Player player : Bukkit.getOnlinePlayers()) {
+            if(player.hasPermission(permission)) {
+                player.sendMessage(mesage);
+            }
         }
     }
 }

@@ -1,11 +1,6 @@
 package collinvht.zenticracing.listener.driver.object;
 
 import lombok.Getter;
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.Player;
-
-import java.util.UUID;
 
 public class FinishData {
     @Getter

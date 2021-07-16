@@ -53,3 +53,12 @@ commands:
   testpc:
     description: Test voor pc
     permission: zentic.test
+  getband:
+    description: band
+    permission: zentic.band
+  fia:
+    description: FIA
+    permission: zentic.fia
+  weer:
+    description: Weer
+    permission: zentic.fia

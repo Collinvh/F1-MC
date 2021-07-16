@@ -2,6 +2,7 @@ package collinvht.zenticracing.commands.racing.laptime.object;
 
 import collinvht.zenticracing.commands.racing.object.RaceObject;
 import collinvht.zenticracing.listener.driver.object.DriverObject;
+import collinvht.zenticracing.manager.tyre.Tyres;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.ChatColor;
@@ -19,6 +20,9 @@ public class Laptime {
 
     @Getter
     private long laptime;
+
+    @Getter @Setter
+    private Tyres tyre = Tyres.NULLTYRE;
 
     @Getter
     private SectorData s1data;
@@ -221,6 +225,7 @@ public class Laptime {
         obj.s2data = s2data.clone();
         obj.s3data= s3data.clone();
         obj.lapData = lapData.clone();
+        obj.tyre = tyre;
         return obj;
     }
 }

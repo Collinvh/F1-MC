@@ -2,17 +2,20 @@ package collinvht.zenticracing;
 
 import collinvht.zenticracing.commands.Commands;
 import collinvht.zenticracing.commands.racing.setup.SetupManager;
-import collinvht.zenticracing.commands.racing.setup.obj.SetupOBJ;
+import collinvht.zenticracing.commands.team.Team;
 import collinvht.zenticracing.listener.Listeners;
 import collinvht.zenticracing.listener.VPPListener;
+import collinvht.zenticracing.util.ConfigUtil;
 import collinvht.zenticracing.util.Utils;
 import collinvht.zenticracing.util.objs.JSONUtil;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.Objects;
 
 public final class ZenticRacing extends JavaPlugin {
     @Getter
@@ -31,11 +34,27 @@ public final class ZenticRacing extends JavaPlugin {
         }
 
         JSONUtil.load();
+
+        ConfigUtil.loadConfig();
     }
 
     @Override
     public void onDisable() {
         JSONUtil.unload();
+        Team.getTeamObj().forEach((s, teamObject) -> teamObject.getRaceCars().forEach(car -> {
+            if(car.getSpawnedVehicle() != null) {
+                ItemStack stack = car.getBandGui().getItem(13);
+                Location location = car.getSpawnedVehicle().getHolder().getLocation();
+                if(location.getWorld() != null && stack != null) {
+                    Item item = (Item) location.getWorld().spawnEntity(location, EntityType.DROPPED_ITEM);
+                    item.setItemStack(stack);
+                }
+
+                car.getSpawnedVehicle().despawn(true);
+            }
+        }));
         VPPListener.cancel();
+
+        ConfigUtil.save();
     }
 }

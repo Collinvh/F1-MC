@@ -25,6 +25,9 @@ public class CuboidStorage {
     @Getter @Setter
     private HashMap<String, Cuboid> detecties = new HashMap<>();
 
+    @Getter @Setter
+    private HashMap<String, DRSZone> drsZone = new HashMap<>();
+
 
     public void addDetectie(String name, Cuboid cuboid) {
         detecties.put(name, cuboid);
@@ -32,5 +35,10 @@ public class CuboidStorage {
 
     public void removeDetectie(String name) {
         detecties.remove(name);
+    }
+
+    public boolean hasNull() {
+
+        return s1 == null || s2 == null || s3 == null || pitexit == null || pit == null;
     }
 }

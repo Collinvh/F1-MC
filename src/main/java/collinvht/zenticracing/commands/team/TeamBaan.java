@@ -33,7 +33,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Objects;
 
 public class TeamBaan implements CommandUtil {
@@ -277,6 +276,10 @@ public class TeamBaan implements CommandUtil {
         JsonObject main = new JsonObject();
         JsonArray raceArray = new JsonArray();
         for(TeamBaanObject raceObj : teamBanen.values()) {
+            if(raceObj.getBaseVehicle() == null || raceObj.getObject().getRaceName() == null || raceObj.getObject().getStorage().hasNull() || raceObj.getCarSpawnLocation() == null) {
+                return;
+            }
+
             JsonObject race = new JsonObject();
             race.addProperty("TeamNaam", raceObj.getTeam().getTeamName());
             race.addProperty("BaseVehicleName", raceObj.getBaseVehicle().getName());

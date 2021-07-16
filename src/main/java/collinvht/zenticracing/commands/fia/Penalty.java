@@ -8,7 +8,6 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -32,7 +31,7 @@ public class Penalty implements CommandUtil {
                         }
 
                         if (builder.length() != 0) {
-                            sendMessageToServer(prefix + player.getDisplayName() + " | " + builder.toString());
+                            CommandUtil.sendMessageToServer(prefix + player.getDisplayName() + " | " + builder.toString());
 
                             EmbedBuilder embedBuilder = new EmbedBuilder();
                             embedBuilder.setTitle("Penalty", null);

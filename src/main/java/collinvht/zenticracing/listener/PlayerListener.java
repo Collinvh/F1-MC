@@ -1,26 +1,29 @@
 package collinvht.zenticracing.listener;
 
-import collinvht.zenticracing.commands.racing.computer.RaceCar;
+import collinvht.zenticracing.commands.fia.Warning;
+import collinvht.zenticracing.commands.racing.computer.band.BandGUI;
 import collinvht.zenticracing.commands.racing.computer.ers.ERSComputer;
 import collinvht.zenticracing.commands.racing.setup.SetupManager;
 import collinvht.zenticracing.commands.racing.setup.gui.SetupPC;
+import collinvht.zenticracing.commands.team.Team;
 import collinvht.zenticracing.listener.driver.DriverManager;
 import collinvht.zenticracing.listener.driver.object.DriverObject;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.block.Container;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.inventory.meta.ItemMeta;
-
-import java.util.Objects;
 
 public class PlayerListener implements Listener {
 
@@ -53,9 +56,39 @@ public class PlayerListener implements Listener {
     }
 
     @EventHandler
+    public static void clickBlock(PlayerInteractEvent event) {
+        if(event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+            Block block = event.getClickedBlock();
+            assert block != null;
+            if(block.getType() == Material.NETHER_BRICK_STAIRS) {
+                ERSComputer.openInventory(event.getPlayer(), Team.checkTeamForPlayer(event.getPlayer()));
+                event.setCancelled(true);
+            }
+            if(block.getType() == Material.CHAIN) {
+                BandGUI.open(event.getPlayer(), Team.checkTeamForPlayer(event.getPlayer()));
+                event.setCancelled(true);
+            }
+        }
+
+    }
+
+    @EventHandler
+    public static void inventoryClose(InventoryCloseEvent event) {
+        if(event.getView().getTitle().equalsIgnoreCase(ERSComputer.title)) {
+            ERSComputer.stopPlayer((Player) event.getPlayer());
+        }
+
+        if(event.getView().getTitle().equalsIgnoreCase(ChatColor.GREEN + "Banden")) {
+            BandGUI.removePlayer(event.getPlayer());
+        }
+    }
+
+    @EventHandler
     public static void inventoryListener(InventoryClickEvent event) {
         ERSComputer.runEvent(event);
+        BandGUI.runEvent(event);
         SetupPC.runEvent(event);
+        Warning.runEvent(event);
     }
 
     @EventHandler
@@ -69,6 +102,8 @@ public class PlayerListener implements Listener {
                 }
             }
         }
+
+        BandGUI.runEventMove(event);
     }
 
 

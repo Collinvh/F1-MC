@@ -1,8 +1,6 @@
 package collinvht.zenticracing.commands.team.object;
 
 import collinvht.zenticracing.commands.racing.object.RaceObject;
-import collinvht.zenticracing.commands.team.Team;
-import collinvht.zenticracing.commands.team.TeamBaan;
 import lombok.Getter;
 import lombok.Setter;
 import me.legofreak107.vehiclesplus.vehicles.api.VehiclesPlusAPI;

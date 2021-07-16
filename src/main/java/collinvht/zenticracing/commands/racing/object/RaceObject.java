@@ -4,28 +4,22 @@ import collinvht.zenticracing.commands.fia.Warning;
 import collinvht.zenticracing.commands.racing.SnelsteCommand;
 import collinvht.zenticracing.commands.racing.laptime.LaptimeListener;
 import collinvht.zenticracing.commands.racing.laptime.object.Laptime;
-import collinvht.zenticracing.commands.team.Team;
-import collinvht.zenticracing.commands.team.object.TeamObject;
 import collinvht.zenticracing.listener.driver.DriverManager;
 import collinvht.zenticracing.listener.driver.object.DriverObject;
 import collinvht.zenticracing.listener.driver.object.FinishData;
+import collinvht.zenticracing.manager.tyre.Tyres;
 import collinvht.zenticracing.util.objs.DiscordUtil;
 import lombok.Getter;
 import lombok.Setter;
-import me.danieljunek17.racingcommission.objects.VehicleData;
-import me.danieljunek17.racingcommission.objects.WheelsData;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
+import org.bukkit.ChatColor;
 
 import java.awt.*;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import static jdk.internal.org.jline.terminal.MouseEvent.Type.Wheel;
 
 public class RaceObject {
 
@@ -123,7 +117,14 @@ public class RaceObject {
                     treeMap.forEach((driver, aLong) -> {
                         pos.getAndIncrement();
                         if (driver.getLapstorage().getBestTime() != null) {
-                            builder.append(pos.get() + "." + " : " + driver.getPlayer().getName() + "  : " + Laptime.millisToTimeString(driver.getLapstorage().getBestTime().getLapData().getSectorLength()) + "\n");
+                            String tyre;
+                            if(driver.getLapstorage().getBestTime().getTyre() != Tyres.NULLTYRE) {
+                                tyre = " [" + driver.getLapstorage().getBestTime().getTyre().getName().charAt(0) +  "]";
+                            } else {
+                                tyre = " [" + ChatColor.BLACK + "?" + ChatColor.RESET + "]";
+                            }
+
+                            builder.append(pos.get() + "." + " : " + driver.getPlayer().getName() + "  : " + Laptime.millisToTimeString(driver.getLapstorage().getBestTime().getLapData().getSectorLength()) + tyre + "\n");
                         }
                     });
 

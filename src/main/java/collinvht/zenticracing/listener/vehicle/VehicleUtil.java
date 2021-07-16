@@ -10,18 +10,13 @@ public class VehicleUtil {
     private int maxSpeed;
 
     @Getter @Setter
+    private int fuelUsage;
+
+    @Getter @Setter
     private SpawnedVehicle vehicle;
 
 
     public VehicleUtil(SpawnedVehicle vehicle) {
         this.vehicle = vehicle;
-    }
-
-    public void addMaxSpeed(int amount) {
-        maxSpeed += amount;
-    }
-
-    public void removeMaxSpeed(int amount) {
-        maxSpeed -= amount;
     }
 }

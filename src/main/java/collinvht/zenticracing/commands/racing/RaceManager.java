@@ -2,7 +2,7 @@ package collinvht.zenticracing.commands.racing;
 
 import collinvht.zenticracing.ZenticRacing;
 import collinvht.zenticracing.commands.CommandUtil;
-import collinvht.zenticracing.commands.fia.Warning;
+import collinvht.zenticracing.commands.racing.object.DRSZone;
 import collinvht.zenticracing.commands.racing.object.RaceMode;
 import collinvht.zenticracing.commands.racing.object.RaceObject;
 import collinvht.zenticracing.commands.team.TeamBaan;
@@ -11,18 +11,14 @@ import collinvht.zenticracing.util.objs.WorldEditUtil;
 import com.google.gson.*;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.World;
 import lombok.Getter;
-import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -32,7 +28,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
 
@@ -164,6 +159,56 @@ public class RaceManager implements CommandUtil {
                                         return true;
                                 }
                             }
+                        case "drs":
+                            if (args.length > 2) {
+                                switch (args[1].toLowerCase()) {
+                                    case "add":
+                                        if(args.length > 3) {
+                                            RaceObject object = races.get(args[2]);
+                                            object.getStorage().getDrsZone().put(args[3].toLowerCase(), new DRSZone());
+                                        }
+                                    case "set":
+                                        if(args.length > 4) {
+                                            RaceObject object = races.get(args[2]);
+                                            if(object == null) {
+                                                sender.sendMessage(prefix + "Race bestaat niet.");
+                                                return false;
+                                            }
+
+                                            DRSZone zone = object.getStorage().getDrsZone().get(args[3].toLowerCase());
+
+                                            if(zone == null) {
+                                                sender.sendMessage(prefix + "Die zone bestaat nog niet?");
+                                                return false;
+                                            }
+
+                                            World world = BukkitAdapter.adapt(((Player) sender).getWorld());
+                                            Region region = null;
+                                            String id;
+                                            try {
+                                                region = WorldEditUtil.getSession(((Player) sender).getPlayer()).getSelection(world);
+                                            } catch (IncompleteRegionException | NumberFormatException ignored) {
+                                            }
+
+                                            if(region == null) {
+                                                sender.sendMessage(prefix + "Selectie is null");
+                                                return false;
+                                            }
+
+                                            switch (args[4].toLowerCase()) {
+                                                case "detectie":
+                                                    zone.setDetectieCuboid(new Cuboid(toLocation(((Player) sender).getWorld(), region.getMinimumPoint()), toLocation(((Player) sender).getWorld(), region.getMaximumPoint())));
+                                                    sender.sendMessage(prefix + "Zone aangepast.");
+                                                    return true;
+                                                case "straight":
+                                                    zone.setDrsStraight(new Cuboid(toLocation(((Player) sender).getWorld(), region.getMinimumPoint()), toLocation(((Player) sender).getWorld(), region.getMaximumPoint())));
+                                                    sender.sendMessage(prefix + "Zone aangepast.");
+                                                    return true;
+                                            }
+                                        }
+                                }
+                            }
+                            return true;
                         case "list":
                             if (races.size() > 0) {
                                 sender.sendMessage(prefix + "Racelijst : ");
@@ -265,6 +310,8 @@ public class RaceManager implements CommandUtil {
                                 } else {
                                     sender.sendMessage(prefix + "Race bestaat niet!");
                                 }
+                            } else {
+                                sender.sendMessage(prefix + "/race start [naam] [id]");
                             }
                             return true;
                         case "stop":
@@ -324,6 +371,18 @@ public class RaceManager implements CommandUtil {
 
             race.add("Detecties", array);
 
+            JsonArray array2 = new JsonArray();
+
+            raceObj.getStorage().getDrsZone().forEach((str, detectieZone) -> {
+                JsonObject object = new JsonObject();
+                object.addProperty("Naam", str);
+                createLoc(detectieZone.getDetectieCuboid(), object, "Cuboid_Detectie");
+                createLoc(detectieZone.getDrsStraight(), object, "Cuboid_Straight");
+                array2.add(object);
+            });
+
+            race.add("DRS", array2);
+
             raceArray.add(race);
         }
         main.add("Races", raceArray);
@@ -380,12 +439,27 @@ public class RaceManager implements CommandUtil {
             detectieZones.put(naam, cuboid);
         });
 
+        JsonArray obj2 = race.getAsJsonArray("DRS");
+
+        HashMap<String, DRSZone> drsZoneHashMap = new HashMap<>();
+        obj2.forEach(jsonElement -> {
+            JsonObject obz = jsonElement.getAsJsonObject();
+            String naam = obz.get("Naam").getAsString();
+            Cuboid cuboid = createCuboid(obz.get("Cuboid_Detectie").getAsJsonObject());
+            Cuboid cuboid2 = createCuboid(obz.get("Cuboid_Straight").getAsJsonObject());
+            DRSZone zone = new DRSZone();
+            zone.setDrsStraight(cuboid2);
+            zone.setDrsStraight(cuboid2);
+            zone.setDetectieCuboid(cuboid);
+
+            drsZoneHashMap.put(naam, zone);
+        });
         RaceObject raceObj = new RaceObject(name, Math.toIntExact(laps));
 
         Cuboid finishcuboid = createCuboid(finish);
         Cuboid sector1cuboid = createCuboid(sector1);
         Cuboid sector2cuboid = createCuboid(sector2);
-        Cuboid pitcuboid = createCuboid(finish);
+        Cuboid pitcuboid = createCuboid(pit);
         Cuboid pitexitcuboid = createCuboid(pitexit);
 
         if(finishcuboid.isDisabled() || sector1cuboid.isDisabled() || sector2cuboid.isDisabled() || pitcuboid.isDisabled() || pitexitcuboid.isDisabled()) {
@@ -398,6 +472,8 @@ public class RaceManager implements CommandUtil {
         raceObj.getStorage().setPit(pitcuboid);
         raceObj.getStorage().setPitexit(pitexitcuboid);
         raceObj.getStorage().setDetecties(detectieZones);
+
+        raceObj.getStorage().setDrsZone(drsZoneHashMap);
 
         races.put(name.toLowerCase(), raceObj);
     }

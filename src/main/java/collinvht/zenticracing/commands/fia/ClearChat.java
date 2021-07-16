@@ -4,7 +4,6 @@ import collinvht.zenticracing.commands.CommandUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,7 +16,7 @@ public class ClearChat implements CommandUtil {
             for(int i = 0; i<200; i++) {
                 Bukkit.broadcastMessage("");
             }
-            sendMessageToServer(ChatColor.RED +" Chat is gecleared.");
+            CommandUtil.sendMessageToServer(ChatColor.RED +" Chat is gecleared.");
             sender.sendMessage(zentic + "Chat gecleared");
         } else {
             sender.sendMessage(zentic + "Geen permissie.");

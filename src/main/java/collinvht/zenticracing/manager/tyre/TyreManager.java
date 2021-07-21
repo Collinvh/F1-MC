@@ -24,7 +24,7 @@ public class TyreManager {
 
     public static void startTimer(RaceCar car) {
         if(timers.containsKey(car.getSpawnedVehicle().getStorageVehicle().getUuid())) {
-            return;
+            Bukkit.getScheduler().cancelTask(timers.get(car.getSpawnedVehicle().getStorageVehicle().getUuid()));
         }
         timers.put(car.getSpawnedVehicle().getStorageVehicle().getUuid(), new BukkitRunnable() {
             @Override

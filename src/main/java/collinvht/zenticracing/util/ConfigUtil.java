@@ -95,6 +95,7 @@ public class ConfigUtil {
                 int wetSpeed = object1.get("WetSpeed").getAsInt();
 
 
+                Bukkit.getLogger().warning("" + id + " " + dura + " " + steer + " " + degradingRate + " " + extraSpeed + " " + wetSpeed);
                 ConfigUtil.tyres.put(id, new TyreConfigData(dura, degradingRate,steer,extraSpeed,wetSpeed));
             }
 

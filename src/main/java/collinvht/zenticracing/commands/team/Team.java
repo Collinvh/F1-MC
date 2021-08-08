@@ -163,7 +163,7 @@ public class Team implements CommandUtil, Listener {
                                         if (color != null) {
                                             ArrayList<UUID> o = new ArrayList<>();
                                             o.add(newp.getUniqueId());
-                                            TeamObject obj1 = new TeamObject(o, args[2], color);
+                                            TeamObject obj1 = new TeamObject(o, args[2].toLowerCase(), color);
                                             addTeam(obj1);
                                         } else {
                                             sender.sendMessage(prefix + args[3] + " is geen valid color code!");
@@ -193,7 +193,7 @@ public class Team implements CommandUtil, Listener {
                                 if (args.length > 2) {
                                     TeamObject team = teamObj.get(args[1].toLowerCase());
                                     if (team != null) {
-                                        switch (args[2]) {
+                                        switch (args[2].toLowerCase()) {
                                             case "name":
                                                 if (args.length > 3) {
                                                     team.setTeamName(args[3]);
@@ -431,7 +431,7 @@ public class Team implements CommandUtil, Listener {
     public static TeamObject checkTeamForPlayer(Player player) {
         TeamObject team = null;
         for (TeamObject obj1 : teamObj.values()) {
-            if (obj1.getOwnerUUID().equals(player.getUniqueId())) {
+            if (obj1.getOwnerUUID().contains(player.getUniqueId())) {
                 team = obj1;
             } else {}
 

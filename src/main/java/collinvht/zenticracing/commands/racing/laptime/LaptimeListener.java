@@ -98,7 +98,7 @@ public class LaptimeListener {
                                             if(driver.getCurRunnable() == null) {
                                                 for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
                                                     if(onlinePlayer.hasPermission("zentic.fia")) {
-                                                        onlinePlayer.sendMessage(driver.getPlayer().getDisplayName() + " HAS SPEEDED IN PITLANE");
+                                                        onlinePlayer.sendMessage(driver.getPlayer().getDisplayName() + " HAS SPEEDED IN PITLANE WITH" + vehicle.getCurrentSpeedInKm() + "KM/H");
                                                     }
                                                 }
 

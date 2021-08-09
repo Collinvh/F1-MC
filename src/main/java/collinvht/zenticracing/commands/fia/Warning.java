@@ -125,10 +125,11 @@ public class Warning implements CommandUtil {
                 inventory.setItem(i, item);
             }
 
-            inventory.setItem(11, createPlayer(warningPlayer));
+            inventory.setItem(10, createPlayer(warningPlayer));
 
-            inventory.setItem(13, createItem(ChatColor.GREEN + "Corner Cut", Material.GREEN_CONCRETE));
-            inventory.setItem(15, createItem(ChatColor.YELLOW + "Track Limit", Material.YELLOW_CONCRETE));
+            inventory.setItem(12, createItem(ChatColor.GREEN + "Corner Cut", Material.GREEN_CONCRETE));
+            inventory.setItem(14, createItem(ChatColor.YELLOW + "Track Limit", Material.YELLOW_CONCRETE));
+            inventory.setItem(16, createItem(ChatColor.RED + "Speeding in Pit", Material.RED_CONCRETE));
 
             player.openInventory(inventory);
         }
@@ -154,7 +155,7 @@ public class Warning implements CommandUtil {
     public static void runEvent(InventoryClickEvent event) {
         if(event.getView().getTitle().equalsIgnoreCase(ChatColor.RED + "WarningGUI")) {
             if(event.getClickedInventory() != null) {
-                ItemStack stack = event.getClickedInventory().getItem(11);
+                ItemStack stack = event.getClickedInventory().getItem(10);
                 if (stack != null) {
                     if (stack.getItemMeta() != null) {
                         if (stack.getItemMeta() instanceof SkullMeta) {
@@ -207,6 +208,22 @@ public class Warning implements CommandUtil {
                                                 embedBuilder.setDescription(warnedplayer.getName());
 
                                                 embedBuilder.addField("Reden", "Corner Cut || GUI", false);
+                                                embedBuilder.addField("Warn Count", String.valueOf(warningCount), false);
+
+                                                embedBuilder.setFooter("ZenticRacing | " + RaceManager.getRunningRace().getRaceName());
+
+                                                DiscordUtil.getChannelByID(844159011666526208L).sendMessage(embedBuilder.build()).queue();
+                                                break;
+                                            case "speeding in pit":
+                                                CommandUtil.sendMessageToServer(prefix + warnedplayer.getDisplayName() + " | " + "Speeding in the Pitlane");
+                                                warningCount += 1;
+
+                                                embedBuilder = new EmbedBuilder();
+                                                embedBuilder.setTitle("Waarschuwing", null);
+                                                embedBuilder.setColor(Color.RED);
+                                                embedBuilder.setDescription(warnedplayer.getName());
+
+                                                embedBuilder.addField("Reden", "Speeding in Pit || GUI", false);
                                                 embedBuilder.addField("Warn Count", String.valueOf(warningCount), false);
 
                                                 embedBuilder.setFooter("ZenticRacing | " + RaceManager.getRunningRace().getRaceName());

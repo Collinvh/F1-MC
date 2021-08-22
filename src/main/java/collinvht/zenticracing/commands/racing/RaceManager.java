@@ -2,34 +2,54 @@ package collinvht.zenticracing.commands.racing;
 
 import collinvht.zenticracing.ZenticRacing;
 import collinvht.zenticracing.commands.CommandUtil;
+import collinvht.zenticracing.commands.racing.laptime.object.Laptime;
 import collinvht.zenticracing.commands.racing.object.DRSZone;
 import collinvht.zenticracing.commands.racing.object.RaceMode;
 import collinvht.zenticracing.commands.racing.object.RaceObject;
+import collinvht.zenticracing.commands.team.Team;
 import collinvht.zenticracing.commands.team.TeamBaan;
+import collinvht.zenticracing.commands.team.object.TeamObject;
+import collinvht.zenticracing.listener.driver.DriverManager;
+import collinvht.zenticracing.listener.driver.object.DriverObject;
+import collinvht.zenticracing.manager.tyre.Tyres;
 import collinvht.zenticracing.util.objs.Cuboid;
+import collinvht.zenticracing.util.objs.DiscordUtil;
 import collinvht.zenticracing.util.objs.WorldEditUtil;
 import com.google.gson.*;
+import com.sk89q.util.StringUtil;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.World;
 import lombok.Getter;
+import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.chat.hover.content.Text;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Locale;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class RaceManager implements CommandUtil {
 
@@ -220,6 +240,21 @@ public class RaceManager implements CommandUtil {
                                 sender.sendMessage(prefix + "Er zijn geen races aangemaakt");
                             }
                             return true;
+                        case "createresult":
+                            if(runningRace != null) {
+                                if(runningRace.getRunningMode().isHasLaps()) {
+                                    sender.sendMessage(prefix + "Unsuported at the moment!");
+                                } else {
+                                    try {
+                                        createResultImage();
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            } else {
+                                sender.sendMessage(prefix + "Geen race bezig.");
+                            }
+                            break;
                         case "set":
                             if (args.length > 2) {
                                 RaceObject obj = races.get(args[1]);
@@ -337,6 +372,89 @@ public class RaceManager implements CommandUtil {
             return false;
         }
         return true;
+    }
+
+    private void createResultImage() throws IOException {
+        final BufferedImage image = ImageIO.read(new URL(
+                "https://media.discordapp.net/attachments/634115064567431189/874392848714334258/template.png"));
+        Graphics ip = image.getGraphics();
+
+        Font basefont = new Font("Bahnschrift", Font.BOLD, 16);
+
+        HashMap<UUID, DriverObject> drivers = DriverManager.getDrivers();
+        if(drivers.values().toArray().length > 0) {
+            LinkedHashMap<DriverObject, Long> sectors = new LinkedHashMap<>();
+
+            drivers.forEach((unused, driver) -> {
+                if (driver.getLapstorage().getBestTime() != null) {
+                    sectors.put(driver, driver.getLapstorage().getBestTime().getLaptime());
+                }
+            });
+
+            LinkedHashMap<DriverObject, Long> treeMap = SnelsteCommand.sortByValueDesc(sectors);
+            if (treeMap.values().toArray().length > 0) {
+
+                AtomicInteger pos = new AtomicInteger();
+                treeMap.forEach((driver, aLong) -> {
+                    if (driver.getLapstorage().getBestTime() != null) {
+                        pos.getAndIncrement();
+                        if (pos.get() < 21) {
+
+                            TeamObject object = Team.checkTeamForPlayer(driver.getPlayer());
+
+                            String team = "N/A";
+                            if (object != null) {
+                                team = StringUtils.capitalize(object.getTeamName());
+                            }
+
+                            if (pos.get() == 1) {
+
+                                try {
+                                    final BufferedImage character = ImageIO.read(new URL(
+                                            "https://minotar.net/body/" + driver.getPlayer().getName() + "/125"));
+                                    ip.drawImage(character, 132, 70, null);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+
+                                Font font = new Font("Calibri", Font.PLAIN, 30);
+                                ip.setColor(Color.WHITE);
+                                ip.setFont(font);
+                                ip.drawString(driver.getPlayer().getName(), 32, 365);
+
+                                font = new Font("Calibri", Font.PLAIN, 15);
+                                ip.setFont(font);
+                                ip.drawString(team, 32, 390);
+                            }
+
+                            ip.setFont(basefont);
+                            ip.drawString(driver.getPlayer().getName(), 405, 78 + (23 * (pos.get() - 1)));
+                            ip.setFont(basefont);
+                            ip.drawString(team, 725, 78 + (23 * (pos.get() - 1)));
+                            ip.setFont(basefont);
+                            ip.drawString(Laptime.millisToTimeString(driver.getLapstorage().getBestTime().getLapData().getSectorLength()), 895, 78 + (23 * (pos.get() - 1)));
+                            try {
+                                File file = new File(ZenticRacing.getRacing().getDataFolder() + "/storage/tyre/" + driver.getLapstorage().getBestTime().getTyre().getTyreID() + ".png");
+                                Bukkit.getLogger().warning(file.toString());
+                                final BufferedImage test = ImageIO.read(file);
+                                ip.drawImage(test, 1033, 59 + (23 * (pos.get() - 1)), null);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                });
+            }
+
+            ip.dispose();
+            File file = new File(ZenticRacing.getRacing().getDataFolder() + "/temp/result.png");
+            file.mkdir();
+            ImageIO.write(image, "png", file);
+
+            file = new File(ZenticRacing.getRacing().getDataFolder() + "/temp/result.png");
+
+            DiscordUtil.getChannelByID(874035064692953159L).sendMessage("Result:").addFile(file).queue();
+        }
     }
 
     public Location toLocation(org.bukkit.World world, BlockVector3 vector3) {

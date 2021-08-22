@@ -15,7 +15,7 @@ public class Cuboid implements Cloneable, ConfigurationSerializable, Iterable<Bl
     From https://gist.github.com/KingFaris10/4527fbaf8caa9fd7b800
      */
 
-    protected String worldName;
+    protected String worldName = "";
     protected Vector minimumPoint, maximumPoint;
 
     @Getter

@@ -7,6 +7,7 @@ import collinvht.zenticracing.listener.Listeners;
 import collinvht.zenticracing.listener.VPPListener;
 import collinvht.zenticracing.util.ConfigUtil;
 import collinvht.zenticracing.util.Utils;
+import collinvht.zenticracing.util.objs.DiscordUtil;
 import collinvht.zenticracing.util.objs.JSONUtil;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -40,6 +41,7 @@ public final class ZenticRacing extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        DiscordUtil.close();
         JSONUtil.unload();
         Team.getTeamObj().forEach((s, teamObject) -> teamObject.getRaceCars().forEach(car -> {
             if(car.getSpawnedVehicle() != null) {

@@ -57,6 +57,6 @@ public final class ZenticRacing extends JavaPlugin {
         }));
         VPPListener.cancel();
 
-        //ConfigUtil.save();
+        ConfigUtil.save();
     }
 }

@@ -307,11 +307,10 @@ public class Team implements CommandUtil, Listener {
     }
 
     public static void saveTeams() {
-        File racesLoc = Paths.get(ZenticRacing.getRacing().getDataFolder().toString() + "/storage/teams" + ".json").toFile();
-        File path = Paths.get(ZenticRacing.getRacing().getDataFolder().toString()).toFile();
-        JsonObject main = new JsonObject();
-        JsonArray teamArray = new JsonArray();
         for(TeamObject teamObj : teamObj.values()) {
+            File racesLoc = Paths.get(ZenticRacing.getRacing().getDataFolder() + "/storage/teams/" + teamObj.getTeamName().toLowerCase() + ".json").toFile();
+            File path = Paths.get(ZenticRacing.getRacing().getDataFolder().toString()).toFile();
+            JsonObject main = new JsonObject();
             JsonObject team = new JsonObject();
             team.addProperty("Name", teamObj.getTeamName());
             team.addProperty("OwnerUUID", teamObj.getOwnerUUID().toString());
@@ -341,36 +340,34 @@ public class Team implements CommandUtil, Listener {
             });
 
             team.add("Invited", array2);
+            main.add("TeamInfo", team);
 
-            teamArray.add(team);
-        }
-        main.add("Teams", teamArray);
+            try {
+                if (path.mkdir() || racesLoc.createNewFile() || racesLoc.exists()) {
+                    FileWriter writer = new FileWriter(racesLoc);
+                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-        try {
-            if (path.mkdir() || racesLoc.createNewFile() || racesLoc.exists()) {
-                FileWriter writer = new FileWriter(racesLoc);
-                Gson gson = new GsonBuilder().setPrettyPrinting().create();
-
-                writer.write(gson.toJson(main));
-                writer.flush();
+                    writer.write(gson.toJson(main));
+                    writer.flush();
+                }
+            } catch (IOException ignored) {
             }
-        } catch (IOException ignored) {
         }
     }
 
     public static void loadTeams() {
-        File teamLoc = Paths.get(ZenticRacing.getRacing().getDataFolder().toString() + "/storage/teams" + ".json").toFile();
+        File teamLoc = Paths.get(ZenticRacing.getRacing().getDataFolder() + "/storage/teams/").toFile();
         if(teamLoc.exists()) {
-            JsonObject jsonObject = null;
-            try {
-                jsonObject = (JsonObject) readJson(ZenticRacing.getRacing().getDataFolder().toString() + "/storage/teams" + ".json");
-            } catch (Exception ignored) {
-            }
-
-            if(jsonObject != null) {
-                JsonArray array = (JsonArray) jsonObject.get("Teams");
-                if(array != null) {
-                    array.forEach(team -> parseTeam((JsonObject) team));
+            JsonObject jsonObject;
+            File[] teams = teamLoc.listFiles();
+            if(teams != null) {
+                for(File team : teams) {
+                    try {
+                        jsonObject = (JsonObject) readJson(team.getAbsolutePath() + ".json");
+                        JsonObject array = jsonObject.getAsJsonObject("TeamInfo");
+                        parseTeam(array);
+                    } catch (Exception ignored) {
+                    }
                 }
             }
         }

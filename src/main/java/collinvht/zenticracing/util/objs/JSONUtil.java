@@ -4,7 +4,6 @@ import collinvht.zenticracing.ZenticRacing;
 import collinvht.zenticracing.commands.racing.RaceManager;
 import collinvht.zenticracing.commands.racing.setup.SetupManager;
 import collinvht.zenticracing.commands.team.Team;
-import collinvht.zenticracing.commands.team.TeamBaan;
 import collinvht.zenticracing.commands.util.MuteUtil;
 import com.google.gson.Gson;
 import lombok.Getter;
@@ -21,7 +20,6 @@ public class JSONUtil {
     public static void load() {
         RaceManager.loadRaces();
         Team.loadTeams();
-        TeamBaan.loadRaces();
         MuteUtil.saveUtil();
         SetupManager.loadSetups();
     }
@@ -32,9 +30,6 @@ public class JSONUtil {
         MuteUtil.loadUtil();
         Team.saveTeams();
         SetupManager.saveSetups();
-
-
-        TeamBaan.saveRaces();
     }
 
 }

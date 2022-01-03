@@ -140,7 +140,7 @@ public class MuteUtil implements CommandExecutor, Listener {
     }
 
     public static void saveUtil() {
-        File racesLoc = Paths.get(ZenticRacing.getRacing().getDataFolder().toString() + "/storage/muteutil" + ".json").toFile();
+        File racesLoc = Paths.get(ZenticRacing.getRacing().getDataFolder() + "/storage/other/muteutil" + ".json").toFile();
         File path = Paths.get(ZenticRacing.getRacing().getDataFolder().toString()).toFile();
         JsonObject main = new JsonObject();
         JsonArray mainArray = new JsonArray();
@@ -176,11 +176,11 @@ public class MuteUtil implements CommandExecutor, Listener {
     }
 
     public static void loadUtil() {
-        File teamLoc = Paths.get(ZenticRacing.getRacing().getDataFolder().toString() + "/storage/muteutil" + ".json").toFile();
+        File teamLoc = Paths.get(ZenticRacing.getRacing().getDataFolder().toString() + "/storage/other/muteutil" + ".json").toFile();
         if(teamLoc.exists()) {
             JsonObject jsonObject = null;
             try {
-                jsonObject = (JsonObject) Team.readJson(ZenticRacing.getRacing().getDataFolder().toString() + "/storage/muteutil" + ".json");
+                jsonObject = (JsonObject) Team.readJson(ZenticRacing.getRacing().getDataFolder().toString() + "/storage/other/muteutil" + ".json");
             } catch (Exception ignored) {
             }
 

@@ -7,28 +7,22 @@ import collinvht.zenticracing.commands.racing.object.DRSZone;
 import collinvht.zenticracing.commands.racing.object.RaceMode;
 import collinvht.zenticracing.commands.racing.object.RaceObject;
 import collinvht.zenticracing.commands.team.Team;
-import collinvht.zenticracing.commands.team.TeamBaan;
 import collinvht.zenticracing.commands.team.object.TeamObject;
 import collinvht.zenticracing.listener.driver.DriverManager;
 import collinvht.zenticracing.listener.driver.object.DriverObject;
-import collinvht.zenticracing.manager.tyre.Tyres;
 import collinvht.zenticracing.util.objs.Cuboid;
 import collinvht.zenticracing.util.objs.DiscordUtil;
 import collinvht.zenticracing.util.objs.WorldEditUtil;
 import com.google.gson.*;
-import com.sk89q.util.StringUtil;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.World;
 import lombok.Getter;
-import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.chat.hover.content.Text;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -42,7 +36,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -332,8 +325,6 @@ public class RaceManager implements CommandUtil {
                                 RaceObject object = races.get(args[1].toLowerCase());
                                 RaceMode mode = RaceMode.getModeFromString(args[2]);
 
-                                TeamBaan.getTeamBanen().forEach((s, teamBaanObject) -> teamBaanObject.stopRace());
-
                                 if (runningRace != null) {
                                     runningRace.stopRace(false);
                                 }
@@ -462,11 +453,11 @@ public class RaceManager implements CommandUtil {
     }
 
     public static void saveRaces() {
-        File racesLoc = Paths.get(ZenticRacing.getRacing().getDataFolder().toString() + "/storage/races" + ".json").toFile();
-        File path = Paths.get(ZenticRacing.getRacing().getDataFolder().toString()).toFile();
-        JsonObject main = new JsonObject();
-        JsonArray raceArray = new JsonArray();
         for(RaceObject raceObj : races.values()) {
+            File raceLoc = Paths.get(ZenticRacing.getRacing().getDataFolder() + "/storage/races/" + raceObj.getRaceName() + ".json").toFile();
+            File path = Paths.get(ZenticRacing.getRacing().getDataFolder().toString()).toFile();
+            JsonObject main = new JsonObject();
+
             JsonObject race = new JsonObject();
             race.addProperty("Name", raceObj.getRaceName());
             race.addProperty("Laps", raceObj.getLapCount());
@@ -501,34 +492,37 @@ public class RaceManager implements CommandUtil {
 
             race.add("DRS", array2);
 
-            raceArray.add(race);
-        }
-        main.add("Races", raceArray);
+            main.add("RaceInfo", race);
+            try {
+                if (path.mkdir() || raceLoc.createNewFile() || raceLoc.exists()) {
+                    FileWriter writer = new FileWriter(raceLoc);
+                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-        try {
-            if (path.mkdir() || racesLoc.createNewFile() || racesLoc.exists()) {
-                FileWriter writer = new FileWriter(racesLoc);
-                Gson gson = new GsonBuilder().setPrettyPrinting().create();
-
-                writer.write(gson.toJson(main));
-                writer.close();
+                    writer.write(gson.toJson(main));
+                    writer.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
     public static void loadRaces() {
-        File teamLoc = Paths.get(ZenticRacing.getRacing().getDataFolder().toString() + "/storage/races" + ".json").toFile();
+        File teamLoc = Paths.get(ZenticRacing.getRacing().getDataFolder() + "/storage/races/").toFile();
         if(teamLoc.exists()) {
-            JsonObject jsonObject = null;
-            try {
-                jsonObject = (JsonObject) readJson(ZenticRacing.getRacing().getDataFolder().toString() + "/storage/races" + ".json");
-                JsonArray array = (JsonArray) jsonObject.get("Races");
-                array.forEach(team -> parseRace((JsonObject) team));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+                File[] races = teamLoc.listFiles();
+                if(races != null) {
+                    for (File file : races) {
+                        JsonObject jsonObject;
+                        try {
+                            jsonObject = (JsonObject) readJson(file.getAbsolutePath() + ".json");
+                            JsonObject array = jsonObject.getAsJsonObject("RaceInfo");
+                            parseRace(array);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
         }
     }
 

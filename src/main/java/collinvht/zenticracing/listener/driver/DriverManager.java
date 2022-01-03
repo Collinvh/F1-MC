@@ -5,8 +5,6 @@ import collinvht.zenticracing.commands.racing.RaceManager;
 import collinvht.zenticracing.commands.racing.laptime.object.Laptime;
 import collinvht.zenticracing.commands.racing.object.RaceObject;
 import collinvht.zenticracing.commands.team.Team;
-import collinvht.zenticracing.commands.team.TeamBaan;
-import collinvht.zenticracing.commands.team.object.TeamBaanObject;
 import collinvht.zenticracing.commands.team.object.TeamObject;
 import collinvht.zenticracing.listener.driver.object.DriverObject;
 import lombok.Getter;
@@ -52,24 +50,8 @@ public class DriverManager {
 
             @Override
             public void run() {
-                TeamObject teamObject = Team.checkTeamForPlayer(driver.getPlayer());
-
-                TeamBaanObject object = null;
-                if(teamObject != null) {
-                    object = TeamBaan.getTeamBanen().get(teamObject.getTeamName().toLowerCase());
-                }
-
-                if (RaceManager.getRunningRace() != null || object != null) {
-                    if(object != null && RaceManager.getRunningRace() == null) {
-                        if (!object.getObject().isRunning()) {
-                            return;
-                        }
-                    }
+                if (RaceManager.getRunningRace() != null) {
                     RaceObject raceObject = RaceManager.getRunningRace();
-                    if(raceObject == null && object != null) {
-                        raceObject = object.getObject();
-                    }
-
                     if(raceObject == null) {
                         return;
                     }

@@ -5,7 +5,6 @@ import collinvht.zenticracing.commands.fia.*;
 import collinvht.zenticracing.commands.racing.*;
 import collinvht.zenticracing.commands.team.Golfkar;
 import collinvht.zenticracing.commands.team.Team;
-import collinvht.zenticracing.commands.team.TeamBaan;
 import collinvht.zenticracing.commands.tyre.GetTyre;
 import collinvht.zenticracing.commands.util.MuteUtil;
 import org.bukkit.command.CommandExecutor;
@@ -22,7 +21,6 @@ public class Commands {
         addCommand("raceteam", new Team());
         addCommand("snelste", new SnelsteCommand());
         addCommand("stand", new StandCommand());
-        addCommand("teambaan", new TeamBaan());
         addCommand("dsq", new DSQ());
         addCommand("flag", new Flag());
         addCommand("lights", new Lights());

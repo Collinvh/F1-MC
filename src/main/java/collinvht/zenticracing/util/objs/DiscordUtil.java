@@ -1,19 +1,14 @@
 package collinvht.zenticracing.util.objs;
 
 import collinvht.zenticracing.ZenticRacing;
-import collinvht.zenticracing.commands.fia.Warning;
 import collinvht.zenticracing.commands.racing.RaceManager;
 import collinvht.zenticracing.commands.racing.SnelsteCommand;
-import collinvht.zenticracing.commands.racing.laptime.LaptimeListener;
 import collinvht.zenticracing.commands.racing.laptime.object.Laptime;
 import collinvht.zenticracing.commands.team.Team;
-import collinvht.zenticracing.commands.team.TeamBaan;
-import collinvht.zenticracing.commands.team.object.TeamBaanObject;
 import collinvht.zenticracing.commands.team.object.TeamObject;
 import collinvht.zenticracing.listener.driver.DriverManager;
 import collinvht.zenticracing.listener.driver.object.DriverObject;
 import collinvht.zenticracing.manager.tyre.Tyres;
-import com.sk89q.util.StringUtil;
 import lombok.Getter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
@@ -23,12 +18,8 @@ import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.chat.hover.content.Text;
 import org.apache.commons.lang.StringUtils;
-import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
+import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 
 import javax.security.auth.login.LoginException;
@@ -58,6 +49,7 @@ public class DiscordUtil {
             jda.addEventListener(commands);
 
         } catch (LoginException | InterruptedException ignored) {
+            Bukkit.getLogger().warning("Error whilst initializing discord hook, disabling this part of the pluigin");
         }
     }
 

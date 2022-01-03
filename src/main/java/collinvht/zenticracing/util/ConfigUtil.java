@@ -25,7 +25,7 @@ public class ConfigUtil {
     private static boolean bestellenEnabled;
 
     private static JsonObject createDefaultConfig() {
-        File config = Paths.get(ZenticRacing.getRacing().getDataFolder().toString() + "/config" + ".json").toFile();
+        File config = Paths.get(ZenticRacing.getRacing().getDataFolder() + "/config" + ".json").toFile();
         if(!config.exists()) {
             JsonObject configMain = new JsonObject();
 

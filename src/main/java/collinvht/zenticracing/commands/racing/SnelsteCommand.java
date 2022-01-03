@@ -3,8 +3,6 @@ package collinvht.zenticracing.commands.racing;
 import collinvht.zenticracing.commands.racing.laptime.LaptimeListener;
 import collinvht.zenticracing.commands.racing.laptime.object.Laptime;
 import collinvht.zenticracing.commands.team.Team;
-import collinvht.zenticracing.commands.team.TeamBaan;
-import collinvht.zenticracing.commands.team.object.TeamBaanObject;
 import collinvht.zenticracing.commands.team.object.TeamObject;
 import collinvht.zenticracing.listener.driver.DriverManager;
 import collinvht.zenticracing.listener.driver.object.DriverObject;
@@ -28,18 +26,7 @@ public class SnelsteCommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if(sender instanceof Player) {
             if(!(args.length > 0)) {
-                TeamObject teamObject = Team.checkTeamForPlayer(((Player) sender).getPlayer());
-
-                TeamBaanObject object = null;
-                if(teamObject != null) {
-                    object = TeamBaan.getTeamBanen().get(teamObject.getTeamName().toLowerCase());
-                }
-                if(RaceManager.getRunningRace() != null || object != null) {
-                    if(object != null) {
-                        if(!object.getObject().isRunning() && RaceManager.getRunningRace() == null) {
-                            sender.sendMessage(prefix + "Er is momenteel geen sessie bezig.");
-                        }
-                    }
+                if(RaceManager.getRunningRace() != null) {
                     HashMap<UUID, DriverObject> drivers = DriverManager.getDrivers();
 
                     if(drivers.values().toArray().length > 0) {

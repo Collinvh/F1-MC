@@ -43,8 +43,6 @@ commands:
     permission: zentic.fia
   muteutil:
     description: MuteUtil
-  teambaan:
-    description: Teambaan
   raceteam:
     description: Team
   golfkar:

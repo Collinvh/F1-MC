@@ -1,0 +1,113 @@
+package collinvht.projectr.commands.racing;
+
+import collinvht.projectr.commands.racing.laptime.LaptimeListener;
+import collinvht.projectr.commands.racing.laptime.object.Laptime;
+import collinvht.projectr.listener.driver.DriverManager;
+import collinvht.projectr.listener.driver.object.DriverObject;
+import collinvht.projectr.manager.tyre.Tyres;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.chat.hover.content.Text;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+
+public class SnelsteCommand implements CommandExecutor {
+    public static final String prefix = "" + ChatColor.RED + ChatColor.BOLD + "ZT > " + ChatColor.RESET;
+    @Override
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if(sender instanceof Player) {
+            if(!(args.length > 0)) {
+                if(RaceManager.getRunningRace() != null) {
+                    HashMap<UUID, DriverObject> drivers = DriverManager.getDrivers();
+
+                    if(drivers.values().toArray().length > 0) {
+
+                        LinkedHashMap<DriverObject, Long> sectors = new LinkedHashMap<>();
+
+                        drivers.forEach((unused, driver) -> {
+                            if (driver.getLapstorage().getBestTime() != null) {
+                                sectors.put(driver, driver.getLapstorage().getBestTime().getLaptime());
+                            }
+                        });
+
+                        LinkedHashMap<DriverObject, Long> treeMap = sortByValueDesc(sectors);
+
+                        if (treeMap.values().toArray().length > 0) {
+
+                            sender.sendMessage(prefix + " Snelste Laps");
+
+                            AtomicInteger pos = new AtomicInteger();
+                            treeMap.forEach((driver, aLong) -> {
+                                pos.getAndIncrement();
+                                if (driver.getLapstorage().getBestTime() != null) {
+                                    TextComponent component = new TextComponent();
+                                    String tyre;
+                                    if(driver.getLapstorage().getBestTime().getTyre() != Tyres.NULLTYRE) {
+                                        tyre = " [" + driver.getLapstorage().getBestTime().getTyre().getColor() + driver.getLapstorage().getBestTime().getTyre().getName().charAt(0) + ChatColor.RESET +  "]";
+                                    } else {
+                                        tyre = " [" + ChatColor.BLACK + "?" + ChatColor.RESET + "]";
+                                    }
+
+                                    component.setText(pos.get() + ". " + driver.getPlayer().getDisplayName() + " " + Laptime.millisToTimeString(driver.getLapstorage().getBestTime().getLapData().getSectorLength()) + tyre);
+                                    component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(Laptime.millisToTimeString(driver.getLapstorage().getBestTime().getS1data().getSectorLength()) + " | " + Laptime.millisToTimeString(driver.getLapstorage().getBestTime().getS2data().getSectorLength()) + " | " + Laptime.millisToTimeString(driver.getLapstorage().getBestTime().getS3data().getSectorLength()))));
+                                    sender.spigot().sendMessage(component);
+                                }
+                            });
+                            if(RaceManager.getRunningRace() != null) {
+                                LaptimeListener raceOBJ = RaceManager.getRunningRace().getListener();
+                                if (raceOBJ != null) {
+                                    sender.sendMessage("\nTheoretical best : " + Laptime.millisToTimeString(raceOBJ.getBestS1() + raceOBJ.getBestS2() + raceOBJ.getBestS3()));
+                                }
+                            }
+                            return true;
+                        }
+                    }
+                    sender.sendMessage(prefix + "Er zijn nog geen laps gereden!");
+                    return false;
+                } else {
+                    sender.sendMessage(prefix + "Er is momenteel geen sessie bezig.");
+                }
+                return true;
+            } else {
+                Player player = Bukkit.getPlayer(args[0]);
+                if(player != null) {
+                    DriverObject driver = DriverManager.getDrivers().get(player.getUniqueId());
+                    if(driver != null) {
+                        if (driver.getLapstorage().getBestTime() == null) {
+                            sender.sendMessage(prefix + "Die driver heeft nog geen lap gezet!");
+                            return false;
+                        }
+                        sender.sendMessage(prefix + " " + driver.getPlayer().getDisplayName() + " :");
+                        sender.sendMessage("Fastest Lap : " + Laptime.millisToTimeString(driver.getLapstorage().getBestTime().getLaptime()));
+                        sender.sendMessage("S1/S2/S3 : " + Laptime.millisToTimeString(driver.getLapstorage().getBestTime().getS1data().getSectorLength()) + "/" + Laptime.millisToTimeString(driver.getLapstorage().getBestTime().getS2data().getSectorLength()) + "/" + Laptime.millisToTimeString(driver.getLapstorage().getBestTime().getS3data().getSectorLength()));
+                        sender.sendMessage("Gebruikte Band : " + driver.getLapstorage().getBestTime().getTyre().getName());
+                        sender.sendMessage(" ");
+                        return true;
+                    }
+                } else {
+                    sender.sendMessage(prefix + "Die driver kon niet gevonden worden!");
+                }
+            }
+        }
+        return false;
+    }
+
+    public static LinkedHashMap<DriverObject, Long> sortByValueDesc(Map<DriverObject, Long> map) {
+        List<Map.Entry<DriverObject, Long>> list = new LinkedList(map.entrySet());
+        list.sort((o1, o2) -> o2.getValue().compareTo(o1.getValue()));
+        Collections.reverse(list);
+
+        LinkedHashMap<DriverObject, Long> result = new LinkedHashMap<>();
+        for (Map.Entry<DriverObject, Long> entry : list) {
+            result.put(entry.getKey(), entry.getValue());
+        }
+        return result;
+    }
+}

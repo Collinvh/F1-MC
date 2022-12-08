@@ -23,10 +23,10 @@ public class GetTyre implements CommandUtil {
                             ItemStack stack = TyreManager.getTyre(tyre);
                             Player player = (Player) sender;
                             player.getInventory().addItem(stack);
-                            sender.sendMessage(prefix + "Item geadd");
+                            sender.sendMessage(serverPrefix + "Item geadd");
                         }
                     } catch (NumberFormatException e) {
-                        sender.sendMessage(prefix + "Ongeldig getal.");
+                        sender.sendMessage(serverPrefix + "Ongeldig getal.");
                     }
                 } else {
                     sendUsage(sender, "/gettyre [id]");

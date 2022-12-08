@@ -8,9 +8,9 @@ commands:
   warning:
     aliases: warn
     description: Warn people
-    permission: zentic.fia
+    permission: projectr.fia
   race:
-    permission: zentic.fia
+    permission: projectr.fia
     description: Starts races
   persoonlijkrecord:
     description: Persoonlijk Record
@@ -21,42 +21,42 @@ commands:
   penalty:
     aliases: penalty
     description: Give people a penalty
-    permission: zentic.fia
+    permission: projectr.fia
   dsq:
     aliases: dsq
     description: Give people a dsq
-    permission: zentic.fia
-  flag:
-    aliases: vlag
-    description: Bring out a flag
-    permission: zentic.fia
-  lights:
-    aliases: lichten
-    description: Start de lichten
-    permission: zentic.fia
+    permission: projectr.fia
+#  flag:
+#    aliases: vlag
+#    description: Bring out a flag
+#    permission: projectr.fia
+#  lights:
+#    aliases: lichten
+#    description: Start de lichten
+#    permission: projectr.fia
   garage:
     aliases: spawnkart, spawncar
     description: Spawn a kart
-    permission: zentic.fia
+    permission: projectr.fia
   clearchat:
     description: ClearChat
-    permission: zentic.fia
+    permission: projectr.fia
   muteutil:
     description: MuteUtil
   raceteam:
     description: Team
   golfkar:
     description: Spawn golfkar
-    permission: zentic.spawngolf
+    permission: projectr.spawngolf
   testpc:
     description: Test voor pc
-    permission: zentic.test
+    permission: projectr.test
   getband:
     description: band
-    permission: zentic.band
+    permission: projectr.band
   fia:
     description: FIA
-    permission: zentic.fia
+    permission: projectr.fia
   weer:
     description: Weer
-    permission: zentic.fia
+    permission: projectr.fia

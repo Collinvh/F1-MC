@@ -22,8 +22,8 @@ public class Commands {
         addCommand("snelste", new SnelsteCommand());
         addCommand("stand", new StandCommand());
         addCommand("dsq", new DSQ());
-        addCommand("flag", new Flag());
-        addCommand("lights", new Lights());
+//        addCommand("flag", new Flag());
+//        addCommand("lights", new Lights());
         addCommand("garage", new Garage());
         addCommand("clearchat", new ClearChat());
         addCommand("muteutil", new MuteUtil());

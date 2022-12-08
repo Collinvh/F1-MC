@@ -41,7 +41,7 @@ public class DiscordUtil {
 
     public static void init(ProjectR racing) {
         try {
-            jda = JDABuilder.createDefault("ODQ0MTMyMDEzNjkwMDYwODQx.YKN9Mw.JR3su1AHEvYRZjMua92LJ1xsz9g").build();
+            jda = JDABuilder.createDefault("MTA1MDU0MjgzOTA4OTYwNjcyNw.Gs5wOm.POiVmZVe-nOEStsSCQeh-CvGToZm7VXGSLS-Uk").build();
             jda.awaitReady();
 
             jda.getPresence().setActivity(Activity.streaming("ProjectR", "https://discord.gg/ykXmbNgA7X"));
@@ -78,7 +78,7 @@ public class DiscordUtil {
         public void onGuildMessageReceived(@NotNull GuildMessageReceivedEvent event) {
             String[] args = event.getMessage().getContentRaw().split("\\s+");
 
-            if(event.getChannel().getIdLong() == 827169926145769482L) {
+            if(event.getChannel().getIdLong() == 1049746928063226010L) {
                 if (args[0].equalsIgnoreCase(discordPrefix + "stand")) {
                     sendStand(event);
                 } else if (args[0].equalsIgnoreCase(discordPrefix + "snelste")) {

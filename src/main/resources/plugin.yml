@@ -1,6 +1,6 @@
-name: ZenticRacing
+name: ProjectR
 version: ${project.version}
-main: collinvht.zenticracing.ZenticRacing
+main: collinvht.projectr.ProjectR
 api-version: 1.16
 depend: [ VehiclesPlusPro, WorldEdit, LuckPerms, JDA ]
 authors: [ Collinvht ]

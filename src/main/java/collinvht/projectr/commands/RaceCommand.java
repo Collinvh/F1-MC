@@ -20,7 +20,7 @@ public class RaceCommand implements CommandExecutor {
                 switch (args[0]) {
                     case "start": {
                         if(args.length > 2) {
-                            sender.sendMessage(prefix + racing.startRace(args[1], args[2]));
+                            sender.sendMessage(prefix + racing.startRace(args[1].toLowerCase(), args[2]));
                         } else {
                             sender.sendMessage(prefix + "/race start [name] [mode]");
                         }
@@ -28,7 +28,7 @@ public class RaceCommand implements CommandExecutor {
                     }
                     case "stop": {
                         if(args.length > 1) {
-                            sender.sendMessage(prefix + racing.stopRace(args[1]));
+                            sender.sendMessage(prefix + racing.stopRace(args[1].toLowerCase()));
                         } else {
                             sender.sendMessage(prefix + "/race stop [name]");
                         }
@@ -36,24 +36,40 @@ public class RaceCommand implements CommandExecutor {
                     }
                     case "delete": {
                         if(args.length > 1) {
-                            sender.sendMessage(prefix + racing.deleteRace(args[1]));
+                            sender.sendMessage(prefix + racing.deleteRace(args[1].toLowerCase()));
                         } else {
                             sender.sendMessage(prefix + "/race delete [name]");
                         }
                         return true;
                     }
-                    case "result":
+                    case "result": {
                         sender.sendMessage(prefix + racing.getRaceResult());
                         return true;
-                    case "create":
-                        if(args.length > 2) {
-                            sender.sendMessage(prefix + racing.createRace(args[1], args[2]));
+                    }
+                    case "create": {
+                        if (args.length > 2) {
+                            sender.sendMessage(prefix + racing.createRace(args[1].toLowerCase(), args[2]));
                         } else {
                             sender.sendMessage(prefix + "/race create [name] [laps]");
                         }
-                    case "list":
+                        return true;
+                    }
+                    case "list": {
                         sender.sendMessage(prefix + racing.listRaces());
                         return true;
+                    }
+                    case "set": {
+                        if (args.length > 3) {
+                            if(sender instanceof Player) {
+                                sender.sendMessage(prefix + racing.updateRace((Player) sender, args[1].toLowerCase(), args[2], args[3]));
+                            } else {
+                                sender.sendMessage(prefix + "Dit kun je alleen als speler doen.");
+                            }
+                        } else {
+                            sender.sendMessage(prefix + "/race set [name] [type] [input]");
+                        }
+                        return true;
+                    }
                     default:
                         sender.sendMessage(prefix + "Dit is geen geldig argument.");
                         break;

@@ -1,5 +1,6 @@
 package collinvht.projectr.util.objects;
 
+import com.sk89q.worldedit.math.BlockVector3;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -175,16 +176,16 @@ public class Cuboid implements Cloneable, ConfigurationSerializable, Iterable<Bl
         return serializedCuboid;
     }
 
-    public static Cuboid deserialize(Map<String, Object> serializedCuboid) {
+    public static Cuboid deserialize(Map<String, String> serializedCuboid) {
         try {
-            String worldName = (String) serializedCuboid.get("worldName");
+            String worldName = serializedCuboid.get("worldName");
 
-            double xPos1 = (Double) serializedCuboid.get("x1");
-            double xPos2 = (Double) serializedCuboid.get("x2");
-            double yPos1 = (Double) serializedCuboid.get("y1");
-            double yPos2 = (Double) serializedCuboid.get("y2");
-            double zPos1 = (Double) serializedCuboid.get("z1");
-            double zPos2 = (Double) serializedCuboid.get("z2");
+            double xPos1 = Double.parseDouble(serializedCuboid.get("x1"));
+            double xPos2 = Double.parseDouble(serializedCuboid.get("x2"));
+            double yPos1 = Double.parseDouble(serializedCuboid.get("y1"));
+            double yPos2 = Double.parseDouble(serializedCuboid.get("y2"));
+            double zPos1 = Double.parseDouble(serializedCuboid.get("z1"));
+            double zPos2 = Double.parseDouble(serializedCuboid.get("z2"));
 
             return new Cuboid(worldName, xPos1, yPos1, zPos1, xPos2, yPos2, zPos2);
         } catch (Exception ex) {

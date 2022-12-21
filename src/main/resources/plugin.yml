@@ -2,61 +2,9 @@ name: ProjectR
 version: ${project.version}
 main: collinvht.projectr.ProjectR
 api-version: 1.16
-depend: [ VehiclesPlusPro, WorldEdit, LuckPerms, JDA ]
+depend: [ MTVehicles, WorldEdit, LuckPerms, JDA ]
 authors: [ Collinvht ]
 commands:
-  warning:
-    aliases: warn
-    description: Warn people
-    permission: projectr.fia
   race:
-    permission: projectr.fia
+    permission: projectr.fia.race
     description: Starts races
-  persoonlijkrecord:
-    description: Persoonlijk Record
-  snelste:
-    description: Snelste tijden
-  stand:
-    description: Stand
-  penalty:
-    aliases: penalty
-    description: Give people a penalty
-    permission: projectr.fia
-  dsq:
-    aliases: dsq
-    description: Give people a dsq
-    permission: projectr.fia
-#  flag:
-#    aliases: vlag
-#    description: Bring out a flag
-#    permission: projectr.fia
-#  lights:
-#    aliases: lichten
-#    description: Start de lichten
-#    permission: projectr.fia
-  garage:
-    aliases: spawnkart, spawncar
-    description: Spawn a kart
-    permission: projectr.fia
-  clearchat:
-    description: ClearChat
-    permission: projectr.fia
-  muteutil:
-    description: MuteUtil
-  raceteam:
-    description: Team
-  golfkar:
-    description: Spawn golfkar
-    permission: projectr.spawngolf
-  testpc:
-    description: Test voor pc
-    permission: projectr.test
-  getband:
-    description: band
-    permission: projectr.band
-  fia:
-    description: FIA
-    permission: projectr.fia
-  weer:
-    description: Weer
-    permission: projectr.fia

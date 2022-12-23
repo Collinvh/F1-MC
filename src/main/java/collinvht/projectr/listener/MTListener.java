@@ -60,4 +60,8 @@ public class MTListener implements Listener {
     public static void initialize() {
         Bukkit.getPluginManager().registerEvents(new MTListener(), ProjectR.getInstance());
     }
+
+    public static void disable() {
+
+    }
 }

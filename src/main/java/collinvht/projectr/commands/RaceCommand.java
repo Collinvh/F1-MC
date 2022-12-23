@@ -94,10 +94,17 @@ public class RaceCommand implements CommandUtil {
                 }
                 default:
                     sender.sendMessage(prefix + "Dit is geen geldig argument");
-                    break;
+                    return true;
             }
         } else {
             UsageBuilder builder = new UsageBuilder();
+            builder.addUsage("/race start [name] [mode]", Permissions.FIA_RACE, Permissions.FIA_ADMIN);
+            builder.addUsage("/race stop", Permissions.FIA_RACE, Permissions.FIA_ADMIN);
+            builder.addUsage("/race delete [name]", Permissions.FIA_RACE, Permissions.FIA_ADMIN);
+            builder.addUsage("/race get [type]");
+            builder.addUsage("/race create [name] [laps]", Permissions.FIA_RACE, Permissions.FIA_ADMIN);
+            builder.addUsage("/race list", Permissions.FIA_RACE, Permissions.FIA_ADMIN);
+            builder.addUsage("/race set [name] [type] [input]", Permissions.FIA_RACE, Permissions.FIA_ADMIN);
             sender.sendMessage(prefix + "Command Usage:\n" + builder.buildUsages(sender));
             return true;
         }

@@ -7,6 +7,7 @@ import lombok.Setter;
 import nl.mtvehicles.core.infrastructure.models.Vehicle;
 
 import java.util.LinkedList;
+import java.util.UUID;
 
 public class RaceDriver {
     @Setter @Getter
@@ -23,8 +24,18 @@ public class RaceDriver {
     @Getter
     private boolean isInPit = true;
 
-    public RaceDriver() {
-        laptimes = new Laptimes();
+    @Getter @Setter
+    private boolean finished;
+
+    @Getter @Setter
+    private int currentLap;
+
+    @Getter
+    private final UUID driverUUID;
+
+    public RaceDriver(UUID uuid) {
+        this.laptimes = new Laptimes();
+        this.driverUUID = uuid;
     }
 
     public void addLaptime(LaptimeStorage storage) {

@@ -2,6 +2,7 @@ package collinvht.projectr.util.objects.race;
 
 import collinvht.projectr.ProjectR;
 import collinvht.projectr.listener.MTListener;
+import collinvht.projectr.util.Permissions;
 import collinvht.projectr.util.Utils;
 import collinvht.projectr.util.objects.race.laptime.LaptimeStorage;
 import collinvht.projectr.util.objects.race.laptime.Laptimes;
@@ -14,6 +15,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.UUID;
 
 public class RaceListener {
@@ -21,7 +23,10 @@ public class RaceListener {
     private static RaceListener instance;
 
     @Getter
-    private final HashMap<UUID, LaptimeStorage> laptimeHash = new HashMap<>();
+    private final LinkedHashMap<UUID, LaptimeStorage> laptimeHash = new LinkedHashMap<>();
+
+    @Getter
+    private final LinkedHashMap<Integer, UUID> finishers = new LinkedHashMap<>();
 
     @Getter @Setter
     private LaptimeStorage bestLapTime;
@@ -35,6 +40,7 @@ public class RaceListener {
     @Getter @Setter
     private long bestS3 = -1;
 
+    @Getter
     private Race currentRace;
     private int runnableID = -1;
 
@@ -135,22 +141,22 @@ public class RaceListener {
                                                             laptimeStorage.setPassedS1(false);
                                                             laptimeStorage.setPassedS2(false);
 
-//                                                            driver.getRaceStorage().setLap(driver.getRaceStorage().getLap() + 1);
-//                                                            if (object.getRunningMode().isHasLaps()) {
-//                                                                if (driver.getRaceStorage().getLap() >= object.getLapCount()) {
-//                                                                    driver.getRaceStorage().setFinished(true);
-//                                                                    FinishData data = new FinishData(driver, object.getFinishedDrivers().size() + 1);
-//                                                                    object.addFinishedDriver(data);
-//
-//                                                                    player.sendMessage(ChatColor.GRAY + "Je bent gefinished op plek " + data.getFinishPosition());
-//
-//                                                                    for (Player p : Bukkit.getOnlinePlayers()) {
-//                                                                        if (p.hasPermission("projectr.fia.race") || p.hasPermission("projectr.admin")) {
-//                                                                            p.sendMessage(player.getDisplayName() + " is gefinished op plek " + data.getFinishPosition());
-//                                                                        }
-//                                                                    }
-//                                                                }
-//                                                            }
+                                                            raceDriver.setCurrentLap(raceDriver.getCurrentLap() + 1);
+                                                            if (raceMode.isHasLaps()) {
+                                                                if (raceDriver.getCurrentLap() >= race.getLaps()) {
+                                                                    raceDriver.setFinished(true);
+                                                                    final int position = finishers.size() + 1;
+                                                                    finishers.put(position, uuid);
+
+                                                                    player.sendMessage(ChatColor.GRAY + "Je bent gefinished op plek " + position);
+
+                                                                    for (Player p : Bukkit.getOnlinePlayers()) {
+                                                                        if (Permissions.FIA_ADMIN.hasPermission(p) || Permissions.FIA_RACE.hasPermission(p)) {
+                                                                            p.sendMessage(player.getDisplayName() + " is gefinished op plek " + position);
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
                                                         }
                                                     }
                                                 }

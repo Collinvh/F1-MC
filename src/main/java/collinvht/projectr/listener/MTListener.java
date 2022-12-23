@@ -25,7 +25,7 @@ public class MTListener implements Listener {
         if(event.getPlayer() != null) {
             RaceDriver driver = raceDrivers.get(event.getPlayer().getUniqueId());
             if (driver == null) {
-                driver = new RaceDriver();
+                driver = new RaceDriver(event.getPlayer().getUniqueId());
                 raceDrivers.put(event.getPlayer().getUniqueId(), driver);
             }
 

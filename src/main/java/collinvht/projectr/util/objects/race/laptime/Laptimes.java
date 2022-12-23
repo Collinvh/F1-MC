@@ -7,6 +7,7 @@ import java.util.LinkedList;
 
 public class Laptimes {
 
+    @Getter
     private LinkedList<LaptimeStorage> laptimes = new LinkedList<>();
 
     @Getter

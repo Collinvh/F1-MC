@@ -1,4 +1,4 @@
-package collinvht.projectr.manager;
+package collinvht.projectr.manager.race;
 import collinvht.projectr.ProjectR;
 import collinvht.projectr.listener.MTListener;
 import collinvht.projectr.util.JSONUtil;
@@ -13,9 +13,7 @@ import com.google.gson.JsonObject;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.regions.Region;
 import lombok.Getter;
-import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.chat.hover.content.Text;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -47,7 +45,7 @@ public class RacingManager {
 
     private void saveRaces() {
         if(!RACES.isEmpty()) {
-            RACES.forEach((s, race) -> {
+            RACES.forEach((s, race) ->  {
                 race.saveJson();
             });
         }
@@ -121,12 +119,13 @@ public class RacingManager {
                         builder.append("Snelste Laps:\n");
                         AtomicInteger pos = new AtomicInteger();
                         treeMap.forEach((driver, aLong) -> {
-                            pos.getAndIncrement();
                             TextComponent component = new TextComponent();
                             OfflinePlayer player = Bukkit.getOfflinePlayer(driver.getDriverUUID());
-                            component.setText(pos.get() + ". " + player.getName() + " " + Utils.millisToTimeString(driver.getLaptimes().getFastestLap().getLapData().getSectorLength()));
-                            component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(Utils.millisToTimeString(driver.getLaptimes().getFastestLap().getS1data().getSectorLength()) + " | " + Utils.millisToTimeString(driver.getLaptimes().getFastestLap().getS2data().getSectorLength()) + " | " + Utils.millisToTimeString(driver.getLaptimes().getFastestLap().getS3data().getSectorLength()))));
-                            builder.append(component);
+                            pos.getAndIncrement();
+                            builder.append(pos.get()).append(". ").append(player.getName()).append(" ").append(Utils.millisToTimeString(driver.getLaptimes().getFastestLap().getLapData().getSectorLength())).append("\n");
+//                            component.setText(pos.get() + ". " + player.getName() + " " + Utils.millisToTimeString(driver.getLaptimes().getFastestLap().getLapData().getSectorLength()));
+//                            component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(Utils.millisToTimeString(driver.getLaptimes().getFastestLap().getS1data().getSectorLength()) + " | " + Utils.millisToTimeString(driver.getLaptimes().getFastestLap().getS2data().getSectorLength()) + " | " + Utils.millisToTimeString(driver.getLaptimes().getFastestLap().getS3data().getSectorLength()))));
+//                            builder.append(component).append("\n");
                         });
                         return builder.toString();
                     }
@@ -139,7 +138,7 @@ public class RacingManager {
                     builder.append("Race Result:\n");
                     RaceListener.getInstance().getFinishers().forEach((integer, uuid) -> {
                         OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
-                        builder.append(integer).append(". | ").append(player.getName());
+                        builder.append(integer).append(". | ").append(player.getName()).append("\n");
                     });
                     return builder.toString();
                 } else {
@@ -166,8 +165,7 @@ public class RacingManager {
                         treeMap.forEach((driver, integer) -> {
                             if (integer > 0) {
                                 OfflinePlayer player = Bukkit.getOfflinePlayer(driver.getDriverUUID());
-                                pos.getAndIncrement();
-                                builder.append(pos.get()).append(". ").append(player.getName()).append(" : ").append(integer);
+                                builder.append(pos.incrementAndGet()).append(". ").append(player.getName()).append(" : ").append(integer).append("\n");
                             }
                         });
                         return builder.toString();
@@ -212,7 +210,7 @@ public class RacingManager {
         return builder.toString();
     }
 
-    private Race getRace(String raceName) {
+    public Race getRace(String raceName) {
         return RACES.get(raceName);
     }
 
@@ -231,6 +229,19 @@ public class RacingManager {
                     return "Laps zijn aangepast.";
                 } catch (NumberFormatException e) {
                     return input + " is geen geldig nummer.";
+                }
+            }
+            case "timetrial": {
+                switch (input.toLowerCase()) {
+                    case "disable":
+                        race.setTimeTrialStatus(false);
+                        return "Time trial staat nu uit.";
+                    case "enable":
+                        race.setTimeTrialStatus(true);
+                        return "Time trial staat nu aan.";
+                    case "setspawn":
+                        race.getStorage().setTimeTrialSpawn(player.getLocation());
+                        return "Spawn aangepast.";
                 }
             }
             case "sector": {

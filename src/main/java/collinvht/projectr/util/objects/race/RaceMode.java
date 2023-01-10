@@ -4,7 +4,8 @@ import lombok.Getter;
 
 public enum RaceMode {
     PRATICE(0, false),
-    RACE(1, true);
+    RACE(1, true),
+    TIMETRIAL(2, false);
 
     @Getter
     private final int id;

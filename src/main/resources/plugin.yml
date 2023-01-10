@@ -6,5 +6,10 @@ depend: [ MTVehicles, WorldEdit, LuckPerms, JDA ]
 authors: [ Collinvht ]
 commands:
   race:
-    permission: projectr.fia.race
     description: Starts races
+  blockslowdown:
+    permission: projectr.fia.common
+    description: Blockslowdown
+  timetrial:
+    permission: projectr.fia.common
+    description: Starts timetrial

@@ -1,12 +1,12 @@
 package collinvht.projectr.util.objects.race;
 
+import collinvht.projectr.manager.race.SetupManager;
 import collinvht.projectr.util.objects.race.laptime.LaptimeStorage;
 import collinvht.projectr.util.objects.race.laptime.Laptimes;
 import lombok.Getter;
 import lombok.Setter;
 import nl.mtvehicles.core.infrastructure.models.Vehicle;
 
-import java.util.LinkedList;
 import java.util.UUID;
 
 public class RaceDriver {
@@ -36,6 +36,8 @@ public class RaceDriver {
     public RaceDriver(UUID uuid) {
         this.laptimes = new Laptimes();
         this.driverUUID = uuid;
+
+        SetupManager.initializeSetup(uuid);
     }
 
     public void addLaptime(LaptimeStorage storage) {

@@ -1,7 +1,6 @@
 package collinvht.projectr.util.objects.race.laptime;
 
 import collinvht.projectr.listener.MTListener;
-import collinvht.projectr.manager.RacingManager;
 import collinvht.projectr.util.objects.race.Race;
 import collinvht.projectr.util.objects.race.RaceDriver;
 import collinvht.projectr.util.objects.race.RaceListener;
@@ -9,8 +8,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.ChatColor;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.UUID;
 
 public class LaptimeStorage implements Cloneable {

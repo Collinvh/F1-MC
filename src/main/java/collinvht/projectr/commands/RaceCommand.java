@@ -1,11 +1,9 @@
 package collinvht.projectr.commands;
 
-import collinvht.projectr.ProjectR;
 import collinvht.projectr.commands.commandusage.UsageBuilder;
-import collinvht.projectr.manager.RacingManager;
+import collinvht.projectr.manager.race.RacingManager;
 import collinvht.projectr.util.Permissions;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;

@@ -9,6 +9,7 @@ import com.sk89q.worldedit.regions.Region;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.World;
 
 import java.util.HashMap;
@@ -32,6 +33,12 @@ public class RaceStorage {
     private NamedCuboid pitEntry;
     @Setter @Getter
     private NamedCuboid pitExit;
+
+    /*
+    Time trial
+     */
+    @Getter
+    private Location timeTrialSpawn;
 
     public static RaceStorage fromJson(JsonObject cuboids) {
         try {
@@ -95,5 +102,28 @@ public class RaceStorage {
     public NamedCuboid createNamedCuboidFromSelection(World world, Region region, String name) {
         Cuboid cuboid = new Cuboid(Utils.blockVectorToLocation(world, region.getMinimumPoint()), Utils.blockVectorToLocation(world, region.getMaximumPoint()));
         return new NamedCuboid(cuboid, name);
+    }
+
+    public JsonObject ttSpawnJson() {
+        JsonObject object = new JsonObject();
+        if(timeTrialSpawn != null) {
+            timeTrialSpawn.serialize().forEach(((s, o) -> object.addProperty(s, String.valueOf(o))));
+        }
+        return object;
+    }
+
+
+    public void setTimeTrialSpawn(Location timeTrialSpawn) {
+        this.timeTrialSpawn = timeTrialSpawn;
+    }
+
+    public void setTimeTrialSpawn(JsonObject ttSpawn) {
+        if(ttSpawn != null) {
+            Map<String, Object> serializableMap = new HashMap<>();
+            for (Map.Entry<String, JsonElement> stringJsonElementEntry : ttSpawn.entrySet()) {
+                serializableMap.put(stringJsonElementEntry.getKey(), stringJsonElementEntry.getValue().getAsString());
+            }
+            this.timeTrialSpawn = Location.deserialize(serializableMap);
+        }
     }
 }

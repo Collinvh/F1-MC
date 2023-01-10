@@ -23,6 +23,9 @@ public class Race {
     @Getter @Setter
     private RaceStorage storage;
 
+    @Getter @Setter
+    private boolean timeTrialStatus;
+
     public Race(String name, int laps) {
         this.laps = laps;
         this.name = name;
@@ -36,6 +39,7 @@ public class Race {
         JsonObject mainObject = new JsonObject();
         mainObject.addProperty("Name", name);
         mainObject.addProperty("Laps", laps);
+        mainObject.add("TT_Spawn", storage.ttSpawnJson());
         mainObject.add("Cuboids", storage.toJson());
 
         try {
@@ -57,11 +61,14 @@ public class Race {
             int laps = object.get("Laps").getAsInt();
 
             RaceStorage raceStorage = RaceStorage.fromJson(object.get("Cuboids").getAsJsonObject());
-            Race race = new Race(name, laps);
-            race.setStorage(raceStorage);
-            return race;
-        } catch (Exception e) {
-            return null;
+            if(raceStorage != null) {
+                raceStorage.setTimeTrialSpawn(object.get("TT_Spawn").getAsJsonObject());
+                Race race = new Race(name, laps);
+                race.setStorage(raceStorage);
+                return race;
+            }
+        } catch (Exception ignored) {
         }
+        return null;
     }
 }

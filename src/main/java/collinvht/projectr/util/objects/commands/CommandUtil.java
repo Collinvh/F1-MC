@@ -52,7 +52,7 @@ public abstract class CommandUtil implements CommandExecutor {
         sender.sendMessage(prefix + "Command usage \n" + builder.buildUsages(sender));
     }
 
-    protected abstract void initializeCommand(@NotNull CommandSender sender);
+    protected abstract void initializeCommand(@NotNull CommandSender commandSender);
 
     protected void addPart(String name, int extraArguments, String usage, CallableCommand<String> function) {
         addPart(name,extraArguments, usage, function, Permissions.NONE);

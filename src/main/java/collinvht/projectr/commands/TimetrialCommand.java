@@ -3,6 +3,7 @@ package collinvht.projectr.commands;
 import collinvht.projectr.util.objects.commands.CommandUtil;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.jetbrains.annotations.NotNull;
 
 /*
 Disabled for now
@@ -44,6 +45,6 @@ public class TimetrialCommand extends CommandUtil {
 //    }
 
     @Override
-    protected void initializeCommand(CommandSender commandSender) {
+    protected void initializeCommand(@NotNull CommandSender commandSender) {
     }
 }

@@ -44,6 +44,7 @@ public final class ProjectR extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        MTListener.disable();
 
         /*
         Disable Managers

@@ -15,3 +15,6 @@ commands:
   timetrial:
     permission: projectr.fia.common
     description: Starts timetrial
+  tuktuk:
+    permission: projectr.console.tuktuk
+    description: tuktuk

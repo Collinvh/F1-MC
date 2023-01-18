@@ -1,6 +1,7 @@
 package collinvht.projectr.listener;
 
 import collinvht.projectr.ProjectR;
+import collinvht.projectr.commands.TukTukCommand;
 import collinvht.projectr.manager.vehicle.SetupManager;
 import collinvht.projectr.manager.vehicle.SlowDownManager;
 import collinvht.projectr.util.objects.race.RaceDriver;
@@ -10,8 +11,10 @@ import nl.mtvehicles.core.events.VehicleLeaveEvent;
 import nl.mtvehicles.core.infrastructure.dataconfig.VehicleDataConfig;
 import nl.mtvehicles.core.infrastructure.helpers.VehicleData;
 import nl.mtvehicles.core.infrastructure.models.Vehicle;
+import nl.mtvehicles.core.infrastructure.models.VehicleUtils;
 import nl.mtvehicles.core.infrastructure.modules.ConfigModule;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -48,20 +51,34 @@ public class MTListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public static void OnVehicleLeave(VehicleLeaveEvent event) {
         if(event.getPlayer() != null) {
-            if (containsDriver(event.getPlayer().getUniqueId())) {
+            Player player = event.getPlayer();
+            UUID uuid = player.getUniqueId();
+            if (containsDriver(uuid)) {
                 RaceDriver driver = raceDrivers.get(event.getPlayer().getUniqueId());
                 driver.setDriving(false);
                 driver.setVehicle(null);
+            }
+            if(TukTukCommand.getTuktuks().containsKey(uuid)) {
+                String plate = TukTukCommand.getTuktuks().get(uuid);
+                VehicleUtils.deleteVehicle(plate, player,false);
+                TukTukCommand.getTuktuks().remove(uuid);
             }
         }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public static void OnPlayerLeave(PlayerQuitEvent event) {
-        if(containsDriver(event.getPlayer().getUniqueId())) {
-            RaceDriver driver = raceDrivers.get(event.getPlayer().getUniqueId());
+        Player player = event.getPlayer();
+        UUID uuid = player.getUniqueId();
+        if(containsDriver(uuid)) {
+            RaceDriver driver = raceDrivers.get(uuid);
             driver.setDriving(false);
             driver.setVehicle(null);
+        }
+        if(TukTukCommand.getTuktuks().containsKey(uuid)) {
+            String plate = TukTukCommand.getTuktuks().get(uuid);
+            VehicleUtils.deleteVehicle(plate, player,false);
+            TukTukCommand.getTuktuks().remove(uuid);
         }
     }
 

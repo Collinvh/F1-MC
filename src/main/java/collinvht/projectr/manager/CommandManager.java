@@ -13,6 +13,7 @@ public class CommandManager {
         registerCommand("slowdown", new BlockSlowDown());
         registerCommand("timetrial", new TimetrialCommand());
         registerCommand("raceteam", new TeamCommand());
+        registerCommand("tuktuk", new TukTukCommand());
     }
 
     private static void registerCommand(String command, CommandExecutor executor) {

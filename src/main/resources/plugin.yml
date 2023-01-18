@@ -33,3 +33,6 @@ commands:
   announcement:
     permission: projectr.fia.common
     description: Announce something
+  hypersoft:
+    permission: projectr.fia.admin
+    description: Hypersoft someone

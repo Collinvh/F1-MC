@@ -3,6 +3,7 @@ package collinvht.projectr.manager;
 import collinvht.projectr.ProjectR;
 import collinvht.projectr.commands.*;
 import collinvht.projectr.commands.fia.*;
+import collinvht.projectr.commands.fun.Hypersoft;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabCompleter;
@@ -24,6 +25,7 @@ public class CommandManager {
         registerCommand("penalty", new PenaltyCommand());
         registerCommand("warning", new WarningCommand());
         registerCommand("flag", new FlagCommand());
+        registerCommand("hypersoft", new Hypersoft());
     }
 
     private static void registerCommand(String command, CommandExecutor executor) {

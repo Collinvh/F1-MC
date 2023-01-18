@@ -65,6 +65,6 @@ public class RaceCommand extends CommandUtil {
         Pitlane
         Name
          */
-        addPart("set", 2, "/race set [name] [type] [input]", (sender, command, label, args) -> racing.updateRace((Player) sender, args[1].toLowerCase(), args[2], args[3]), Permissions.FIA_RACE, Permissions.FIA_ADMIN);
+        addPart("set", 3, "/race set [name] [type] [input]", (sender, command, label, args) -> racing.updateRace((Player) sender, args[1].toLowerCase(), args[2], args[3]), Permissions.FIA_RACE, Permissions.FIA_ADMIN);
     }
 }

@@ -33,6 +33,9 @@ public class RaceDriver {
     @Getter
     private final UUID driverUUID;
 
+    @Getter @Setter
+    private boolean disqualified;
+
     public RaceDriver(UUID uuid) {
         this.laptimes = new Laptimes();
         this.driverUUID = uuid;

@@ -1,6 +1,7 @@
 package collinvht.projectr.commands;
 
 import collinvht.projectr.ProjectR;
+import collinvht.projectr.util.enums.Permissions;
 import collinvht.projectr.util.objects.commands.CommandUtil;
 import ia.m.H;
 import lombok.Getter;
@@ -49,6 +50,6 @@ public class TukTukCommand extends CommandUtil {
                 }
                 return "";
             }
-        });
+        }, Permissions.FIA_ADMIN);
     }
 }

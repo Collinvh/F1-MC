@@ -11,6 +11,7 @@ import net.luckperms.api.LuckPerms;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
 import java.io.File;
@@ -45,11 +46,10 @@ public class Utils {
         return null;
     }
 
-    public static WorldEditPlugin getWorldEdit() {
+    public static WorldEditPlugin initWorldedit() {
         if(worldEdit != null) return worldEdit;
-        RegisteredServiceProvider<WorldEditPlugin> provider = Bukkit.getServicesManager().getRegistration(WorldEditPlugin.class);
-        if (provider != null) {
-            worldEdit = provider.getProvider();
+        worldEdit = (WorldEditPlugin) Bukkit.getServer().getPluginManager().getPlugin("WorldEdit");
+        if (worldEdit != null) {
             return worldEdit;
         } else {
             Bukkit.getLogger().severe("WORLD EDIT NOT PRESENT DISABLING");

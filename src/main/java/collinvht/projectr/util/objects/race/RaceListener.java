@@ -109,8 +109,8 @@ public class RaceListener {
                                 if (storage.getS1().getCuboid().containsLocation(player.getLocation())) {
                                     laptimeStorage.setPassedS1(true);
                                     laptimeStorage.setPassedS3(false);
-                                    if (!raceDriver.getLaptimes().isInvalidated()) {
-                                        laptimeStorage.setS1(System.currentTimeMillis());
+                                    laptimeStorage.setS1(System.currentTimeMillis());
+                                    if (!raceDriver.getLaptimes().isInvalidated() && !raceDriver.isDisqualified()) {
 
                                         player.sendMessage(ChatColor.GRAY + " Je tijd in sector 1 was " + laptimeStorage.getS1Color() + Utils.millisToTimeString(laptimeStorage.getS1data().getSectorLength()) + "\n");
                                     }
@@ -120,8 +120,8 @@ public class RaceListener {
                             if (laptimeStorage.isPassedS1() && !laptimeStorage.isPassedS2()) {
                                 if (storage.getS2().getCuboid().containsLocation(player.getLocation())) {
                                     laptimeStorage.setPassedS2(true);
-                                    if (!raceDriver.getLaptimes().isInvalidated()) {
-                                        laptimeStorage.setS2(System.currentTimeMillis());
+                                    laptimeStorage.setS2(System.currentTimeMillis());
+                                    if (!raceDriver.getLaptimes().isInvalidated() && !raceDriver.isDisqualified()) {
 
                                         player.sendMessage(ChatColor.GRAY + " Je tijd in sector 2 was " + laptimeStorage.getS2Color() + Utils.millisToTimeString(laptimeStorage.getS2data().getSectorLength()) + "\n");
                                     }
@@ -132,8 +132,8 @@ public class RaceListener {
                                 if (!laptimeStorage.isPassedS3()) {
                                     if (laptimeStorage.isPassedS1() && laptimeStorage.isPassedS2()) {
                                         laptimeStorage.getS1data().setSectorStart(System.currentTimeMillis());
-                                        if (!raceDriver.getLaptimes().isInvalidated()) {
-                                            laptimeStorage.setS3(System.currentTimeMillis());
+                                        laptimeStorage.setS3(System.currentTimeMillis());
+                                        if (!raceDriver.getLaptimes().isInvalidated() && !raceDriver.isDisqualified()) {
                                             player.sendMessage(ChatColor.GRAY + " Je tijd in sector 3 was " + laptimeStorage.getS3Color() + Utils.millisToTimeString(laptimeStorage.getS3data().getSectorLength()) + "\n");
                                             laptimeStorage.createLaptime();
                                             LaptimeStorage clone = laptimeStorage.clone();
@@ -172,7 +172,6 @@ public class RaceListener {
                         } else {
                             if (storage.getPitExit().getCuboid().containsLocation(player.getLocation())) {
                                 raceDriver.setPassedPitExit();
-                                player.sendMessage("Pit out");
                             }
 
                             if((VehicleData.speed.get(licensePlate)*50) > 80.00D) {
@@ -207,6 +206,7 @@ public class RaceListener {
         laptimeHash.clear();
         MTListener.getRaceDrivers().forEach((uuid, raceDriver) -> {
             raceDriver.getLaptimes().resetLaptimes();
+            raceDriver.setDisqualified(false);
         });
         bestLapTime = null;
         bestS1 = -1;

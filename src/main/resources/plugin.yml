@@ -18,3 +18,18 @@ commands:
   tuktuk:
     permission: projectr.console.tuktuk
     description: tuktuk
+  dsq:
+    permission: projectr.fia.common
+    description: Disqualifies someone
+  flag:
+    permission: projectr.fia.common
+    description: Sets a flag or edits the locations
+  warning:
+    permission: projectr.fia.common
+    description: Gives a warning
+  penalty:
+    permission: projectr.fia.common
+    description: Gives a penalty
+  announcement:
+    permission: projectr.fia.common
+    description: Announce something

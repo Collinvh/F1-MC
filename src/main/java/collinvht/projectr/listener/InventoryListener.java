@@ -24,18 +24,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class InventoryListener implements Listener {
-    @EventHandler(priority = EventPriority.HIGH)
-    public static void blockClickEvent(PlayerInteractEvent e) {
-        if(e.getAction() == Action.RIGHT_CLICK_BLOCK) {
-            Block block = e.getClickedBlock();
-            assert block != null;
-            if(block.getType() == Material.NETHER_BRICK_STAIRS) {
-                PCInventory.openFirst(e.getPlayer());
-                e.setCancelled(true);
-            }
-        }
-
-    }
 
     @EventHandler
     public static void playerChat(AsyncPlayerChatEvent event) {

@@ -20,12 +20,16 @@ public class Race {
     private RaceStorage storage;
 
     @Getter @Setter
+    private RaceFlags flags;
+
+    @Getter @Setter
     private boolean timeTrialStatus;
 
     public Race(String name, int laps) {
         this.laps = laps;
         this.name = name;
         this.storage = new RaceStorage();
+        this.flags = new RaceFlags();
     }
 
     public void saveJson() {
@@ -34,8 +38,10 @@ public class Race {
         JsonObject mainObject = new JsonObject();
         mainObject.addProperty("Name", name);
         mainObject.addProperty("Laps", laps);
-        mainObject.add("TT_Spawn", storage.ttSpawnJson());
+        mainObject.addProperty("TimeTrial_Status", timeTrialStatus);
+        mainObject.add("TimeTrial_Spawn", storage.ttSpawnJson());
         mainObject.add("Cuboids", storage.toJson());
+        mainObject.add("Flags", flags.toJson());
 
         Utils.saveJSON(path, name, mainObject);
     }
@@ -44,11 +50,14 @@ public class Race {
         try {
             String name = object.get("Name").getAsString();
             int laps = object.get("Laps").getAsInt();
+            boolean ttstatus = object.get("TimeTrial_Status").getAsBoolean();
 
             RaceStorage raceStorage = RaceStorage.fromJson(object.get("Cuboids").getAsJsonObject());
             if(raceStorage != null) {
-                raceStorage.setTimeTrialSpawn(object.get("TT_Spawn").getAsJsonObject());
+                raceStorage.setTimeTrialSpawn(object.get("TimeTrial_Spawn").getAsJsonObject());
                 Race race = new Race(name, laps);
+                race.setFlags(RaceFlags.fromJson(object.get("Flags").getAsJsonObject()));
+                race.setTimeTrialStatus(ttstatus);
                 race.setStorage(raceStorage);
                 return race;
             }

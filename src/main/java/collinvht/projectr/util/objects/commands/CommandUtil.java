@@ -22,7 +22,22 @@ public abstract class CommandUtil implements CommandExecutor {
     public final boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if(parts.isEmpty()) initializeCommand(sender);
         if(args.length > 0) {
-            if(parts.containsKey(args[0])) {
+            if(parts.containsKey("%")) {
+                CommandPart part = parts.get("%");
+                if(part.getExtraArguments() > 0) {
+                    if(args.length > part.getExtraArguments()) {
+                        sender.sendMessage(prefix + part.execute(sender, command, label, args));
+                        return true;
+                    } else {
+                        sender.sendMessage(prefix + "Wrong usage: \n" + part.getUsage());
+                        return false;
+                    }
+                } else {
+                    sender.sendMessage(prefix + part.execute(sender, command, label, args));
+                    return true;
+                }
+
+            } else if(parts.containsKey(args[0])) {
                 CommandPart part = parts.get(args[0]);
                 if(part.getExtraArguments() > 0) {
                     if(args.length > part.getExtraArguments()) {

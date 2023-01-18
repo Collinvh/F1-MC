@@ -1,4 +1,4 @@
-package collinvht.projectr.util;
+package collinvht.projectr.util.enums;
 
 import lombok.Getter;
 import org.bukkit.command.CommandSender;
@@ -7,6 +7,7 @@ public enum Permissions {
     NONE(""),
     FIA_ADMIN("projectr.admin"),
     FIA_RACE("projectr.fia.race"),
+    FIA_TEAM("projectr.fia.team"),
     FIA_COMMON("projectr.fia.common");
 
 

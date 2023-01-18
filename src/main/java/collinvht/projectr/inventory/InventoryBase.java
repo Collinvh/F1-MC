@@ -13,6 +13,7 @@ public abstract class InventoryBase {
     static ItemStack createItem(String name, Material material) {
         ItemStack pane = new ItemStack(material);
         ItemMeta meta = pane.getItemMeta();
+        assert meta != null;
         meta.setDisplayName(name);
         pane.setItemMeta(meta);
         return pane;
@@ -21,6 +22,7 @@ public abstract class InventoryBase {
     static ItemStack createItem(String item, Material material, int data) {
         ItemStack stack = createItem(item, material);
         ItemMeta meta = stack.getItemMeta();
+        assert meta != null;
         meta.setCustomModelData(data);
         stack.setItemMeta(meta);
         return stack;
@@ -32,6 +34,7 @@ public abstract class InventoryBase {
         info.add(ChatColor.RESET + "Current : " + obj.getValue());
         info.add(ChatColor.RESET + "Limits : " + obj.getBottomLimit() + "/" + obj.getTopLimit());
         ItemMeta meta = item.getItemMeta();
+        assert meta != null;
         meta.setLore(info);
         item.setItemMeta(meta);
 
@@ -41,6 +44,7 @@ public abstract class InventoryBase {
     static ItemStack createInformativeStack(String name, Material material, LimitedObject<Float> obj, int data) {
         ItemStack item = createInformativeStack(name, material, obj);
         ItemMeta meta = item.getItemMeta();
+        assert meta != null;
         meta.setCustomModelData(data);
         item.setItemMeta(meta);
         return item;

@@ -1,4 +1,4 @@
-package collinvht.projectr.manager.race;
+package collinvht.projectr.manager;
 
 import collinvht.projectr.ProjectR;
 import collinvht.projectr.util.objects.TimeTrialSession;
@@ -93,7 +93,9 @@ public class TimeTrialHandler implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public static void onPlayerExit(PlayerQuitEvent event) {
-        SESSIONS.get(event.getPlayer().getUniqueId()).quit();
-        SESSIONS.remove(event.getPlayer().getUniqueId());
+        if(SESSIONS.get(event.getPlayer().getUniqueId()) != null) {
+            SESSIONS.get(event.getPlayer().getUniqueId()).quit();
+            SESSIONS.remove(event.getPlayer().getUniqueId());
+        }
     }
 }

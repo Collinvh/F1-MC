@@ -1,7 +1,7 @@
 package collinvht.projectr.inventory;
 
 import collinvht.projectr.ProjectR;
-import collinvht.projectr.manager.race.SetupManager;
+import collinvht.projectr.manager.vehicle.SetupManager;
 import collinvht.projectr.util.objects.LimitedObject;
 import collinvht.projectr.util.objects.Setup;
 import org.bukkit.Bukkit;

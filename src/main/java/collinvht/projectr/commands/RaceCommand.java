@@ -1,112 +1,70 @@
 package collinvht.projectr.commands;
 
-import collinvht.projectr.commands.commandusage.UsageBuilder;
+import collinvht.projectr.util.objects.commands.CommandUtil;
 import collinvht.projectr.manager.race.RacingManager;
-import collinvht.projectr.util.Permissions;
-import org.bukkit.command.Command;
+import collinvht.projectr.util.enums.Permissions;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public class RaceCommand implements CommandUtil {
+public class RaceCommand extends CommandUtil {
     private static final RacingManager racing = RacingManager.getInstance();
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        boolean hasFIAPerms = Permissions.FIA_ADMIN.hasPermission(sender) || Permissions.FIA_RACE.hasPermission(sender);
-        if (args.length > 0) {
-            switch (args[0]) {
-                case "start": {
-                    if(hasFIAPerms) {
-                        if (args.length > 2) {
-                            sender.sendMessage(prefix + racing.startRace(args[1].toLowerCase(), args[2]));
-                        } else {
-                            sender.sendMessage(prefix + "/race start [name] [mode]");
-                        }
-                        return true;
-                    }
-                    break;
-                }
-                case "stop": {
-                    if(hasFIAPerms) {
-                        sender.sendMessage(prefix + racing.stopRace());
-                        return true;
-                    }
-                    break;
-                }
-                case "delete": {
-                    if(hasFIAPerms) {
-                        if (args.length > 1) {
-                            sender.sendMessage(prefix + racing.deleteRace(args[1].toLowerCase()));
-                        } else {
-                            sender.sendMessage(prefix + "/race delete [name]");
-                        }
-                        return true;
-                    }
-                    break;
-                }
-                case "get": {
-                    if (sender instanceof Player) {
-                        if (args.length > 1) {
-                            sender.sendMessage(prefix + racing.getRaceResult(args[1].toLowerCase(), ((Player) sender).getUniqueId()));
-                        } else {
-                            sender.sendMessage(prefix + "/race get [type]");
-                        }
-                    } else {
-                        sender.sendMessage(prefix + "Dit kun je alleen als speler doen");
-                    }
-                    return true;
-                }
-                case "create": {
-                    if(hasFIAPerms) {
-                        if (args.length > 2) {
-                            sender.sendMessage(prefix + racing.createRace(args[1].toLowerCase(), args[2]));
-                        } else {
-                            sender.sendMessage(prefix + "/race create [name] [laps]");
-                        }
-                        return true;
-                    }
-                    break;
-                }
-                case "list": {
-                    if(hasFIAPerms) {
-                        sender.sendMessage(prefix + racing.listRaces());
-                        return true;
-                    }
-                    break;
-                }
-                case "set": {
-                    if(hasFIAPerms) {
-                        if (args.length > 3) {
-                            if (sender instanceof Player) {
-                                sender.sendMessage(prefix + racing.updateRace((Player) sender, args[1].toLowerCase(), args[2], args[3]));
-                            } else {
-                                sender.sendMessage(prefix + "Dit kun je alleen als speler doen");
-                            }
-                        } else {
-                            sender.sendMessage(prefix + "/race set [name] [type] [input]");
-                        }
-                        return true;
-                    }
-                    break;
-                }
-                default:
-                    sender.sendMessage(prefix + "Dit is geen geldig argument");
-                    return true;
-            }
-        } else {
-            UsageBuilder builder = new UsageBuilder();
-            builder.addUsage("/race start [name] [mode]", Permissions.FIA_RACE, Permissions.FIA_ADMIN);
-            builder.addUsage("/race stop", Permissions.FIA_RACE, Permissions.FIA_ADMIN);
-            builder.addUsage("/race delete [name]", Permissions.FIA_RACE, Permissions.FIA_ADMIN);
-            builder.addUsage("/race get [type]");
-            builder.addUsage("/race create [name] [laps]", Permissions.FIA_RACE, Permissions.FIA_ADMIN);
-            builder.addUsage("/race list", Permissions.FIA_RACE, Permissions.FIA_ADMIN);
-            builder.addUsage("/race set [name] [type] [input]", Permissions.FIA_RACE, Permissions.FIA_ADMIN);
-            sender.sendMessage(prefix + "Command Usage:\n" + builder.buildUsages(sender));
-            return true;
-        }
-        sender.sendMessage(prefix + "Je hebt geen toegang tot dit command");
-        return false;
+    protected void initializeCommand(@NotNull CommandSender commandSender) {
+        /*
+        This starts the race.
+
+        Mode is currently:
+        Mode 1: Practice/Qualification
+        Mode 2: Race
+         */
+        addPart("start", 2, "/race start [name] [mode]", (sender, command, label, args) -> racing.startRace(args[1].toLowerCase(), args[2]), Permissions.FIA_RACE, Permissions.FIA_ADMIN);
+        /*
+        This stops the race
+         */
+        addPart("stop", 0, "/race stop", (sender, command, label, args) -> racing.stopRace(), Permissions.FIA_RACE, Permissions.FIA_ADMIN);
+        /*
+        Resets the race to nothing
+         */
+        addPart("reset", 0, "/race reset", (sender, command, label, args) -> racing.resetRace(), Permissions.FIA_RACE, Permissions.FIA_ADMIN);
+        /*
+        Converts the race standings to a PNG file to upload
+         */
+        addPart("toimage", 0, "/race toimage", (sender, command, label, args) -> racing.toImage(), Permissions.FIA_RACE, Permissions.FIA_ADMIN);
+        /*
+        Deletes the race
+         */
+        addPart("delete", 1, "/race delete [name]", (sender, command, label, args) -> racing.deleteRace(args[1]), Permissions.FIA_RACE, Permissions.FIA_ADMIN);
+        /*
+        /race get [type]
+        When a race is occurring you can use one of the following types to get information about it:
+
+        Fastest
+        Result
+        Stand
+        Record
+         */
+        addPart("get", 1, "/race get [type]", (sender, command, label, args) -> {
+            if (sender instanceof Player) {
+                return racing.getRaceResult(args[1].toLowerCase(), ((Player) sender).getUniqueId());
+            } else return "You can only do this as a player.";
+        });
+        /*
+        Creates a race with parameters
+         */
+        addPart("create", 2, "/race create [name] [laps]", (sender, command, label, args) -> racing.createRace(args[1], args[2]), Permissions.FIA_RACE, Permissions.FIA_ADMIN);
+        /*
+        Lists currently created races
+         */
+        addPart("list", 0, "/race list", (sender, command, label, args) -> racing.listRaces(), Permissions.FIA_RACE, Permissions.FIA_ADMIN);
+        /*
+        You can change one of the following types with this command:
+        Laps
+        Sector
+        Pitlane
+        Name
+         */
+        addPart("set", 2, "/race set [name] [type] [input]", (sender, command, label, args) -> racing.updateRace((Player) sender, args[1].toLowerCase(), args[2], args[3]), Permissions.FIA_RACE, Permissions.FIA_ADMIN);
     }
 }

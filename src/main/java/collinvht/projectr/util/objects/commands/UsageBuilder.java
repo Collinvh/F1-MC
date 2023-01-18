@@ -1,6 +1,6 @@
-package collinvht.projectr.commands.commandusage;
+package collinvht.projectr.util.objects.commands;
 
-import collinvht.projectr.util.Permissions;
+import collinvht.projectr.util.enums.Permissions;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;

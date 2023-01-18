@@ -2,12 +2,14 @@ name: ProjectR
 version: ${project.version}
 main: collinvht.projectr.ProjectR
 api-version: 1.18
-depend: [ MTVehicles, WorldEdit, LuckPerms, JDA ]
-authors: [ Collinvht ]
+depend: [ MTVehicles, WorldEdit, LuckPerms, JDA, ItemsAdder  ]
+authors: [ Collinvht, SBDeveloper ]
 commands:
+  raceteam:
+    description: Manage or create teams
   race:
-    description: Starts races
-  blockslowdown:
+    description: Start or manage races
+  slowdown:
     permission: projectr.fia.common
     description: Blockslowdown
   timetrial:

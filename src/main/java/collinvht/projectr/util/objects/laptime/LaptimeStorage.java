@@ -1,4 +1,4 @@
-package collinvht.projectr.util.objects.race.laptime;
+package collinvht.projectr.util.objects.laptime;
 
 import collinvht.projectr.listener.MTListener;
 import collinvht.projectr.util.objects.race.Race;

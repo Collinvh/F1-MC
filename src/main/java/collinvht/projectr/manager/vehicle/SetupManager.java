@@ -1,13 +1,11 @@
-package collinvht.projectr.manager.race;
+package collinvht.projectr.manager.vehicle;
 
 import collinvht.projectr.ProjectR;
-import collinvht.projectr.util.JSONUtil;
+import collinvht.projectr.util.Utils;
 import collinvht.projectr.util.objects.Setup;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
-import org.bukkit.Bukkit;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -15,7 +13,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.Set;
 import java.util.UUID;
 
 public class SetupManager {
@@ -36,7 +33,7 @@ public class SetupManager {
             for (File file : files) {
                 UUID uuid = UUID.fromString(file.getName().replace(".json", ""));
                 try {
-                    JsonObject object = (JsonObject) JSONUtil.readJson(file.getAbsolutePath());
+                    JsonObject object = (JsonObject) Utils.readJson(file.getAbsolutePath());
                     if(object == null) return;
                     Setup setup = Setup.fromJson(object.getAsJsonObject("setupInfo"));
                     SETUP_HASH_MAP.put(uuid, setup);

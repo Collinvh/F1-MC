@@ -1,63 +1,63 @@
 package collinvht.projectr.commands;
 
-import collinvht.projectr.commands.commandusage.UsageBuilder;
+import collinvht.projectr.util.objects.commands.CommandUtil;
 import collinvht.projectr.manager.vehicle.SlowDownManager;
-import collinvht.projectr.util.Permissions;
-import org.bukkit.command.Command;
+import collinvht.projectr.util.enums.Permissions;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-public class BlockSlowDown implements CommandUtil {
+/*
+Command /slowdown
+ */
+public class BlockSlowDown extends CommandUtil {
     @Override
-    public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
-        if (Permissions.FIA_ADMIN.hasPermission(commandSender) || Permissions.FIA_COMMON.hasPermission(commandSender)) {
-            if (args.length > 0) {
-                if (commandSender instanceof Player) {
-                    if (args[0].equals("add")) {
-                        if (args.length > 1) {
-                            try {
-                                double steering = 1;
-                                if (args.length > 2) {
-                                    steering = Double.parseDouble(args[2]);
-                                }
-                                ItemStack stack = ((Player) commandSender).getInventory().getItemInMainHand();
-                                double extraSpeed = Integer.parseInt(args[1]);
-                                if (stack.getType().isBlock() && stack.getType().isSolid()) {
-                                    commandSender.sendMessage(prefix + SlowDownManager.addBlock(stack, extraSpeed, steering));
-                                    return true;
-                                }
-                                commandSender.sendMessage(prefix + "Je moet wel een geldig block vasthouden.");
-                            } catch (NumberFormatException e) {
-                                commandSender.sendMessage(prefix + "Ongeldig getal.");
-                                return false;
-                            }
-                            return true;
-                        } else {
-                            commandSender.sendMessage(prefix + "/blockslowdown add [slowDownSpeed] {steering}");
-                        }
-                    } else if (args[0].equals("remove")) {
-                        ItemStack stack = ((Player) commandSender).getInventory().getItemInMainHand();
-                        if (stack.getType().isBlock() && stack.getType().isSolid()) {
-                            commandSender.sendMessage(prefix + SlowDownManager.removeBlock(stack));
-                            return true;
-                        }
-                        commandSender.sendMessage(prefix + "Je moet wel een geldig block vasthouden.");
-                        return true;
-                    } else {
-                        commandSender.sendMessage(prefix + "Dit is geen geldig argument");
-                    }
-                    return true;
+    protected void initializeCommand(@NotNull CommandSender commandSender) {
+        /*
+        This adds the current block in your main hand to the slowdown manager
+         */
+        addPart("add", 1, "/slowdown add [slowDown] {steering}", (sender, command, label, args) -> {
+            if(sender instanceof Player) {
+                double steering = 1;
+                if (args.length > 2) {
+                    steering = Double.parseDouble(args[2]);
                 }
+                ItemStack stack = ((Player) sender).getInventory().getItemInMainHand();
+                double extraSpeed = Integer.parseInt(args[1]);
+                if (stack.getType().isBlock() && stack.getType().isSolid()) {
+                    return SlowDownManager.addBlock(stack, extraSpeed, steering);
+                }
+                return "This block is invalid.";
             } else {
-                UsageBuilder builder = new UsageBuilder();
-                builder.addUsage("/blockslowdown add [slowDownSpeed] {steering}", Permissions.FIA_ADMIN, Permissions.FIA_COMMON);
-                builder.addUsage("/blockslowdown remove", Permissions.FIA_ADMIN, Permissions.FIA_COMMON);
-                commandSender.sendMessage(prefix + "Command Usage:\n" + builder.buildUsages(commandSender));
-                return false;
+                return "You have to be a player to do this.";
             }
-        }
-        return false;
+        }, Permissions.FIA_ADMIN, Permissions.FIA_COMMON);
+        /*
+        This removes the block in your main hand from the manager
+         */
+        addPart("remove", 0, "/slowdown remove", (sender, command, label, args) -> {
+            if(sender instanceof Player) {
+                ItemStack stack = ((Player) sender).getInventory().getItemInMainHand();
+                if (stack.getType().isBlock() && stack.getType().isSolid()) {
+                    return SlowDownManager.removeBlock(stack);
+                }
+                return "This block is invalid.";
+            } else {
+                return "You have to be a player to do this.";
+            }
+        }, Permissions.FIA_ADMIN, Permissions.FIA_COMMON);
+        /*
+        This sets the max speed on the slowdown blocks, whatever happens the speed won't get below this.
+         */
+        addPart("speed", 1, "/slowdown speed [kmh]", (sender, command, label, args) -> {
+            try {
+                double speed = Double.parseDouble(args[1]);
+                SlowDownManager.setMaxSpeed(speed / 73.125);
+                return "Max speed changed.";
+            } catch (NumberFormatException e) {
+                return "Invalid number.";
+            }
+        }, Permissions.FIA_ADMIN, Permissions.FIA_COMMON);
     }
 }

@@ -1,14 +1,12 @@
 package collinvht.projectr.manager.race;
 import collinvht.projectr.ProjectR;
 import collinvht.projectr.listener.MTListener;
-import collinvht.projectr.util.JSONUtil;
 import collinvht.projectr.util.Utils;
-import collinvht.projectr.util.WorldEditUtil;
 import collinvht.projectr.util.objects.NamedCuboid;
 import collinvht.projectr.util.objects.race.Race;
 import collinvht.projectr.util.objects.race.RaceDriver;
 import collinvht.projectr.util.objects.race.RaceListener;
-import collinvht.projectr.util.objects.race.laptime.LaptimeStorage;
+import collinvht.projectr.util.objects.laptime.LaptimeStorage;
 import com.google.gson.JsonObject;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.regions.Region;
@@ -58,7 +56,7 @@ public class RacingManager {
             if(races != null) {
                 for (File raceFile : races) {
                     try {
-                        Race race = Race.createRaceFromJson((JsonObject) JSONUtil.readJson(raceFile.getAbsolutePath()));
+                        Race race = Race.createRaceFromJson((JsonObject) Utils.readJson(raceFile.getAbsolutePath()));
                         if(race != null) {
                             RACES.put(race.getName(), race);
                         }
@@ -177,11 +175,15 @@ public class RacingManager {
             case "record": {
                 StringBuilder builder = new StringBuilder();
                 RaceDriver driver = MTListener.getRaceDrivers().get(playerUUID);
-                LinkedList<LaptimeStorage> list = driver.getLaptimes().getLaptimes();
-                if(list.size() > 0) {
-                    builder.append(" Jouw laatste tien laps :\n");
-                    list.forEach(laptimeOBJ -> builder.append(ChatColor.BOLD).append(ChatColor.GREEN).append(Utils.millisToTimeString(laptimeOBJ.getLaptime())).append(" | ").append(ChatColor.RESET).append(Utils.millisToTimeString(laptimeOBJ.getS1data().getSectorLength())).append("/").append(Utils.millisToTimeString(laptimeOBJ.getS2data().getSectorLength())).append("/").append(Utils.millisToTimeString(laptimeOBJ.getS3data().getSectorLength())).append("\n"));
-                    return builder.toString();
+                if(driver != null) {
+                    LinkedList<LaptimeStorage> list = driver.getLaptimes().getLaptimes();
+                    if (list.size() > 0) {
+                        builder.append(" Jouw laatste tien laps :\n");
+                        list.forEach(laptimeOBJ -> builder.append(ChatColor.BOLD).append(ChatColor.GREEN).append(Utils.millisToTimeString(laptimeOBJ.getLaptime())).append(" | ").append(ChatColor.RESET).append(Utils.millisToTimeString(laptimeOBJ.getS1data().getSectorLength())).append("/").append(Utils.millisToTimeString(laptimeOBJ.getS2data().getSectorLength())).append("/").append(Utils.millisToTimeString(laptimeOBJ.getS3data().getSectorLength())).append("\n"));
+                        return builder.toString();
+                    } else {
+                        return "Je hebt nog geen laps gereden";
+                    }
                 } else {
                     return "Je hebt nog geen laps gereden";
                 }
@@ -219,48 +221,48 @@ public class RacingManager {
     }
 
     public String updateRace(Player player, String raceName, String type, String input) {
-        if(!raceExists(raceName)) return "Race bestaat niet";
+        if(!raceExists(raceName)) return "Race doesn't exist.";
         Race race = getRace(raceName);
         switch (type.toLowerCase()) {
             case "laps": {
                 try {
                     int laps = Integer.parseInt(input);
                     race.setLaps(laps);
-                    return "Laps zijn aangepast.";
+                    return "Laps have been changed.";
                 } catch (NumberFormatException e) {
-                    return input + " is geen geldig nummer.";
+                    return input + " is a invalid number.";
                 }
             }
             case "timetrial": {
                 switch (input.toLowerCase()) {
                     case "disable":
                         race.setTimeTrialStatus(false);
-                        return "Time trial staat nu uit.";
+                        return "Disabled timetrial on this track.";
                     case "enable":
                         race.setTimeTrialStatus(true);
-                        return "Time trial staat nu aan.";
+                        return "Enabled timetrial on this track.";
                     case "setspawn":
                         race.getStorage().setTimeTrialSpawn(player.getLocation());
-                        return "Spawn aangepast.";
+                        return "Spawn has been changed.";
                 }
             }
             case "sector": {
                 try {
-                    Region region = WorldEditUtil.getSession(player).getSelection(WorldEditUtil.getAdaptedWorld(player.getWorld()));
+                    Region region = Utils.getSession(player).getSelection(Utils.getAdaptedWorld(player.getWorld()));
                     switch (input.toLowerCase()) {
                         case "1":
                         case "sector1":
                         case "s1": {
                             NamedCuboid cuboid = race.getStorage().createNamedCuboidFromSelection(player.getWorld(), region, "s1");
                             race.getStorage().setS1(cuboid);
-                            return "S1 is aangepast.";
+                            return "S1 has been changed.";
                         }
                         case "2":
                         case "sector2":
                         case "s2": {
                             NamedCuboid cuboid = race.getStorage().createNamedCuboidFromSelection(player.getWorld(), region, "s2");
                             race.getStorage().setS2(cuboid);
-                            return "S2 is aangepast.";
+                            return "S2 has been changed.";
                         }
                         case "finish":
                         case "3":
@@ -268,46 +270,55 @@ public class RacingManager {
                         case "s3": {
                             NamedCuboid cuboid = race.getStorage().createNamedCuboidFromSelection(player.getWorld(), region, "s3");
                             race.getStorage().setS3(cuboid);
-                            return "S3 is aangepast.";
+                            return "S3 has been changed.";
                         }
                         default: {
-                            return "Geen geldige sector";
+                            return "Not an valid sector";
                         }
                     }
                 } catch (IncompleteRegionException e) {
-                    return "Geen geldige worldedit selectie gevonden.";
+                    return "No valid WorldEdit selection has been found.";
                 }
             }
             case "pitlane": {
                 try {
-                    Region region = WorldEditUtil.getSession(player).getSelection(WorldEditUtil.getAdaptedWorld(player.getWorld()));
+                    Region region = Utils.getSession(player).getSelection(Utils.getAdaptedWorld(player.getWorld()));
                     switch (input.toLowerCase()) {
                         case "pen":
                         case "pitentry": {
                             NamedCuboid cuboid = race.getStorage().createNamedCuboidFromSelection(player.getWorld(), region, "pitentry");
                             race.getStorage().setPitEntry(cuboid);
-                            return "Pit Entry is aangepast.";
+                            return "Pit Entry has been changed.";
                         }
                         case "pex":
                         case "pitexit": {
                             NamedCuboid cuboid = race.getStorage().createNamedCuboidFromSelection(player.getWorld(), region, "pitexit");
                             race.getStorage().setPitExit(cuboid);
-                            return "Pit Exit is aangepast.";
+                            return "Pit Exit has been changed.";
                         }
                         default: {
-                            return "Geen geldige pitlane sector";
+                            return "This is not an valid pitlane type.";
                         }
                     }
                 } catch (IncompleteRegionException e) {
-                    return "Geen geldige worldedit selectie gevonden.";
+                    return "No valid WorldEdit selection has been found.";
                 }
             }
             case "name": {
                 race.setName(input.toLowerCase());
-                return "Racenaam is aangepast.";
+                return "Changed race name";
             }
             default:
-                return "Ongeldig type; \n-Laps\n-Sector\n-Pitlane\n-Name";
+                return "Invalid type; \n-Laps\n-Sector\n-Pitlane\n-Name";
         }
+    }
+
+    public String resetRace() {
+        RaceListener.getInstance().reset();
+        return "Race has been reset.";
+    }
+
+    public String toImage() {
+        return "Image created";
     }
 }

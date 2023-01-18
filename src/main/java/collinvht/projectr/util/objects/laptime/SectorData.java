@@ -1,4 +1,4 @@
-package collinvht.projectr.util.objects.race.laptime;
+package collinvht.projectr.util.objects.laptime;
 
 import lombok.Getter;
 import lombok.Setter;

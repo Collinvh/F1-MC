@@ -2,11 +2,9 @@ package collinvht.projectr.util.objects;
 
 import collinvht.projectr.util.objects.race.Race;
 import collinvht.projectr.util.objects.race.RaceListener;
-import collinvht.projectr.util.objects.race.RaceMode;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.entity.Player;
 
 import java.util.UUID;
 

@@ -1,9 +1,8 @@
 package collinvht.projectr.listener;
 
 import collinvht.projectr.ProjectR;
-import collinvht.projectr.manager.race.SetupManager;
+import collinvht.projectr.manager.vehicle.SetupManager;
 import collinvht.projectr.manager.vehicle.SlowDownManager;
-import collinvht.projectr.util.objects.Setup;
 import collinvht.projectr.util.objects.race.RaceDriver;
 import lombok.Getter;
 import nl.mtvehicles.core.events.VehicleEnterEvent;
@@ -11,7 +10,6 @@ import nl.mtvehicles.core.events.VehicleLeaveEvent;
 import nl.mtvehicles.core.infrastructure.dataconfig.VehicleDataConfig;
 import nl.mtvehicles.core.infrastructure.helpers.VehicleData;
 import nl.mtvehicles.core.infrastructure.models.Vehicle;
-import nl.mtvehicles.core.infrastructure.models.VehicleUtils;
 import nl.mtvehicles.core.infrastructure.modules.ConfigModule;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
@@ -38,7 +36,7 @@ public class MTListener implements Listener {
                 driver = new RaceDriver(event.getPlayer().getUniqueId());
                 raceDrivers.put(event.getPlayer().getUniqueId(), driver);
             }
-            if((int)ConfigModule.vehicleDataConfig.get(event.getLicensePlate(), VehicleDataConfig.Option.SKIN_DAMAGE) < 25) {
+            if(((double)ConfigModule.vehicleDataConfig.get(event.getLicensePlate(), VehicleDataConfig.Option.DOWNFORCE)) > 1.0) {
                 double downforce = SetupManager.getSetup(event.getPlayer().getUniqueId()).getDownForceFromSettings();
                 VehicleData.Downforce.put(vehicle.getLicensePlate(), downforce);
             }

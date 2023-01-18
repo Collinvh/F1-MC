@@ -1,4 +1,4 @@
-package collinvht.projectr.util.objects.race.laptime;
+package collinvht.projectr.util.objects.laptime;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -67,5 +67,12 @@ public class Laptimes {
 
     public void resetLaptimes() {
         laptimes = new LinkedList<>();
+        sectors = 0;
+        currentLap = null;
+        fastestLap = null;
+        bestS1 = 0;
+        bestS2 = 0;
+        bestS3 = 0;
+        invalidated = false;
     }
 }

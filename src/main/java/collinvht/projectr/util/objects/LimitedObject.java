@@ -19,7 +19,6 @@ public class LimitedObject<Z extends Number> {
         this.topLimit = topLimit;
     }
 
-
     public void setValue(Z integer) {
         if((float) integer < (float)  bottomLimit) {
             integer = bottomLimit;

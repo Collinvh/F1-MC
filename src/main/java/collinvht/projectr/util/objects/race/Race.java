@@ -1,16 +1,12 @@
 package collinvht.projectr.util.objects.race;
 
 import collinvht.projectr.ProjectR;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import collinvht.projectr.util.Utils;
 import com.google.gson.JsonObject;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class Race {
@@ -34,7 +30,6 @@ public class Race {
 
     public void saveJson() {
         File path = Paths.get(ProjectR.getInstance().getDataFolder() + "/storage/races/").toFile();
-        File file = Paths.get(path + "/" + name + ".json").toFile();
 
         JsonObject mainObject = new JsonObject();
         mainObject.addProperty("Name", name);
@@ -42,17 +37,7 @@ public class Race {
         mainObject.add("TT_Spawn", storage.ttSpawnJson());
         mainObject.add("Cuboids", storage.toJson());
 
-        try {
-            if(!path.mkdirs()) {
-                Files.createDirectories(Paths.get(path.toURI()));
-            }
-            FileWriter writer = new FileWriter(file);
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            writer.write(gson.toJson(mainObject));
-            writer.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        Utils.saveJSON(path, name, mainObject);
     }
 
     public static Race createRaceFromJson(JsonObject object) {

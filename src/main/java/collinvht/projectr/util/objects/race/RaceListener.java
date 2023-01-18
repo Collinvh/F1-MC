@@ -2,10 +2,9 @@ package collinvht.projectr.util.objects.race;
 
 import collinvht.projectr.ProjectR;
 import collinvht.projectr.listener.MTListener;
-import collinvht.projectr.util.Permissions;
+import collinvht.projectr.util.enums.Permissions;
 import collinvht.projectr.util.Utils;
-import collinvht.projectr.util.objects.race.laptime.LaptimeStorage;
-import collinvht.projectr.util.objects.race.laptime.Laptimes;
+import collinvht.projectr.util.objects.laptime.LaptimeStorage;
 import lombok.Getter;
 import lombok.Setter;
 import nl.mtvehicles.core.infrastructure.helpers.VehicleData;
@@ -14,7 +13,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.UUID;
 
@@ -100,7 +98,7 @@ public class RaceListener {
                             laptimeStorage = new LaptimeStorage(player.getUniqueId(), race);
                             raceDriver.getLaptimes().setCurrentLap(laptimeStorage);
                         }
-                        if (raceDriver.isPassedPitExit()) {
+                        if (raceDriver.isPassedPitExit() || mode.isHasLaps()) {
                             if (!raceDriver.isInPit()) {
                                 if (storage.getPitEntry().getCuboid().containsLocation(player.getLocation())) {
                                     raceDriver.setInPit();
@@ -197,7 +195,13 @@ public class RaceListener {
             return "Er is geen race bezig";
         }
         Bukkit.getScheduler().cancelTask(runnableID);
-        runnableID = -1;
+        reset();
+
+
+        return "Race gestopt.";
+    }
+
+    public void reset() {
         currentRace = null;
 
         laptimeHash.clear();
@@ -208,8 +212,5 @@ public class RaceListener {
         bestS1 = -1;
         bestS2 = -1;
         bestS3 = -1;
-
-
-        return "Race gestopt.";
     }
 }

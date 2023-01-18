@@ -1,9 +1,7 @@
 package collinvht.projectr.manager;
 
 import collinvht.projectr.ProjectR;
-import collinvht.projectr.commands.BlockSlowDown;
-import collinvht.projectr.commands.RaceCommand;
-import collinvht.projectr.commands.Timetrial;
+import collinvht.projectr.commands.*;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabCompleter;
@@ -12,8 +10,9 @@ public class CommandManager {
 
     public static void initializeCommands() {
         registerCommand("race", new RaceCommand());
-        registerCommand("blockslowdown", new BlockSlowDown());
-        registerCommand("timetrial", new Timetrial());
+        registerCommand("slowdown", new BlockSlowDown());
+        registerCommand("timetrial", new TimetrialCommand());
+        registerCommand("raceteam", new TeamCommand());
     }
 
     private static void registerCommand(String command, CommandExecutor executor) {

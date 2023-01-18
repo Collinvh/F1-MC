@@ -1,8 +1,8 @@
 package collinvht.projectr.util.objects.race;
 
-import collinvht.projectr.manager.race.SetupManager;
-import collinvht.projectr.util.objects.race.laptime.LaptimeStorage;
-import collinvht.projectr.util.objects.race.laptime.Laptimes;
+import collinvht.projectr.manager.vehicle.SetupManager;
+import collinvht.projectr.util.objects.laptime.LaptimeStorage;
+import collinvht.projectr.util.objects.laptime.Laptimes;
 import lombok.Getter;
 import lombok.Setter;
 import nl.mtvehicles.core.infrastructure.models.Vehicle;

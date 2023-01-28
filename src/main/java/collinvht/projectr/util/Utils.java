@@ -1,7 +1,7 @@
 package collinvht.projectr.util;
 
 import collinvht.projectr.ProjectR;
-import collinvht.projectr.util.objects.race.RaceDriver;
+import collinvht.projectr.module.main.objects.RaceDriver;
 import com.google.gson.*;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
@@ -11,7 +11,6 @@ import net.luckperms.api.LuckPerms;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
 import java.io.File;
@@ -46,7 +45,7 @@ public class Utils {
         return null;
     }
 
-    public static WorldEditPlugin initWorldedit() {
+    public static WorldEditPlugin getWorldEdit() {
         if(worldEdit != null) return worldEdit;
         worldEdit = (WorldEditPlugin) Bukkit.getServer().getPluginManager().getPlugin("WorldEdit");
         if (worldEdit != null) {
@@ -70,16 +69,29 @@ public class Utils {
     }
 
     public static LocalSession getSession(org.bukkit.entity.Player player) {
-        return worldEdit.getSession(player);
+        return getWorldEdit().getSession(player);
     }
 
     /*
     Formats milliseconds based on minutes seconds and milliseconds
      */
     public static String millisToTimeString(final long mSec) {
-        final String pattern = "mm:ss.SSS";
+        return millisToTimeString(mSec, "mm:ss.SSS");
+    }
+    /*
+    Formats milliseconds based on minutes seconds and milliseconds
+     */
+    public static String millisToTimeString(long mSec, String pattern) {
         final SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
-        return simpleDateFormat.format(new Date(mSec));
+        if(mSec < 0) {
+            return  "+" + simpleDateFormat.format(new Date(-mSec));
+        } else {
+            if(pattern.equalsIgnoreCase("ss.SS")) {
+                return "-" + simpleDateFormat.format(new Date(mSec));
+            } else {
+                return simpleDateFormat.format(new Date(mSec));
+            }
+        }
     }
     /*
     Sorts a map descending. Used for fastest laps finish positions ect.
@@ -106,7 +118,7 @@ public class Utils {
     /*
     Saves the json file to a certain path
      */
-    public static void saveJSON(File path, String name, JsonObject object) {
+    public static void saveJSON(File path, String name, JsonElement object) {
         try {
             if(!path.mkdirs()) {
                 Files.createDirectories(Paths.get(path.toURI()));

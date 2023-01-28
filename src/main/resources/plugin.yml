@@ -2,7 +2,7 @@ name: ProjectR
 version: ${project.version}
 main: collinvht.projectr.ProjectR
 api-version: 1.18
-depend: [ MTVehicles, WorldEdit, LuckPerms, JDA, ItemsAdder  ]
+depend: [ VehiclesPlus, WorldEdit, LuckPerms, JDA, ItemsAdder, ProtocolLib ]
 authors: [ Collinvht, SBDeveloper ]
 commands:
   raceteam:

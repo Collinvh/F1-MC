@@ -1,5 +1,7 @@
 package collinvht.projectr.util.modules;
 
+import org.bukkit.Bukkit;
+
 import java.util.ArrayList;
 
 public abstract class ModuleBase {
@@ -14,6 +16,10 @@ public abstract class ModuleBase {
 
     public final void save() {
         for (ModuleBase attachedModule : attachedModules) {
+            if(attachedModule == this) {
+                Bukkit.getLogger().severe("Saving parent module in child, creates infinite loop\nPlease remove this.");
+                return;
+            }
             attachedModule.save();
         }
         saveModule();

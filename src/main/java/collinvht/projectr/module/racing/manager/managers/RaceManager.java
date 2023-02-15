@@ -1,22 +1,37 @@
 package collinvht.projectr.module.racing.manager.managers;
 
 import collinvht.projectr.ProjectR;
+import collinvht.projectr.module.vehiclesplus.listener.listeners.VPListener;
+import collinvht.projectr.module.vehiclesplus.objects.RaceDriver;
 import collinvht.projectr.module.racing.object.NamedCuboid;
-import collinvht.projectr.module.racing.util.RacingMessages;
-import collinvht.projectr.module.racing.object.race.RaceListener;
-import collinvht.projectr.util.Utils;
+import collinvht.projectr.module.racing.object.laptime.LaptimeStorage;
 import collinvht.projectr.module.racing.object.race.Race;
+import collinvht.projectr.module.racing.object.race.RaceListener;
+import collinvht.projectr.module.racing.util.RacingMessages;
 import collinvht.projectr.util.DefaultMessages;
+import collinvht.projectr.util.Utils;
 import collinvht.projectr.util.modules.ModuleBase;
 import com.google.gson.JsonObject;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.regions.Region;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class RaceManager extends ModuleBase {
     private static RaceManager instance;
@@ -108,91 +123,87 @@ public class RaceManager extends ModuleBase {
         switch (type) {
             case "timing":
             case "fastest": {
-//                HashMap<UUID, RaceDriver> drivers = MTListener.getRaceDrivers();
-//                if(drivers.values().toArray().length > 0) {
-//                    LinkedHashMap<RaceDriver, Long> sectors = new LinkedHashMap<>();
-//                    drivers.forEach((unused, driver) -> {
-//                        if (driver.getLaptimes().getFastestLap() != null) {
-//                            sectors.put(driver, driver.getLaptimes().getFastestLap().getLaptime());
-//                        }
-//                    });
-//
-//                    LinkedHashMap<RaceDriver, Long> treeMap = Utils.sortByValueDesc(sectors);
-//                    if (treeMap.values().toArray().length > 0) {
-//                        StringBuilder builder = new StringBuilder();
-//                        builder.append(RacingMessages.FASTEST_LAPS);
-//                        AtomicInteger pos = new AtomicInteger();
-//                        treeMap.forEach((driver, aLong) -> {
-//                            TextComponent component = new TextComponent();
-//                            OfflinePlayer player = Bukkit.getOfflinePlayer(driver.getDriverUUID());
-//                            pos.getAndIncrement();
-//                            builder.append(pos.get()).append(". ").append(player.getName()).append(" ").append(Utils.millisToTimeString(driver.getLaptimes().getFastestLap().getLapData().getSectorLength())).append("\n");
-////                            component.setText(pos.get() + ". " + player.getName() + " " + Utils.millisToTimeString(driver.getLaptimes().getFastestLap().getLapData().getSectorLength()));
-////                            component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(Utils.millisToTimeString(driver.getLaptimes().getFastestLap().getS1data().getSectorLength()) + " | " + Utils.millisToTimeString(driver.getLaptimes().getFastestLap().getS2data().getSectorLength()) + " | " + Utils.millisToTimeString(driver.getLaptimes().getFastestLap().getS3data().getSectorLength()))));
-////                            builder.append(component).append("\n");
-//                        });
-//                        return builder.toString();
-//                    }
-//                }
+                HashMap<UUID, RaceDriver> drivers = VPListener.getRACE_DRIVERS();
+                if(drivers.values().toArray().length > 0) {
+                    LinkedHashMap<RaceDriver, Long> sectors = new LinkedHashMap<>();
+                    drivers.forEach((unused, driver) -> {
+                        if (driver.getLaptimes(race).getFastestLap() != null) {
+                            sectors.put(driver, driver.getLaptimes(race).getFastestLap().getLaptime());
+                        }
+                    });
+
+                    LinkedHashMap<RaceDriver, Long> treeMap = Utils.sortByValueDesc(sectors);
+                    if (treeMap.values().toArray().length > 0) {
+                        StringBuilder builder = new StringBuilder();
+                        builder.append(RacingMessages.FASTEST_LAPS);
+                        AtomicInteger pos = new AtomicInteger();
+                        treeMap.forEach((driver, aLong) -> {
+                            OfflinePlayer player = Bukkit.getOfflinePlayer(driver.getDriverUUID());
+                            pos.getAndIncrement();
+                            builder.append(pos.get()).append(". ").append(player.getName()).append(" ").append(Utils.millisToTimeString(driver.getLaptimes(race).getFastestLap().getLapData().getSectorLength())).append("\n");
+                        });
+                        return builder.toString();
+                    }
+                }
                 return RacingMessages.NO_LAPS_DRIVEN;
             }
             case "result": {
-//                if(RaceListener.getInstance().getFinishers().size() > 0) {
-//                    StringBuilder builder = new StringBuilder();
-//                    builder.append(RacingMessages.RACE_RESULT);
-//                    RaceListener.getInstance().getFinishers().forEach((integer, uuid) -> {
-//                        OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
-//                        builder.append(integer).append(". | ").append(player.getName()).append("\n");
-//                    });
-//                    return builder.toString();
-//                } else {
+                if(race.getRaceLapStorage().getFinishers().size() > 0) {
+                    StringBuilder builder = new StringBuilder();
+                    builder.append(RacingMessages.RACE_RESULT);
+                    race.getRaceLapStorage().getFinishers().forEach((integer, uuid) -> {
+                        OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
+                        builder.append(integer).append(". | ").append(player.getName()).append("\n");
+                    });
+                    return builder.toString();
+                } else {
                     return RacingMessages.NO_FINISHERS;
-//                }
+                }
             }
             case "position": {
                 StringBuilder builder = new StringBuilder();
-//                HashMap<UUID, RaceDriver> drivers = MTListener.getRaceDrivers();
-//                if(drivers.size() > 0) {
-//                    builder.append(RacingMessages.RACE_POSITION);
-//
-//                    LinkedHashMap<RaceDriver, Long> sectors = new LinkedHashMap<>();
-//
-//                    drivers.forEach((unused, driver) -> sectors.put(driver, (long) driver.getLaptimes().getSectors()));
-//
-//                    LinkedHashMap<RaceDriver, Long> treeMap = Utils.sortByValueDesc(sectors);
-//
-//
-//                    if (treeMap.size() > 0) {
-//                        builder.append(RacingMessages.SECTOR_POSITION);
-//
-//                        AtomicInteger pos = new AtomicInteger();
-//                        treeMap.forEach((driver, integer) -> {
-//                            if (integer > 0) {
-//                                OfflinePlayer player = Bukkit.getOfflinePlayer(driver.getDriverUUID());
-//                                builder.append(pos.incrementAndGet()).append(". ").append(player.getName()).append(" : ").append(integer).append("\n");
-//                            }
-//                        });
-//                        return builder.toString();
-//                    }
-//                } else {
+                HashMap<UUID, RaceDriver> drivers = VPListener.getRACE_DRIVERS();
+                if(drivers.size() > 0) {
+                    builder.append(RacingMessages.RACE_POSITION);
+
+                    LinkedHashMap<RaceDriver, Long> sectors = new LinkedHashMap<>();
+
+                    drivers.forEach((unused, driver) -> sectors.put(driver, (long) driver.getLaptimes(race).getSectors()));
+
+                    LinkedHashMap<RaceDriver, Long> treeMap = Utils.sortByValueDesc(sectors);
+
+
+                    if (treeMap.size() > 0) {
+                        builder.append(RacingMessages.SECTOR_POSITION);
+
+                        AtomicInteger pos = new AtomicInteger();
+                        treeMap.forEach((driver, integer) -> {
+                            if (integer > 0) {
+                                OfflinePlayer player = Bukkit.getOfflinePlayer(driver.getDriverUUID());
+                                builder.append(pos.incrementAndGet()).append(". ").append(player.getName()).append(" : ").append(integer).append("\n");
+                            }
+                        });
+                        return builder.toString();
+                    }
+                } else {
                     return RacingMessages.NO_LAPS_DRIVEN;
-//                }
+                }
             }
             case "record": {
-//                StringBuilder builder = new StringBuilder();
-//                RaceDriver driver = MTListener.getRaceDrivers().get(playerUUID);
-//                if(driver != null) {
-//                    LinkedList<LaptimeStorage> list = driver.getLaptimes().getLaptimes();
-//                    if (list.size() > 0) {
-//                        builder.append(RacingMessages.LAST_10_LAPS);
-//                        list.forEach(laptimeOBJ -> builder.append(ChatColor.BOLD).append(ChatColor.GREEN).append(Utils.millisToTimeString(laptimeOBJ.getLaptime())).append(" | ").append(ChatColor.RESET).append(Utils.millisToTimeString(laptimeOBJ.getS1data().getSectorLength())).append("/").append(Utils.millisToTimeString(laptimeOBJ.getS2data().getSectorLength())).append("/").append(Utils.millisToTimeString(laptimeOBJ.getS3data().getSectorLength())).append("\n"));
-//                        return builder.toString();
-//                    } else {
-//                        return RacingMessages.NO_LAPS_DRIVEN;
-//                    }
-//                } else {
+                StringBuilder builder = new StringBuilder();
+                RaceDriver driver = VPListener.getRACE_DRIVERS().get(playerUUID);
+                if (driver != null) {
+                    LinkedList<LaptimeStorage> list = driver.getLaptimes(race).getLaptimes();
+                    if (list.size() > 0) {
+                        builder.append(RacingMessages.LAST_10_LAPS);
+                        list.forEach(laptimeOBJ -> builder.append(ChatColor.BOLD).append(ChatColor.GREEN).append(Utils.millisToTimeString(laptimeOBJ.getLaptime())).append(" | ").append(ChatColor.RESET).append(Utils.millisToTimeString(laptimeOBJ.getS1data().getSectorLength())).append("/").append(Utils.millisToTimeString(laptimeOBJ.getS2data().getSectorLength())).append("/").append(Utils.millisToTimeString(laptimeOBJ.getS3data().getSectorLength())).append("\n"));
+                        return builder.toString();
+                    } else {
+                        return RacingMessages.NO_LAPS_DRIVEN;
+                    }
+                } else {
                     return RacingMessages.NO_LAPS_DRIVEN;
-//                }
+                }
             }
             default:
                 return DefaultMessages.INVALID_TYPE;
@@ -322,12 +333,85 @@ public class RaceManager extends ModuleBase {
     }
 
     public String resetRace(String name) {
-        RaceListener.reset(name);
-        return DefaultMessages.PREFIX + "Race has been reset.";
+        return DefaultMessages.PREFIX + RaceListener.reset(name);
     }
 
-    public String toImage(String name) {
-        return "Image created";
+    public String toImage(String raceName) {
+        if(!raceExists(raceName)) return RacingMessages.RACE_DOES_NOT_EXIST;
+        Race race = getRace(raceName);
+        try {
+            final BufferedImage image = ImageIO.read(new URL(
+                    "https://media.discordapp.net/attachments/634115064567431189/1069386920590852106/image.png"));
+            Graphics imageGraphics = image.getGraphics();
+            Font basefont = new Font("Bahnschrift", Font.BOLD, 16);
+            HashMap<UUID, RaceDriver> drivers = VPListener.getRACE_DRIVERS();
+            if(drivers.values().toArray().length > 0) {
+                LinkedHashMap<RaceDriver, Long> sectors = new LinkedHashMap<>();
+                if(!race.getRaceLapStorage().getRaceMode().isLapped()) {
+                    drivers.forEach((unused, driver) -> {
+                        if (driver.getLaptimes(race).getFastestLap() != null) {
+                            sectors.put(driver, driver.getLaptimes(race).getFastestLap().getLaptime());
+                        }
+                    });
+                } else {
+                    race.getRaceLapStorage().getFinishers().forEach((integer, uuid) -> {
+                        RaceDriver driver = VPListener.getRACE_DRIVERS().get(uuid);
+                        if (driver.getLaptimes(race).getFastestLap() != null) {
+                            sectors.put(driver, integer.longValue());
+                        }
+                    });
+                }
+                AtomicInteger pos = new AtomicInteger();
+                LinkedHashMap<RaceDriver, Long> treeMap = Utils.sortByValueDesc(sectors);
+                if (treeMap.values().toArray().length > 0) {
+                    treeMap.forEach((driver, unused) -> {
+                        pos.getAndIncrement();
+                        if(pos.get() <21) {
+                            String team = "N/A";
+                            Player player = Bukkit.getPlayer(driver.getDriverUUID());
+                            if(player == null) return;
+
+                            if(pos.get() == 1) {
+                                try {
+                                    final BufferedImage character = ImageIO.read(new URL(
+                                            "https://crafatar.com/renders/body/" + driver.getDriverUUID()       ));
+                                    imageGraphics.drawImage(character, 132, 70, null);
+                                    Font font = new Font("Calibri", Font.PLAIN, 30);
+                                    imageGraphics.setColor(Color.WHITE);
+                                    imageGraphics.setFont(font);
+                                    imageGraphics.drawString(player.getName(), 32, 365);
+
+                                    font = new Font("Calibri", Font.PLAIN, 15);
+                                    imageGraphics.setFont(font);
+                                    imageGraphics.drawString(team, 32, 390);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            imageGraphics.setFont(basefont);
+                            imageGraphics.drawString(player.getName(), 615, 95 + (95 * (pos.get() - 1)));
+                            imageGraphics.drawString(team, 760, 95 + (23 * (pos.get() - 1)));
+                            imageGraphics.drawString(Utils.millisToTimeString(driver.getLaptimes(race).getFastestLap().getLapData().getSectorLength()), 895, 95 + (23 * (pos.get() - 1)));
+                        }
+                    });
+
+                    imageGraphics.dispose();
+                    File path = new File(ProjectR.getInstance().getDataFolder() + "/temp/");
+                    File file = new File(path + "/result.png");
+                    if(!path.mkdirs()) {
+                        Files.createDirectories(Paths.get(path.toURI()));
+                    }
+
+                    ImageIO.write(image, "png", file);
+                }
+            } else {
+                return "Can't create image with no race result";
+            }
+            return "Image created";
+        } catch (IOException e) {
+            return "Error creating image.";
+        }
     }
 
 }

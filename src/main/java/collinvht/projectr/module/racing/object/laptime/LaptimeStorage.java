@@ -1,16 +1,15 @@
 package collinvht.projectr.module.racing.object.laptime;
 
-import collinvht.projectr.module.main.listener.listeners.MainVehicleListener;
+import collinvht.projectr.module.vehiclesplus.listener.listeners.VPListener;
 import collinvht.projectr.module.racing.object.race.Race;
-import collinvht.projectr.module.main.objects.RaceDriver;
-import collinvht.projectr.module.racing.object.race.RaceListener;
+import collinvht.projectr.module.vehiclesplus.objects.RaceDriver;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.ChatColor;
 
 import java.util.UUID;
 
-public class LaptimeStorage implements Cloneable {
+public class LaptimeStorage {
     @Getter
     private final RaceDriver driver;
     private final UUID driverUUID;
@@ -51,7 +50,7 @@ public class LaptimeStorage implements Cloneable {
 
 
     public LaptimeStorage(UUID driver, Race obj) {
-        this.driver = MainVehicleListener.getRACE_DRIVERS().get(driver);
+        this.driver = VPListener.getRACE_DRIVERS().get(driver);
         this.driverUUID = driver;
         this.race = obj;
 
@@ -166,7 +165,7 @@ public class LaptimeStorage implements Cloneable {
             long difference = race.getRaceLapStorage().getBestLapTime().getLapData().getSectorLength() - sectors;
             lapData.setSectorDifference(difference);
             if (difference >= 0) {
-                if(setTime) race.getRaceLapStorage().setBestLapTime(this.clone());
+                if(setTime) race.getRaceLapStorage().setBestLapTime(this.copy());
                 lapData.setSectorColor(ChatColor.LIGHT_PURPLE);
                 return ChatColor.LIGHT_PURPLE;
             } else {
@@ -183,7 +182,7 @@ public class LaptimeStorage implements Cloneable {
                 }
             }
         } else {
-            if(setTime) race.getRaceLapStorage().setBestLapTime(this.clone());
+            if(setTime) race.getRaceLapStorage().setBestLapTime(this.copy());
             lapData.setSectorColor(ChatColor.LIGHT_PURPLE);
             return ChatColor.LIGHT_PURPLE;
         }
@@ -240,13 +239,13 @@ public class LaptimeStorage implements Cloneable {
         this.lapData.setSectorLength(this.laptime);
     }
 
-    public LaptimeStorage clone () {
+    public LaptimeStorage copy () {
         LaptimeStorage obj = new LaptimeStorage(driverUUID, race);
         obj.laptime = laptime;
-        obj.s1data = s1data.clone();
-        obj.s2data = s2data.clone();
-        obj.s3data= s3data.clone();
-        obj.lapData = lapData.clone();
+        obj.s1data = s1data.copy();
+        obj.s2data = s2data.copy();
+        obj.s3data= s3data.copy();
+        obj.lapData = lapData.copy();
 //        obj.tyre = tyre;
         return obj;
     }

@@ -1,7 +1,7 @@
 package collinvht.projectr.util;
 
 import collinvht.projectr.ProjectR;
-import collinvht.projectr.module.main.objects.RaceDriver;
+import collinvht.projectr.module.vehiclesplus.objects.RaceDriver;
 import com.google.gson.*;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;

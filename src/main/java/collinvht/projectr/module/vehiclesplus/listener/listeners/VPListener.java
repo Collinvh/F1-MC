@@ -1,6 +1,6 @@
-package collinvht.projectr.module.main.listener.listeners;
+package collinvht.projectr.module.vehiclesplus.listener.listeners;
 
-import collinvht.projectr.module.main.objects.RaceDriver;
+import collinvht.projectr.module.vehiclesplus.objects.RaceDriver;
 import lombok.Getter;
 import nl.sbdeveloper.vehiclesplus.api.events.impl.VehicleDespawnEvent;
 import nl.sbdeveloper.vehiclesplus.api.events.impl.VehicleDestroyEvent;
@@ -13,11 +13,10 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
-public class MainVehicleListener implements Listener {
+public class VPListener implements Listener {
     @Getter
     private static final HashMap<UUID, RaceDriver> RACE_DRIVERS = new HashMap<>();
 

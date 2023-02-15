@@ -1,7 +1,7 @@
 package collinvht.projectr.module.racing.object.race;
 
-import collinvht.projectr.module.main.listener.listeners.MainVehicleListener;
-import collinvht.projectr.module.main.objects.RaceDriver;
+import collinvht.projectr.module.vehiclesplus.listener.listeners.VPListener;
+import collinvht.projectr.module.vehiclesplus.objects.RaceDriver;
 import collinvht.projectr.module.racing.object.laptime.LaptimeStorage;
 import collinvht.projectr.util.Permissions;
 import collinvht.projectr.util.Utils;
@@ -58,7 +58,7 @@ public class RaceLapStorage {
                             raceDriver.getLaptimes(race).setCurrentLap(laptimeStorage);
                         }
                         Location location = player.getLocation();
-                        if (raceDriver.isPassedPitExit()) {
+                        if (raceDriver.isPassedPitExit() || raceMode.isLapped()) {
                             if (!raceDriver.isInPit()) {
                                 if (storage.getPitEntry().getCuboid().containsLocation(location)) {
                                     raceDriver.setInPit();
@@ -70,7 +70,7 @@ public class RaceLapStorage {
                                     laptimeStorage.setPassedS3(false);
                                     laptimeStorage.setS1(System.currentTimeMillis());
                                     if (!raceDriver.getLaptimes(race).isInvalidated() && !raceDriver.isDisqualified()) {
-                                        player.sendMessage(ChatColor.GRAY + "Your time in S1 was " + laptimeStorage.getS1Color() + Utils.millisToTimeString(laptimeStorage.getS1data().getSectorLength()) + "\n");
+                                        player.sendMessage(ChatColor.GRAY + "Your time in S1 was " +  laptimeStorage.getS1Color() + Utils.millisToTimeString(laptimeStorage.getS1data().getSectorLength()) + " | " + Utils.millisToTimeString(laptimeStorage.getS1data().getSectorDifference(), "ss.SS"));
                                     }
                                     raceDriver.getLaptimes(race).addSector();
                                     Bukkit.getLogger().warning(player.getDisplayName() + " s1");
@@ -95,7 +95,7 @@ public class RaceLapStorage {
                                         laptimeStorage.setS3(System.currentTimeMillis());
                                         if (!raceDriver.getLaptimes(race).isInvalidated() && !raceDriver.isDisqualified()) {
                                             laptimeStorage.createLaptime();
-                                            LaptimeStorage clone = laptimeStorage.clone();
+                                            LaptimeStorage clone = laptimeStorage.copy();
                                             laptimeHash.put(raceDriver.getDriverUUID(), clone);
                                             raceDriver.addLaptime(race, clone);
                                             player.sendMessage(ChatColor.GRAY + "Your time in S3 was " +  laptimeStorage.getS3Color() + Utils.millisToTimeString(laptimeStorage.getS3data().getSectorLength()) + " | " + Utils.millisToTimeString(laptimeStorage.getS3data().getSectorDifference(), "ss.SS"));
@@ -128,19 +128,19 @@ public class RaceLapStorage {
                                             }
                                         }
                                     } else {
-                                        drivingBackwards(raceDriver, player);
+                                        drivingBackwards(raceDriver, race, player);
                                     }
                                 }
                             }
-                        } else {
+                        }
+                        if(!laptimeStorage.isPastPitExit()) {
                             if (storage.getPitExit().getCuboid().containsLocation(location)) {
                                 raceDriver.setPassedPitExit(race);
-                                Bukkit.getLogger().warning(player.getDisplayName() + " pit out");
                             }
                         }
                     }
                 } else {
-                    MainVehicleListener.getRACE_DRIVERS().remove(raceDriver.getDriverUUID());
+                    VPListener.getRACE_DRIVERS().remove(raceDriver.getDriverUUID());
                 }
             }
         }
@@ -152,6 +152,6 @@ public class RaceLapStorage {
         bestS1 = -1;
         bestS2 = -1;
         bestS3 = -1;
-        MainVehicleListener.getRACE_DRIVERS().forEach((uuid, raceDriver) -> raceDriver.getLaptimes(race).resetLaptimes());
+        VPListener.getRACE_DRIVERS().forEach((uuid, raceDriver) -> raceDriver.getLaptimes(race).resetLaptimes());
     }
 }

@@ -4,7 +4,6 @@ import jline.internal.Nullable;
 import lombok.Getter;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.checkerframework.checker.units.qual.C;
 
 public enum FlagType {
     GREEN("Green",999, false, ChatColor.GREEN, Material.BLACK_WOOL),
@@ -12,7 +11,6 @@ public enum FlagType {
     RED("Red",30.0, true, ChatColor.RED, true, Material.RED_WOOL),
     VSC("VSC",60.0, true, ChatColor.GOLD, Material.YELLOW_TERRACOTTA),
     SC("SC",60.0, true, ChatColor.GOLD, Material.ORANGE_TERRACOTTA);
-
 
     @Getter
     private final String name;

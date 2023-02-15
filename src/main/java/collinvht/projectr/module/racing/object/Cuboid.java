@@ -1,6 +1,5 @@
 package collinvht.projectr.module.racing.object;
 
-import com.sk89q.worldedit.math.BlockVector3;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;

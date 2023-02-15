@@ -1,5 +1,7 @@
 package collinvht.projectr.module;
 
+import collinvht.projectr.module.itemsadder.ItemsAdderModule;
+import collinvht.projectr.module.vehiclesplus.VehiclePlusModule;
 import collinvht.projectr.util.modules.ModuleBase;
 import collinvht.projectr.module.main.MainModule;
 import collinvht.projectr.module.racing.RacingModule;
@@ -11,7 +13,9 @@ public class ModuleManager {
 
     public static void loadModules() {
         modules.add(new MainModule());
+        modules.add(new VehiclePlusModule());
         modules.add(new RacingModule());
+        modules.add(new ItemsAdderModule());
     }
 
     public static void saveModules() {

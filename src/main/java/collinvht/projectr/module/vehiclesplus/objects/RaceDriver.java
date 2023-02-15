@@ -1,4 +1,4 @@
-package collinvht.projectr.module.main.objects;
+package collinvht.projectr.module.vehiclesplus.objects;
 
 import collinvht.projectr.module.racing.object.laptime.DriverLaptimeStorage;
 import collinvht.projectr.module.racing.object.laptime.LaptimeStorage;
@@ -17,6 +17,7 @@ public class RaceDriver {
     @Getter
     private boolean isDriving = true;
 
+    @Getter
     private final HashMap<Race, DriverLaptimeStorage> laptimes = new HashMap<>();
 
     @Getter

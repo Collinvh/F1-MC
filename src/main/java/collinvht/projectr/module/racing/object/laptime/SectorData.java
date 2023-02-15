@@ -30,7 +30,7 @@ public class SectorData {
         this.sectorLength = (sectorLength - sectorStart);
     }
 
-    public SectorData clone() {
+    public SectorData copy() {
         SectorData data = new SectorData(driver);
         data.sectorLength = sectorLength;
         data.sectorColor = sectorColor;

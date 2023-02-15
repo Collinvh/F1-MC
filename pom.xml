@@ -136,7 +136,7 @@
             <artifactId>VehiclesPlus-API</artifactId>
             <version>3.0.0-SNAPSHOT</version>
             <scope>system</scope>
-            <systemPath>${pom.basedir}/lib/VehiclesPlus-3.0.0-SNAPSHOT.jar</systemPath>
+            <systemPath>${pom.basedir}/lib/VehiclesPlus-3.0.0-PRE3.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.comphenix.protocol</groupId>

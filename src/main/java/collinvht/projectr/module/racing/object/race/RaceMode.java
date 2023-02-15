@@ -2,7 +2,7 @@ package collinvht.projectr.module.racing.object.race;
 
 import lombok.Getter;
 
-public enum RaceMode {
+public enum     RaceMode {
     PRACTICE(0, false),
     LAPPING(1, true);
 

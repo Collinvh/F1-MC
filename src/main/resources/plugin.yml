@@ -1,6 +1,6 @@
-name: ProjectR
+name: F1MC
 version: ${project.version}
-main: collinvht.projectr.ProjectR
+main: collinvht.f1mc.F1MC
 api-version: 1.18
 depend: [ VehiclesPlus, WorldEdit, LuckPerms, JDA, ItemsAdder, ProtocolLib ]
 authors: [ Collinvht, SBDeveloper ]

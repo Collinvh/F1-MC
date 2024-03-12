@@ -26,7 +26,7 @@ public class ItemsAdderListener implements Listener {
             World world = location.getWorld();
             if(world == null) return;
 
-            CustomBlock block = CustomBlock.getInstance("f1mc:" + stripped.toLowerCase().replace(" ", "_"));
+            CustomBlock block = CustomBlock.getInstance("projectr:" + stripped.toLowerCase().replace(" ", "_"));
             if(block == null) return;
 
             block.place(above);
@@ -41,6 +41,7 @@ public class ItemsAdderListener implements Listener {
 
             location.getWorld().setBlockData(location, data);
             event.setCancelled(true);
+            block.playPlaceSound();
         }
     }
 

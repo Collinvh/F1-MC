@@ -15,8 +15,7 @@ public class ModuleManager {
     public static void loadModules() {
         modules.add(new MainModule());
         modules.add(new VehiclePlusModule());
-        modules.add(new DiscordModule());
-        modules.add(new RacingModule());
+//        modules.add(new RacingModule());
         modules.add(new ItemsAdderModule());
     }
 

@@ -12,7 +12,6 @@ public final class F1MC extends JavaPlugin {
         instance = this;
         ModuleManager.loadModules();
     }
-
     @Override
     public void onDisable() {
         ModuleManager.saveModules();

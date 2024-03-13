@@ -1,13 +1,18 @@
 package collinvht.f1mc.util.modules;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Bukkit;
 
 import java.util.ArrayList;
 
 public abstract class ModuleBase {
+    @Getter @Setter
+    private boolean isInitialized;
     private final ArrayList<ModuleBase> attachedModules = new ArrayList<>();
     public ModuleBase() {
         load();
+        isInitialized = true;
     }
     public final void attachModule(ModuleBase module) {
         if(module == this) return;
@@ -24,7 +29,6 @@ public abstract class ModuleBase {
         }
         saveModule();
     }
-
     public abstract void load();
-    public abstract void saveModule();
+    public void saveModule() {}
 }

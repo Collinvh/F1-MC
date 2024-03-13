@@ -5,10 +5,11 @@ import org.bukkit.command.CommandSender;
 
 public enum Permissions {
     NONE(""),
-    FIA_ADMIN("projectr.admin"),
-    FIA_RACE("projectr.fia.race"),
-    FIA_TEAM("projectr.fia.team"),
-    FIA_COMMON("projectr.fia.common");
+    BUILDER("f1mc.builder"),
+    FIA_ADMIN("f1mc.admin"),
+    FIA_RACE("f1mc.fia.race"),
+    FIA_TEAM("f1mc.fia.team"),
+    FIA_COMMON("f1mc.fia.common");
 
 
     @Getter

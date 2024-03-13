@@ -73,7 +73,6 @@ public class RaceLapStorage {
                                         player.sendMessage(ChatColor.GRAY + "Your time in S1 was " +  laptimeStorage.getS1Color() + Utils.millisToTimeString(laptimeStorage.getS1data().getSectorLength()) + " | " + Utils.millisToTimeString(laptimeStorage.getS1data().getSectorDifference(), "ss.SS"));
                                     }
                                     raceDriver.getLaptimes(race).addSector();
-                                    Bukkit.getLogger().warning(player.getDisplayName() + " s1");
                                     return;
                                 }
                             }
@@ -85,7 +84,6 @@ public class RaceLapStorage {
                                         player.sendMessage(ChatColor.GRAY + "Your time in S2 was " +  laptimeStorage.getS2Color() + Utils.millisToTimeString(laptimeStorage.getS2data().getSectorLength()) + " | " + Utils.millisToTimeString(laptimeStorage.getS2data().getSectorDifference(), "ss.SS"));
                                     }
                                     raceDriver.getLaptimes(race).addSector();
-                                    Bukkit.getLogger().warning(player.getDisplayName() + " s2");
                                     return;
                                 }
                             }
@@ -100,7 +98,6 @@ public class RaceLapStorage {
                                             raceDriver.addLaptime(race, clone);
                                             player.sendMessage(ChatColor.GRAY + "Your time in S3 was " +  laptimeStorage.getS3Color() + Utils.millisToTimeString(laptimeStorage.getS3data().getSectorLength()) + " | " + Utils.millisToTimeString(laptimeStorage.getS3data().getSectorDifference(), "ss.SS"));
                                             player.sendMessage(ChatColor.GRAY + "Your lap time was a " + laptimeStorage.getLapColor(true) + Utils.millisToTimeString(laptimeStorage.getLaptime()) + " | " + Utils.millisToTimeString(laptimeStorage.getLapData().getSectorDifference(), "ss.SS"));
-                                            Bukkit.getLogger().warning(player.getDisplayName() + " s3");
                                         } else {
                                             player.sendMessage(ChatColor.RED + "Your lap time is INVALIDATED.");
                                             raceDriver.getLaptimes(race).setInvalidated(false);

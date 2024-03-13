@@ -35,14 +35,14 @@ public class RaceListener {
     public static String startListeningTo(Race race, int mode) {
         if(isListeningToRace(race)) return DefaultMessages.PREFIX + "That race already started.";
         RaceMode raceMode = RaceMode.getRace(mode);
-        if(raceMode == null) return "That Race mode doesn't exist!";
+        if(raceMode == null) return "That race mode doesn't exist!";
         RaceCuboidStorage storage = race.getStorage();
         if(storage != null ) {
-            if(!storage.allCuboidsSet()) return "Not the whole track is done setup, this is required to start";
+            if(!storage.allCuboidsSet()) return "Not the whole track has been setup, this is required to start";
             LISTENING.add(race);
             race.getRaceLapStorage().setRaceMode(raceMode);
         } else {
-            return "Not the whole track is done setup, this is required to start";
+            return "Not the whole track has been setup, this is required to start";
         }
 
         return DefaultMessages.PREFIX + "Race started.";
@@ -98,6 +98,6 @@ public class RaceListener {
     }
 
     public static boolean isListeningToAnyRace() {
-        return LISTENING.size() > 0;
+        return !LISTENING.isEmpty();
     }
 }

@@ -1,7 +1,7 @@
 package collinvht.f1mc.module;
 
 import collinvht.f1mc.module.discord.DiscordModule;
-import collinvht.f1mc.module.itemsadder.ItemsAdderModule;
+import collinvht.f1mc.module.buildingtools.BuildingToolsModule;
 import collinvht.f1mc.module.vehiclesplus.VehiclePlusModule;
 import collinvht.f1mc.util.modules.ModuleBase;
 import collinvht.f1mc.module.main.MainModule;
@@ -14,9 +14,10 @@ public class ModuleManager {
 
     public static void loadModules() {
         modules.add(new MainModule());
+        modules.add(new DiscordModule());
         modules.add(new VehiclePlusModule());
-//        modules.add(new RacingModule());
-        modules.add(new ItemsAdderModule());
+        modules.add(new RacingModule());
+        modules.add(new BuildingToolsModule());
     }
 
     public static void saveModules() {

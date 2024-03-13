@@ -2,10 +2,9 @@ package collinvht.f1mc.module.main.objects;
 
 import lombok.Getter;
 
+@Getter
 public class SharedObject<A, B> {
-    @Getter
     public final A object1;
-    @Getter
     public final B object2;
 
     public SharedObject(A object1, B object2) {

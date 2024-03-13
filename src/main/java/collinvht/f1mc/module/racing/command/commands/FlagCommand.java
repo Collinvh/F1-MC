@@ -13,6 +13,12 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class FlagCommand extends CommandUtil {
+
+    /**
+     * @author Collinvht
+     * See Trello:
+     * <a href="https://trello.com/c/7hKPxTtD">...</a>
+     */
     @Override
     protected void initializeCommand(@NotNull CommandSender commandSender) {
         addPart("stop", 0, "/flag stop", ((sender, command, label, args) -> {

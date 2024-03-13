@@ -80,7 +80,7 @@ public class RaceManager extends ModuleBase {
                             RACES.put(race.getName(), race);
                         }
                     } catch (Exception e) {
-                        Bukkit.getLogger().warning(raceFile.getAbsolutePath() + " failed to load.");
+                        Bukkit.getLogger().severe(raceFile.getAbsolutePath() + " failed to load.");
                     }
                 }
             }
@@ -148,7 +148,7 @@ public class RaceManager extends ModuleBase {
                 return RacingMessages.NO_LAPS_DRIVEN;
             }
             case "result": {
-                if(race.getRaceLapStorage().getFinishers().size() > 0) {
+                if(!race.getRaceLapStorage().getFinishers().isEmpty()) {
                     StringBuilder builder = new StringBuilder();
                     builder.append(RacingMessages.RACE_RESULT);
                     race.getRaceLapStorage().getFinishers().forEach((integer, uuid) -> {
@@ -163,7 +163,7 @@ public class RaceManager extends ModuleBase {
             case "position": {
                 StringBuilder builder = new StringBuilder();
                 HashMap<UUID, RaceDriver> drivers = VPListener.getRACE_DRIVERS();
-                if(drivers.size() > 0) {
+                if(!drivers.isEmpty()) {
                     builder.append(RacingMessages.RACE_POSITION);
 
                     LinkedHashMap<RaceDriver, Long> sectors = new LinkedHashMap<>();
@@ -173,7 +173,7 @@ public class RaceManager extends ModuleBase {
                     LinkedHashMap<RaceDriver, Long> treeMap = Utils.sortByValueDesc(sectors);
 
 
-                    if (treeMap.size() > 0) {
+                    if (!treeMap.isEmpty()) {
                         builder.append(RacingMessages.SECTOR_POSITION);
 
                         AtomicInteger pos = new AtomicInteger();
@@ -194,7 +194,7 @@ public class RaceManager extends ModuleBase {
                 RaceDriver driver = VPListener.getRACE_DRIVERS().get(playerUUID);
                 if (driver != null) {
                     LinkedList<LaptimeStorage> list = driver.getLaptimes(race).getLaptimes();
-                    if (list.size() > 0) {
+                    if (!list.isEmpty()) {
                         builder.append(RacingMessages.LAST_10_LAPS);
                         list.forEach(laptimeOBJ -> builder.append(ChatColor.BOLD).append(ChatColor.GREEN).append(Utils.millisToTimeString(laptimeOBJ.getLaptime())).append(" | ").append(ChatColor.RESET).append(Utils.millisToTimeString(laptimeOBJ.getS1data().getSectorLength())).append("/").append(Utils.millisToTimeString(laptimeOBJ.getS2data().getSectorLength())).append("/").append(Utils.millisToTimeString(laptimeOBJ.getS3data().getSectorLength())).append("\n"));
                         return builder.toString();

@@ -1,7 +1,7 @@
 name: F1MC
 version: ${project.version}
 main: collinvht.f1mc.F1MC
-api-version: 1.18
+api-version: 1.19
 depend: [ VehiclesPlus, WorldEdit, LuckPerms, JDA, ItemsAdder, ProtocolLib ]
 authors: [ Collinvht, SBDeveloper ]
 commands:
@@ -15,9 +15,6 @@ commands:
   timetrial:
     permission: projectr.fia.common
     description: Starts timetrial
-  tuktuk:
-    permission: projectr.console.tuktuk
-    description: tuktuk
   dsq:
     permission: projectr.fia.common
     description: Disqualifies someone
@@ -33,6 +30,7 @@ commands:
   announcement:
     permission: projectr.fia.common
     description: Announce something
-  hypersoft:
-    permission: projectr.fia.admin
-    description: Hypersoft someone
+  buildingtools:
+    permission: f1mc.builder
+    description: Building tools
+    aliases: bt

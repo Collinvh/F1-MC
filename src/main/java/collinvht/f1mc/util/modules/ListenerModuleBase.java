@@ -8,7 +8,4 @@ public abstract class ListenerModuleBase extends ModuleBase {
     public void registerListener(Listener listener) {
         Bukkit.getPluginManager().registerEvents(listener, F1MC.getInstance());
     }
-
-    @Override
-    public final void saveModule() {}
 }

@@ -2,11 +2,14 @@ package collinvht.f1mc.util.commands;
 
 import collinvht.f1mc.util.Permissions;
 import collinvht.f1mc.util.DefaultMessages;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collection;
 import java.util.HashMap;
 
 public abstract class CommandUtil implements CommandExecutor {
@@ -25,8 +28,8 @@ public abstract class CommandUtil implements CommandExecutor {
     public final boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if(parts.isEmpty()) initializeCommand(sender);
         if(args.length > 0) {
-            if(parts.containsKey("%")) {
-                CommandPart part = parts.get("%");
+            if(parts.containsKey(args[0])) {
+                CommandPart part = parts.get(args[0]);
                 if(part.getExtraArguments() > 0) {
                     if(args.length > part.getExtraArguments()) {
                         sender.sendMessage(part.execute(sender, command, label, args));
@@ -39,9 +42,8 @@ public abstract class CommandUtil implements CommandExecutor {
                     sender.sendMessage(part.execute(sender, command, label, args));
                     return true;
                 }
-
-            } else if(parts.containsKey(args[0])) {
-                CommandPart part = parts.get(args[0]);
+            } else if(parts.containsKey("%")) {
+                CommandPart part = parts.get("%");
                 if(part.getExtraArguments() > 0) {
                     if(args.length > part.getExtraArguments()) {
                         sender.sendMessage(part.execute(sender, command, label, args));
@@ -95,5 +97,9 @@ public abstract class CommandUtil implements CommandExecutor {
             part.addPermission(Permissions.NONE);
         }
         parts.put(name, part);
+    }
+
+    protected Collection<? extends Player> getAllPlayers() {
+        return Bukkit.getOnlinePlayers();
     }
 }

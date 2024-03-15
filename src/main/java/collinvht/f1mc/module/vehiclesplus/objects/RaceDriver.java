@@ -5,7 +5,7 @@ import collinvht.f1mc.module.racing.object.laptime.LaptimeStorage;
 import collinvht.f1mc.module.racing.object.race.Race;
 import lombok.Getter;
 import lombok.Setter;
-import nl.sbdeveloper.vehiclesplus.api.vehicles.impl.SpawnedVehicle;
+import me.legofreak107.vehiclesplus.vehicles.vehicles.objects.SpawnedVehicle;
 import org.bukkit.Bukkit;
 
 import java.util.HashMap;

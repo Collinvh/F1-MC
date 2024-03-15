@@ -1,4 +1,4 @@
-package collinvht.f1mc.module.racing.command.commands;
+package collinvht.f1mc.module.racing.module.fia.command.commands;
 
 import collinvht.f1mc.module.racing.manager.managers.FlagManager;
 import collinvht.f1mc.module.racing.manager.managers.RaceManager;

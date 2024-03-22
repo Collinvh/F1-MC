@@ -1,6 +1,7 @@
 package collinvht.f1mc.module.racing.manager.managers;
 
 import collinvht.f1mc.F1MC;
+import collinvht.f1mc.module.discord.DiscordModule;
 import collinvht.f1mc.module.vehiclesplus.listener.listeners.VPListener;
 import collinvht.f1mc.module.vehiclesplus.objects.RaceDriver;
 import collinvht.f1mc.module.racing.object.NamedCuboid;
@@ -14,6 +15,8 @@ import collinvht.f1mc.util.modules.ModuleBase;
 import com.google.gson.JsonObject;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.regions.Region;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.TextChannel;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -91,6 +94,16 @@ public class RaceManager extends ModuleBase {
         if(!raceExists(raceName)) return RacingMessages.RACE_DOES_NOT_EXIST;
         try {
             int modeInt = Integer.parseInt(mode);
+            DiscordModule module = DiscordModule.getInstance();
+            if(module.isInitialized()) {
+                TextChannel channel = module.getJda().getTextChannelById(1217628051853021194L);
+                if(channel != null) {
+                    EmbedBuilder builder = new EmbedBuilder();
+                    builder.addField("Race started at " + raceName, "Mode = " + mode, true);
+                    builder.setColor(Color.BLUE);
+                    channel.sendMessage(builder.build()).queue();
+                }
+            }
             return RaceListener.startListeningTo(getRace(raceName), modeInt);
         } catch (NumberFormatException e) {
             return DefaultMessages.INVALID_NUMBER;
@@ -99,7 +112,21 @@ public class RaceManager extends ModuleBase {
 
     public String stopRace(String name) {
         Race race = RACES.get(name);
-        return RaceListener.stopListeningTo(race);
+        if(RaceListener.isListeningToRace(race)) {
+            DiscordModule module = DiscordModule.getInstance();
+            if(module.isInitialized()) {
+                TextChannel channel = module.getJda().getTextChannelById(1217628051853021194L);
+                if(channel != null) {
+                    EmbedBuilder builder = new EmbedBuilder();
+                    builder.addField("Race started at " + name, "", true);
+                    builder.setColor(Color.BLUE);
+                    channel.sendMessage(builder.build()).queue();
+                }
+            }
+            return RaceListener.stopListeningTo(race);
+        } else {
+            return DefaultMessages.PREFIX + "Race isn't running";
+        }
     }
 
     public String deleteRace(String raceName) {
@@ -341,7 +368,7 @@ public class RaceManager extends ModuleBase {
         Race race = getRace(raceName);
         try {
             final BufferedImage image = ImageIO.read(new URL(
-                    "https://media.discordapp.net/attachments/634115064567431189/1069386920590852106/image.png"));
+                    "https://media.discordapp.net/attachments/634115064567431189/1069386920590852106/image.png?ex=6600ac2e&is=65ee372e&hm=ae1d99317b169e8976bb3f4e6f0839e98c78c88087783d361507529d1a9f8ab3"));
             Graphics imageGraphics = image.getGraphics();
             Font basefont = new Font("Bahnschrift", Font.BOLD, 16);
             HashMap<UUID, RaceDriver> drivers = VPListener.getRACE_DRIVERS();
@@ -404,12 +431,22 @@ public class RaceManager extends ModuleBase {
                     }
 
                     ImageIO.write(image, "png", file);
+
+                    DiscordModule module = DiscordModule.getInstance();
+                    if(module.isInitialized()) {
+                        TextChannel channel = module.getJda().getTextChannelById(1217628051853021194L);
+                        if(channel != null) {
+                            channel.sendFile(file).queue();
+                        }
+                    }
+                    file.delete();
                 }
             } else {
                 return "Can't create image with no race result";
             }
             return "Image created";
         } catch (IOException e) {
+            e.printStackTrace();
             return "Error creating image.";
         }
     }

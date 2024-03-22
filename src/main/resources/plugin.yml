@@ -2,7 +2,7 @@ name: F1MC
 version: ${project.version}
 main: collinvht.f1mc.F1MC
 api-version: 1.19
-depend: [ VehiclesPlus, WorldEdit, LuckPerms, JDA, ItemsAdder, ProtocolLib ]
+depend: [ VehiclesPlusPro, WorldEdit, LuckPerms, JDA, ItemsAdder, ProtocolLib ]
 authors: [ Collinvht, SBDeveloper ]
 commands:
   raceteam:

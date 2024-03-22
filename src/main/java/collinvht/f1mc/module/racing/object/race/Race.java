@@ -9,23 +9,23 @@ import lombok.Setter;
 import java.io.File;
 import java.nio.file.Paths;
 
+@Getter
 public class Race {
-    @Getter @Setter
+    @Setter
     private int laps;
 
-    @Getter @Setter
+    @Setter
     private String name;
 
-    @Getter @Setter
+    @Setter
     private RaceCuboidStorage storage;
 
-    @Getter
-    private RaceLapStorage raceLapStorage;
+    private final RaceLapStorage raceLapStorage;
 
-    @Getter @Setter
+    @Setter
     private RaceFlags flags;
 
-    @Getter @Setter
+    @Setter
     private boolean timeTrialStatus;
 
     public Race(String name, int laps) {

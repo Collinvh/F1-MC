@@ -6,6 +6,7 @@ import collinvht.f1mc.module.racing.object.race.Race;
 import collinvht.f1mc.util.DefaultMessages;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -17,7 +18,7 @@ public class RacingPlayerListener implements Listener {
     public static void onPlayerQuit(PlayerQuitEvent event) {
         FlagManager.getEDITING().remove(event.getPlayer().getUniqueId());
     }
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public static void onBlockPlace(BlockPlaceEvent event) {
         if(FlagManager.getEDITING().containsKey(event.getPlayer().getUniqueId())) {
             if(event.getBlockPlaced().getBlockData().getMaterial() == Material.BLACK_WOOL) {

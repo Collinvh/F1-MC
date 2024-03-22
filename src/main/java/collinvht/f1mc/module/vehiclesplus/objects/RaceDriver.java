@@ -5,8 +5,9 @@ import collinvht.f1mc.module.racing.object.laptime.LaptimeStorage;
 import collinvht.f1mc.module.racing.object.race.Race;
 import lombok.Getter;
 import lombok.Setter;
-import nl.sbdeveloper.vehiclesplus.api.vehicles.impl.SpawnedVehicle;
+import me.legofreak107.vehiclesplus.vehicles.vehicles.objects.SpawnedVehicle;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -34,14 +35,15 @@ public class RaceDriver {
 
     @Getter
     private final UUID driverUUID;
+    @Getter
+    private final String driverName;
 
     @Getter @Setter
     private boolean disqualified;
 
-    public RaceDriver(UUID uuid) {
-        this.driverUUID = uuid;
-        Bukkit.getLogger().warning(uuid.toString());
-
+    public RaceDriver(Player player) {
+        this.driverUUID = player.getUniqueId();
+        this.driverName = player.getName();
 //        SetupManager.initializeSetup(uuid);
     }
 

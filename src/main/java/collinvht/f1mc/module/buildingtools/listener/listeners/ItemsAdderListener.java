@@ -25,7 +25,7 @@ public class ItemsAdderListener implements Listener {
             String stripped = ChatColor.stripColor(meta.getDisplayName());
             if(!stripped.contains("Slab") && !stripped.contains("Curbstone")) return;
             Player player = event.getPlayer();
-            if(!BuildingTools.getPlayers().contains(player.getUniqueId())) {
+            if(!BuildingTools.getPlayers().containsKey(player.getUniqueId())) {
                 player.sendMessage(DefaultMessages.PREFIX + "Can't place curbs outside of building mode");
                 event.setCancelled(true);
                 return;

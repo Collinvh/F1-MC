@@ -2,11 +2,9 @@ package collinvht.f1mc.module.vehiclesplus.listener.listeners;
 
 import collinvht.f1mc.module.vehiclesplus.objects.RaceDriver;
 import lombok.Getter;
-import nl.sbdeveloper.vehiclesplus.api.events.impl.VehicleDespawnEvent;
-import nl.sbdeveloper.vehiclesplus.api.events.impl.VehicleDestroyEvent;
-import nl.sbdeveloper.vehiclesplus.api.events.impl.VehicleEnterEvent;
-import nl.sbdeveloper.vehiclesplus.api.events.impl.VehicleLeaveEvent;
-import nl.sbdeveloper.vehiclesplus.api.vehicles.impl.SpawnedVehicle;
+import me.legofreak107.vehiclesplus.vehicles.api.events.VehicleEnterEvent;
+import me.legofreak107.vehiclesplus.vehicles.api.events.VehicleLeaveEvent;
+import me.legofreak107.vehiclesplus.vehicles.vehicles.objects.SpawnedVehicle;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -22,13 +20,13 @@ public class VPListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public static void vehicleEnterEvent(@NotNull VehicleEnterEvent event) {
-        Player player = event.getPlayer();
-        SpawnedVehicle vehicle = event.getVehicle();
+        Player player = event.getDriver();
+        SpawnedVehicle vehicle = (SpawnedVehicle) event.getVehicle();
         if(player != null && vehicle != null) {
-            RaceDriver driver = RACE_DRIVERS.get(event.getPlayer().getUniqueId());
+            RaceDriver driver = RACE_DRIVERS.get(event.getDriver().getUniqueId());
             if (driver == null) {
-                driver = new RaceDriver(event.getPlayer().getUniqueId());
-                RACE_DRIVERS.put(event.getPlayer().getUniqueId(), driver);
+                driver = new RaceDriver(event.getDriver());
+                RACE_DRIVERS.put(event.getDriver().getUniqueId(), driver);
             }
             driver.setDriving(true);
             driver.setVehicle(vehicle);
@@ -37,7 +35,7 @@ public class VPListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public static void vehicleLeaveEvent(@NotNull VehicleLeaveEvent event) {
-        Player player = event.getPlayer();
+        Player player = event.getDriver();
         if(player != null) {
             RaceDriver driver = RACE_DRIVERS.get(player.getUniqueId());
             if(driver != null) {
@@ -45,13 +43,5 @@ public class VPListener implements Listener {
                 driver.setDriving(false);
             }
         }
-    }
-
-    @EventHandler
-    public static void vehiclePickUpEvent(@NotNull VehicleDespawnEvent event) {
-    }
-
-    @EventHandler
-    public static void vehicleDeleteEvent(@NotNull VehicleDestroyEvent event) {
     }
 }

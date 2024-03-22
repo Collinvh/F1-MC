@@ -1,10 +1,12 @@
 package collinvht.f1mc.module.racing.object.race;
 
+import collinvht.f1mc.module.discord.DiscordModule;
 import collinvht.f1mc.module.vehiclesplus.listener.listeners.VPListener;
 import collinvht.f1mc.module.vehiclesplus.objects.RaceDriver;
 import collinvht.f1mc.module.racing.manager.managers.RaceManager;
 import collinvht.f1mc.util.DefaultMessages;
 import collinvht.f1mc.util.Permissions;
+import net.dv8tion.jda.api.JDA;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -43,6 +45,11 @@ public class RaceListener {
             race.getRaceLapStorage().setRaceMode(raceMode);
         } else {
             return "Not the whole track has been setup, this is required to start";
+        }
+
+        DiscordModule discordModule = DiscordModule.getInstance();
+        if(discordModule.isInitialized()) {
+            JDA jda = discordModule.getJda();
         }
 
         return DefaultMessages.PREFIX + "Race started.";

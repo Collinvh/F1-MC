@@ -1,12 +1,17 @@
 package collinvht.f1mc.module.racing.object.laptime;
 
+import collinvht.f1mc.module.discord.DiscordModule;
 import collinvht.f1mc.module.vehiclesplus.listener.listeners.VPListener;
 import collinvht.f1mc.module.racing.object.race.Race;
 import collinvht.f1mc.module.vehiclesplus.objects.RaceDriver;
+import collinvht.f1mc.util.Utils;
 import lombok.Getter;
 import lombok.Setter;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.TextChannel;
 import org.bukkit.ChatColor;
 
+import java.awt.*;
 import java.util.UUID;
 
 public class LaptimeStorage {
@@ -64,6 +69,18 @@ public class LaptimeStorage {
 
     public void createLaptime() {
         setLaptime(s1data.getSectorLength() + s2data.getSectorLength() + s3data.getSectorLength());
+
+        DiscordModule module = DiscordModule.getInstance();
+        if(module.isInitialized()) {
+            TextChannel channel = module.getJda().getTextChannelById(1217628051853021194L);
+            if(channel == null) return;
+            EmbedBuilder builder = new EmbedBuilder();
+            builder.addField("New laptime at " + race.getName(), "Driven by" + driver.getDriverName(), true);
+            builder.addBlankField(true);
+            builder.setColor(Color.BLUE);
+            builder.addField("Time:", Utils.millisToTimeString(getLaptime()), false);
+            channel.sendMessage(builder.build()).queue();
+        }
     }
 
     public ChatColor getS1Color() {

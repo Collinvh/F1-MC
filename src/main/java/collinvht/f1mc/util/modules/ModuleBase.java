@@ -8,11 +8,10 @@ import java.util.ArrayList;
 
 public abstract class ModuleBase {
     @Getter @Setter
-    private boolean isInitialized;
+    private boolean isInitialized = true;
     private final ArrayList<ModuleBase> attachedModules = new ArrayList<>();
     public ModuleBase() {
         load();
-        isInitialized = true;
     }
     public final void attachModule(ModuleBase module) {
         if(module == this) return;

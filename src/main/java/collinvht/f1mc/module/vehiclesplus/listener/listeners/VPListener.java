@@ -25,7 +25,7 @@ public class VPListener implements Listener {
         if(player != null && vehicle != null) {
             RaceDriver driver = RACE_DRIVERS.get(event.getDriver().getUniqueId());
             if (driver == null) {
-                driver = new RaceDriver(event.getDriver().getUniqueId());
+                driver = new RaceDriver(event.getDriver());
                 RACE_DRIVERS.put(event.getDriver().getUniqueId(), driver);
             }
             driver.setDriving(true);

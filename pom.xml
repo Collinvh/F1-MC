@@ -132,7 +132,7 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>me.legofreak107</groupId>
+            <groupId>me.legofreak</groupId>
             <artifactId>VehiclesPlusPro</artifactId>
             <version>2.4.3</version>
             <scope>system</scope>

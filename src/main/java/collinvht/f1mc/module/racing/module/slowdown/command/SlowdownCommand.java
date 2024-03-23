@@ -1,4 +1,4 @@
-package collinvht.f1mc.module.racing.module.slowdown.commands;
+package collinvht.f1mc.module.racing.module.slowdown.command;
 
 import collinvht.f1mc.module.racing.module.slowdown.manager.SlowdownManager;
 import collinvht.f1mc.util.Permissions;

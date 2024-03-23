@@ -1,5 +1,6 @@
 package collinvht.f1mc.module.discord;
 
+import collinvht.f1mc.module.racing.util.RacingMessages;
 import collinvht.f1mc.util.modules.ModuleBase;
 import lombok.Getter;
 import net.dv8tion.jda.api.JDA;
@@ -16,6 +17,7 @@ public class DiscordModule extends ModuleBase {
     private static DiscordModule instance;
     @Override
     public void load() {
+        Bukkit.getLogger().info("[F1MC] [Discord] Enabling Discord Module");
         try {
             jda = JDABuilder.createDefault("MTA1MDU0MjgzOTA4OTYwNjcyNw.GdCG1P.VUDZJzQft9ogs2yfvAfJaQ-qB44su_rEzJ4yAs").build();
             jda.awaitReady();
@@ -25,6 +27,7 @@ public class DiscordModule extends ModuleBase {
             Bukkit.getLogger().warning("Error whilst initializing discord hook, disabling this part of the plugin");
             setInitialized(false);
         }
+        Bukkit.getLogger().info("[F1MC] [Discord] Enabled Discord Module");
     }
 
     @Override

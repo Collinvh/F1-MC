@@ -26,7 +26,9 @@ public abstract class ModuleBase {
             }
             attachedModule.save();
         }
-        saveModule();
+        if(isInitialized) {
+            saveModule();
+        }
     }
     public abstract void load();
     public void saveModule() {}

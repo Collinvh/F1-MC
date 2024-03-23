@@ -8,6 +8,7 @@ import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.math.BlockVector3;
 import net.luckperms.api.LuckPerms;
+import net.luckperms.api.LuckPermsProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -23,8 +24,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class Utils {
-    private static LuckPerms luckPerms;
-    private static WorldEditPlugin worldEdit;
+    private static LuckPerms luckPerms = null;
+    private static WorldEditPlugin worldEdit = null;
 
     /*
     Dependant Plugins
@@ -34,15 +35,13 @@ public class Utils {
      */
     public static LuckPerms getLuckperms() {
         if(luckPerms != null) return luckPerms;
-        RegisteredServiceProvider<LuckPerms> provider = Bukkit.getServicesManager().getRegistration(LuckPerms.class);
-        if (provider != null) {
-            luckPerms = provider.getProvider();
-            return luckPerms;
-        } else {
-            Bukkit.getLogger().severe("LUCK PERMS NOT PRESENT DISABLING");
+        try {
+            luckPerms = LuckPermsProvider.get();
+        } catch (IllegalStateException e) {
+            Bukkit.getLogger().severe("LUCKPERMS NOT PRESENT DISABLING");
             Bukkit.getPluginManager().disablePlugin(F1MC.getInstance());
         }
-        return null;
+        return luckPerms;
     }
 
     public static WorldEditPlugin getWorldEdit() {

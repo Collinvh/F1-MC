@@ -4,7 +4,6 @@ import collinvht.f1mc.module.buildingtools.command.commands.BuildingTools;
 import collinvht.f1mc.module.buildingtools.object.CircuitBuilder;
 import com.sk89q.worldedit.event.platform.BlockInteractEvent;
 import dev.lone.itemsadder.api.Events.CustomBlockPlaceEvent;
-import net.minecraft.core.Position;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;

@@ -4,6 +4,7 @@ import collinvht.f1mc.module.racing.command.RacingCommands;
 import collinvht.f1mc.module.racing.listener.RacingListeners;
 import collinvht.f1mc.module.racing.manager.RacingManagers;
 import collinvht.f1mc.module.racing.module.fia.FiaModule;
+import collinvht.f1mc.module.racing.module.slowdown.SlowdownModule;
 import collinvht.f1mc.util.modules.ModuleBase;
 
 public class RacingModule extends ModuleBase {
@@ -13,5 +14,6 @@ public class RacingModule extends ModuleBase {
         attachModule(new RacingManagers());
         attachModule(new FiaModule());
         attachModule(new RacingListeners());
+        attachModule(new SlowdownModule());
     }
 }

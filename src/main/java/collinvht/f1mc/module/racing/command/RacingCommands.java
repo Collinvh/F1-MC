@@ -1,6 +1,5 @@
 package collinvht.f1mc.module.racing.command;
 
-import collinvht.f1mc.module.racing.command.commands.fia.*;
 import collinvht.f1mc.module.racing.command.commands.RaceCommand;
 import collinvht.f1mc.util.modules.CommandModuleBase;
 

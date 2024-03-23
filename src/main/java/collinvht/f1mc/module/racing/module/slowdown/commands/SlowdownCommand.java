@@ -29,9 +29,9 @@ public class SlowdownCommand extends CommandUtil {
                 if (stack.getType().isBlock() && stack.getType().isSolid()) {
                     return SlowdownManager.addBlock(stack, slowDown, steering, maxSpeed);
                 }
-                return "This block is invalid.";
+                return prefix + "This block is invalid.";
             } else {
-                return "You have to be a player to do this.";
+                return prefix + "You have to be a player to do this.";
             }
         }, Permissions.FIA_ADMIN, Permissions.FIA_COMMON);
 
@@ -44,9 +44,9 @@ public class SlowdownCommand extends CommandUtil {
                 if (stack.getType().isBlock() && stack.getType().isSolid()) {
                     return SlowdownManager.removeBlock(stack);
                 }
-                return "This block is invalid.";
+                return prefix + "This block is invalid.";
             } else {
-                return "You have to be a player to do this.";
+                return prefix + "You have to be a player to do this.";
             }
         }, Permissions.FIA_ADMIN, Permissions.FIA_COMMON);
 
@@ -57,9 +57,9 @@ public class SlowdownCommand extends CommandUtil {
             try {
                 double speed = Double.parseDouble(args[1]);
                 SlowdownManager.setMaxSpeed(speed);
-                return "Max speed changed.";
+                return prefix + "Max speed changed.";
             } catch (NumberFormatException e) {
-                return "Invalid number.";
+                return prefix + "Invalid number.";
             }
         }, Permissions.FIA_ADMIN, Permissions.FIA_COMMON);
     }

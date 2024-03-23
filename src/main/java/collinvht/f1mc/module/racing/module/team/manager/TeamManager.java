@@ -1,7 +1,7 @@
 package collinvht.f1mc.module.racing.module.team.manager;
 
 import collinvht.f1mc.F1MC;
-import collinvht.f1mc.module.racing.module.team.object.TeamObject;
+import collinvht.f1mc.module.racing.module.team.object.TeamObj;
 import collinvht.f1mc.util.Utils;
 import collinvht.f1mc.util.modules.ModuleBase;
 import lombok.Getter;
@@ -26,10 +26,10 @@ public class TeamManager extends ModuleBase {
     @Getter
     private static TeamManager instance;
 
-    private static final HashMap<String, TeamObject> TEAMS = new HashMap<>();
+    private static final HashMap<String, TeamObj> TEAMS = new HashMap<>();
 
     private static LuckPerms luckPerms;
-    private static final HashMap<TeamObject, Group> GROUPS = new HashMap<>();
+    private static final HashMap<TeamObj, Group> GROUPS = new HashMap<>();
 
     public void load() {
         luckPerms = Utils.getLuckperms();
@@ -48,20 +48,20 @@ public class TeamManager extends ModuleBase {
     }
 
     public static String createNewTeam(String name) {
-        TeamObject team = new TeamObject(name);
+        TeamObj team = new TeamObj(name);
         String str = createTeam(team);
         TEAMS.put(name, team);
         return str;
     }
 
-    public static String createTeam(TeamObject team) {
-        if(TEAMS.containsKey(team.getTeamName())) return "A team with that name already exists.";
-        Group group = luckPerms.getGroupManager().getGroup(team.getTeamName().toLowerCase());
+    public static String createTeam(TeamObj team) {
+        if(TEAMS.containsKey(team.getGroupName())) return "A team with that name already exists.";
+        Group group = luckPerms.getGroupManager().getGroup(team.getGroupName().toLowerCase());
         if(group == null) {
             try {
-                group = luckPerms.getGroupManager().createAndLoadGroup(team.getTeamName()).get();
+                group = luckPerms.getGroupManager().createAndLoadGroup(team.getGroupName()).get();
                 group.getData(DataType.NORMAL).add(PrefixNode.builder().prefix( ChatColor.DARK_GRAY + "|" + team.getTeamColor() + team.getTeamPrefix() + ChatColor.DARK_GRAY +"| " + ChatColor.RESET).withContext("server", "racing").priority(10).build());
-                group.getData(DataType.NORMAL).add(PermissionNode.builder("blocklocker." + team.getTeamName()).permission("team." + team.getTeamName()).withContext("server", "racing").build());
+                group.getData(DataType.NORMAL).add(PermissionNode.builder("blocklocker." + team.getGroupName()).permission("team." + team.getGroupName()).withContext("server", "racing").build());
                 luckPerms.getGroupManager().saveGroup(group);
 
                 Track track = luckPerms.getTrackManager().getTrack("team");
@@ -93,7 +93,7 @@ public class TeamManager extends ModuleBase {
     }
 
     public static String setTeam(String team, String type, String input) {
-        TeamObject teamObj = TEAMS.get(team);
+        TeamObj teamObj = TEAMS.get(team);
         if(teamObj != null) {
             switch (type) {
                 case "prefix":
@@ -105,7 +105,7 @@ public class TeamManager extends ModuleBase {
                 case "owner":
                     Player player = Bukkit.getPlayer(input);
                     if(player == null) return "Player doesn't exist.";
-                    TeamObject team1 = getTeamFromUUID(player.getUniqueId());
+                    TeamObj team1 = getTeamFromUUID(player.getUniqueId());
                     if(team1 == null) teamObj.addMember(player.getUniqueId());
                     else if(!team1.getTeamName().equalsIgnoreCase(teamObj.getTeamName())) {
                         team1.removeMember(player.getUniqueId());
@@ -127,9 +127,9 @@ public class TeamManager extends ModuleBase {
     }
 
     public static String addMember(String team, UUID uuid) {
-        TeamObject teamObj = TEAMS.get(team);
+        TeamObj teamObj = TEAMS.get(team);
         if(teamObj != null) {
-            TeamObject currentTeam = getTeamFromUUID(uuid);
+            TeamObj currentTeam = getTeamFromUUID(uuid);
             if(currentTeam != null) {
                 if(currentTeam.getTeamName().equalsIgnoreCase(teamObj.getTeamName())) return "That player is already in a team.";
                 currentTeam.removeMember(uuid);
@@ -142,9 +142,9 @@ public class TeamManager extends ModuleBase {
 
 
     public static String removeMember(String team, UUID uuid) {
-        TeamObject teamObj = TEAMS.get(team);
+        TeamObj teamObj = TEAMS.get(team);
         if(teamObj != null) {
-            TeamObject currentTeam = getTeamFromUUID(uuid);
+            TeamObj currentTeam = getTeamFromUUID(uuid);
             if(currentTeam != null) currentTeam.removeMember(uuid);
             teamObj.removeMember(uuid);
             if(teamObj.getOwner() == uuid) teamObj.setOwner(null, true);
@@ -154,7 +154,7 @@ public class TeamManager extends ModuleBase {
     }
 
     public static String deleteTeam(String team) {
-        TeamObject teamObj = TEAMS.get(team);
+        TeamObj teamObj = TEAMS.get(team);
         if(teamObj != null) {
             teamObj.delete();
             TEAMS.remove(team);
@@ -164,7 +164,7 @@ public class TeamManager extends ModuleBase {
     }
 
     public static String leave(UUID uuid) {
-        TeamObject team = getTeamFromUUID(uuid);
+        TeamObj team = getTeamFromUUID(uuid);
         if(team != null) {
             if(team.getOwner() == uuid) {
                 return "You are the owner of this team.";
@@ -176,11 +176,11 @@ public class TeamManager extends ModuleBase {
     }
 
     public static String accept(UUID owner, UUID uuid) {
-        TeamObject team = getTeamFromUUID(owner);
+        TeamObj team = getTeamFromUUID(owner);
         if(team != null) {
             if(team.getOwner() == owner) {
                 if(team.getMembers().contains(uuid)) return "Player is already in your team.";
-                TeamObject uuidteam = getTeamFromUUID(uuid);
+                TeamObj uuidteam = getTeamFromUUID(uuid);
                 if(uuidteam != null) {
                     return "Player is already in a team.";
                 }
@@ -199,8 +199,8 @@ public class TeamManager extends ModuleBase {
     }
 
     public static String request(String team, UUID uuid) {
-        TeamObject teamCurrent = getTeamFromUUID(uuid);
-        TeamObject teamNew = TEAMS.get(team);
+        TeamObj teamCurrent = getTeamFromUUID(uuid);
+        TeamObj teamNew = TEAMS.get(team);
         if(teamCurrent == null) {
             if(teamNew != null) {
                 if(teamNew.getRequests().contains(uuid)) return "You already requested to join this team.";
@@ -213,7 +213,7 @@ public class TeamManager extends ModuleBase {
     }
 
     public static String kickPlayer(UUID sender, UUID kickedPlayer) {
-        TeamObject teamCurrent = getTeamFromUUID(sender);
+        TeamObj teamCurrent = getTeamFromUUID(sender);
         if(sender == kickedPlayer) return "You can't kick yourself";
         if(teamCurrent != null) {
             if(teamCurrent.getOwner() != null) {
@@ -239,8 +239,8 @@ public class TeamManager extends ModuleBase {
         return builder.toString();
     }
 
-    private static TeamObject getTeamFromUUID(UUID uuid) {
-        AtomicReference<TeamObject> team = new AtomicReference<>();
+    private static TeamObj getTeamFromUUID(UUID uuid) {
+        AtomicReference<TeamObj> team = new AtomicReference<>();
         TEAMS.forEach((s, team1) -> {
             if(team1.getMembers().contains(uuid)) {
                 team.set(team1);
@@ -256,7 +256,7 @@ public class TeamManager extends ModuleBase {
             if(races != null) {
                 for (File teamFile : races) {
                     try {
-                        TeamObject team = TeamObject.fromJson(Utils.readJson(teamFile.getAbsolutePath()).getAsJsonObject());
+                        TeamObj team = TeamObj.fromJson(Utils.readJson(teamFile.getAbsolutePath()).getAsJsonObject());
                         if(team != null) {
                             createTeam(team);
                             TEAMS.put(team.getTeamName().toLowerCase(), team);

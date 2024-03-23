@@ -27,8 +27,10 @@ import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 @Getter
-public class TeamObject {
+public class TeamObj {
     private String teamName;
+    @Setter
+    private String groupName;
     private String teamPrefix;
 
     private UUID owner = null;
@@ -39,8 +41,9 @@ public class TeamObject {
     @Setter
     private ArrayList<UUID> requests = new ArrayList<>();
 
-    public TeamObject(String name) {
+    public TeamObj(String name) {
         this.teamName = name;
+        this.groupName = name.replace(" ", "_").toLowerCase();
         this.teamPrefix = name;
     }
     public void delete() {
@@ -52,17 +55,15 @@ public class TeamObject {
                 User user = luckPerms.getUserManager().getUser(owner);
                 if (user == null) {
                     Bukkit.getLogger().severe("Owner doesn't exist: " + owner);
-                } else if (!user.getInheritedGroups(QueryOptions.builder(QueryMode.NON_CONTEXTUAL).build()).contains(group)) {
+                } else {
                     user.data().remove(InheritanceNode.builder(group).build());
                     luckPerms.getUserManager().saveUser(user);
                 }
             }
             owner = null;
         }
-
-        for (UUID member : members) {
-            removeMember(member);
-        }
+        ArrayList<UUID> allMembers = new ArrayList<>(members);
+        allMembers.forEach(this::removeMember);
 
         Group teamGroup = luckPerms.getGroupManager().getGroup(teamName);
         if(teamGroup != null) luckPerms.getGroupManager().deleteGroup(teamGroup);
@@ -88,7 +89,7 @@ public class TeamObject {
 
     private void updateLP() {
         LuckPerms luckPerms = Utils.getLuckperms();
-        Group group = luckPerms.getGroupManager().getGroup(getTeamName().toLowerCase());
+        Group group = luckPerms.getGroupManager().getGroup(groupName);
         if(group != null) {
             group.getData(DataType.NORMAL).clear();
             group.getData(DataType.NORMAL).add(PrefixNode.builder().prefix( ChatColor.DARK_GRAY + "|" + getTeamColor() + getTeamPrefix() + ChatColor.DARK_GRAY +"| " + ChatColor.RESET).withContext("server", "racing").priority(10).build());
@@ -99,9 +100,10 @@ public class TeamObject {
         }
     }
 
-    public static TeamObject fromJson(JsonObject json) {
+    public static TeamObj fromJson(JsonObject json) {
         try {
             String name = json.get("Name").getAsString();
+            String groupname = json.get("Groupname").getAsString();
             String prefix = json.get("Prefix").getAsString();
             String color = json.get("TeamColor").getAsString();
 
@@ -109,8 +111,9 @@ public class TeamObject {
             JsonArray memberArray = json.getAsJsonArray("members");
 
 
-            TeamObject team = new TeamObject(name);
-            team.setTeamColor(ChatColor.getByChar(color.charAt(0)));
+            TeamObj team = new TeamObj(name);
+            team.setTeamColor(ChatColor.getByChar(color.charAt(1)));
+            team.setGroupName(groupname);
             if(json.get("Owner") != null) {
                 UUID owner = UUID.fromString(json.get("Owner").getAsString());
                 team.setOwner(owner, true);
@@ -138,8 +141,9 @@ public class TeamObject {
 
         JsonObject mainObject = new JsonObject();
         mainObject.addProperty("Name", teamName);
+        mainObject.addProperty("Groupname", groupName);
         mainObject.addProperty("Prefix", teamPrefix);
-        mainObject.addProperty("TeamColor", String.valueOf(teamColor.getColor()));
+        mainObject.addProperty("TeamColor", teamColor.toString());
         if(owner != null) mainObject.addProperty("Owner", owner.toString());
         JsonArray requests = new JsonArray();
         for (UUID request : this.requests) {
@@ -184,10 +188,8 @@ public class TeamObject {
                 Bukkit.getLogger().severe("Owner doesn't exist: " + owner);
                 return;
             }
-            if(!user.getInheritedGroups(QueryOptions.builder(QueryMode.NON_CONTEXTUAL).build()).contains(group)) {
-                user.data().remove(InheritanceNode.builder(group).build());
-                luckPerms.getUserManager().saveUser(user);
-            }
+            user.data().remove(InheritanceNode.builder(group).build());
+            luckPerms.getUserManager().saveUser(user);
         }
         owner = uuid;
 
@@ -196,17 +198,15 @@ public class TeamObject {
             Bukkit.getLogger().severe("New owner doesn't exist: " + owner);
             return;
         }
-        if(!user.getInheritedGroups(QueryOptions.builder(QueryMode.NON_CONTEXTUAL).build()).contains(group)) {
-            user.data().add(InheritanceNode.builder(group).build());
-            luckPerms.getUserManager().saveUser(user);
-        }
+        user.data().add(InheritanceNode.builder(group).build());
+        luckPerms.getUserManager().saveUser(user);
     }
 
     public void addMember(UUID uuid) {
         members.add(uuid);
         LuckPerms luckPerms = Utils.getLuckperms();
 
-        Group group = luckPerms.getGroupManager().getGroup(getTeamName().toLowerCase());
+        Group group = luckPerms.getGroupManager().getGroup(groupName);
         if(group == null) {
             Bukkit.getLogger().severe("No group for " + getTeamName());
             return;
@@ -217,17 +217,15 @@ public class TeamObject {
             Bukkit.getLogger().severe("User with doesn't exist: " + uuid);
             return;
         }
-        if(!user.getInheritedGroups(QueryOptions.builder(QueryMode.NON_CONTEXTUAL).build()).contains(group)) {
-            user.data().add(InheritanceNode.builder(group).build());
-            luckPerms.getUserManager().saveUser(user);
-        }
+        user.data().add(InheritanceNode.builder(group).build());
+        luckPerms.getUserManager().saveUser(user);
     }
 
     public void removeMember(UUID uuid) {
         members.remove(uuid);
         LuckPerms luckPerms = Utils.getLuckperms();
 
-        Group group = luckPerms.getGroupManager().getGroup(getTeamName().toLowerCase());
+        Group group = luckPerms.getGroupManager().getGroup(groupName);
         if(group == null) {
             Bukkit.getLogger().severe("No group for " + getTeamName());
             return;
@@ -238,9 +236,7 @@ public class TeamObject {
             Bukkit.getLogger().severe("User with doesn't exist: " + uuid);
             return;
         }
-        if(!user.getInheritedGroups(QueryOptions.builder(QueryMode.NON_CONTEXTUAL).build()).contains(group)) {
-            user.data().remove(InheritanceNode.builder(group).build());
-            luckPerms.getUserManager().saveUser(user);
-        }
+        user.data().remove(InheritanceNode.builder(group).build());
+        luckPerms.getUserManager().saveUser(user);
     }
 }

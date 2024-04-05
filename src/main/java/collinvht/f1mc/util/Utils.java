@@ -11,22 +11,28 @@ import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+/*
+@author Collinvht
+ */
 public class Utils {
     private static LuckPerms luckPerms = null;
     private static WorldEditPlugin worldEdit = null;
 
+    private static Gson gson;
     /*
     Dependant Plugins
 
@@ -55,6 +61,11 @@ public class Utils {
         }
         return null;
     }
+    public static double round (double value, int precision) {
+        int scale = (int) Math.pow(10, precision);
+        return (double) Math.round(value * scale) / scale;
+    }
+
     /*
     This creates a location from a WorldEdit region
      */
@@ -114,6 +125,16 @@ public class Utils {
         return JsonParser.parseReader(new FileReader(filename));
     }
 
+    public static ItemStack emptyStack(Material material) {
+        ItemStack stack = new ItemStack(material);
+        ItemMeta meta = stack.getItemMeta();
+        if(meta != null) {
+            meta.setDisplayName(" ");
+            stack.setItemMeta(meta);
+        }
+        return stack;
+    }
+
     /*
     Saves the json file to a certain path
      */
@@ -123,11 +144,24 @@ public class Utils {
                 Files.createDirectories(Paths.get(path.toURI()));
             }
             FileWriter writer = new FileWriter(path + "/" + name + ".json");
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            if(gson == null) gson = new GsonBuilder().setPrettyPrinting().create();
             writer.write(gson.toJson(object));
             writer.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public static String getCountry(String addr) {
+        try(InputStream is = new URL("http://ip-api.com/json/" + addr).openStream();
+            Reader reader = new InputStreamReader(is)) {
+            if(gson == null) gson = new GsonBuilder().setPrettyPrinting().create();
+            JsonObject obj = gson.fromJson(reader, JsonObject.class);
+            return obj.has("continentCode") ? obj.get("continentCode").getAsString().toLowerCase() : "unknown";
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Illegal URL; Internal error");
+        } catch (IOException e) {
+            return "unknown";
         }
     }
 }

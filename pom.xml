@@ -13,7 +13,7 @@
 
     <description>Used for F1MC</description>
     <properties>
-        <java.version>1.8</java.version>
+        <java.version>17</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -22,7 +22,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.4</version>
+                <version>3.5.2</version>
                 <executions>
                     <execution>
                         <id>shade</id>
@@ -49,23 +49,6 @@
                     <source>${java.version}</source>
                     <target>${java.version}</target>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.4</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <createDependencyReducedPom>false</createDependencyReducedPom>
-                            <shadedArtifactAttached>true</shadedArtifactAttached>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
         <resources>
@@ -110,6 +93,10 @@
             <id>jitpack-repo</id>
             <url>https://jitpack.io</url>
         </repository>
+        <repository>
+            <id>xenondevs</id>
+            <url>https://repo.xenondevs.xyz/releases</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -124,6 +111,13 @@
             <artifactId>worldedit-bukkit</artifactId>
             <version>7.2.0-SNAPSHOT</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.nametagedit</groupId>
+            <artifactId>nametagedit</artifactId>
+            <version>4.5.23</version>
+            <scope>system</scope>
+            <systemPath>${pom.basedir}/lib/NametagEdit.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -169,6 +163,12 @@
             <version>3.3.3</version>
             <scope>system</scope>
             <systemPath>${pom.basedir}/lib/ItemsAdder_3.6.3-beta-13.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>xyz.xenondevs.invui</groupId>
+            <artifactId>invui</artifactId>
+            <version>1.27</version>
+            <type>pom</type>
         </dependency>
     </dependencies>
 </project>

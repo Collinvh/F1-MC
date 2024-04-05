@@ -9,7 +9,6 @@ import collinvht.f1mc.util.modules.ModuleBase;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import lombok.Setter;
 import me.legofreak107.vehiclesplus.vehicles.vehicles.objects.SpawnedVehicle;
 import me.legofreak107.vehiclesplus.vehicles.vehicles.objects.VehicleStats;
 import org.bukkit.Bukkit;
@@ -23,11 +22,10 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.io.File;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class SlowdownManager extends ModuleBase {
     private static final HashMap<Material, SlowdownObject> slowDowns = new HashMap<>();
-    @Setter
-    private static double maxSpeed = 1.0;
 
     private static int vehicleRunnable;
 
@@ -38,7 +36,7 @@ public class SlowdownManager extends ModuleBase {
             SlowdownObject object = slowDowns.get(material);
             object.setSlowdownSpeed(slowdown);
             object.setSteeringPercent(steering);
-            object.setMaxSpeedPercent(maxSpeed);
+            object.setMaxSpeed(maxSpeed);
         } else {
             slowDowns.put(material, new SlowdownObject(material, maxSpeed,slowdown,steering));
         }
@@ -57,14 +55,13 @@ public class SlowdownManager extends ModuleBase {
     public void saveModule() {
         File path = Paths.get(F1MC.getInstance().getDataFolder() + "/storage/").toFile();
         JsonObject object = new JsonObject();
-        object.addProperty("maxSpeed", maxSpeed);
         JsonArray mainObject = new JsonArray();
         slowDowns.forEach((material, doubles) -> {
             JsonObject object2 = new JsonObject();
             object2.addProperty("Material", material.name());
             object2.addProperty("SlowdownSpeed", doubles.getSlowdownSpeed());
             object2.addProperty("SteeringSpeed", doubles.getSteeringPercent());
-            object2.addProperty("MaxSpeed", doubles.getMaxSpeedPercent());
+            object2.addProperty("MaxSpeed", doubles.getMaxSpeed());
             mainObject.add(object2);
         });
         object.add("array", mainObject);
@@ -78,7 +75,6 @@ public class SlowdownManager extends ModuleBase {
         if(files.exists()) {
             try {
                 JsonObject object = (JsonObject) Utils.readJson(files.getAbsolutePath());
-                maxSpeed = object.get("maxSpeed").getAsDouble();
                 JsonArray array = object.getAsJsonArray("array");
                 for (JsonElement jsonElement : array) {
                     JsonObject object2 = jsonElement.getAsJsonObject();
@@ -86,11 +82,11 @@ public class SlowdownManager extends ModuleBase {
                     SlowdownObject slowdownObject = new SlowdownObject(material, object2.get("MaxSpeed").getAsDouble(),object2.get("SlowdownSpeed").getAsDouble(),object2.get("SteeringSpeed").getAsDouble());
                     slowDowns.put(material, slowdownObject);
                 }
-            } catch (Exception e) {
-                throw new RuntimeException(e);
+            } catch (Exception ignored) {
             }
         }
         vehicleRunnable = new BukkitRunnable() {
+            double update = 10;
             @Override
             public void run() {
                 VPListener.getRACE_DRIVERS().forEach((uuid, raceDriver) -> {
@@ -99,8 +95,13 @@ public class SlowdownManager extends ModuleBase {
                             update(raceDriver);
                         }
                     }
-
                 });
+                if(update == 10) {
+                    VPListener.getRACE_CARS().forEach((uuid, car) -> car.updateTyre());
+                    update = 0;
+                } else {
+                    update += 1;
+                }
             }
         }.runTaskTimer(F1MC.getInstance(), 0, 0).getTaskId();
 
@@ -117,16 +118,19 @@ public class SlowdownManager extends ModuleBase {
                 block = player.getLocation().clone().add(0, -1.2, 0).getBlock();
             }
             Block finalBlock = block;
+            AtomicReference<Float> steering = new AtomicReference<>(vehicle.getBaseVehicle().getTurningRadiusSettings().getBase());
             slowDowns.forEach((material, obj) -> {
                 double speedReduction = obj.getSlowdownSpeed();
                 if(finalBlock.getType().equals(material)) {
-                    if(curSpeed > maxSpeed) {
+                    if(curSpeed > obj.getMaxSpeed()) {
                         double val = (curSpeed - (speedReduction));
-                        if (val < maxSpeed) val = maxSpeed;
+                        if (val < obj.getMaxSpeed()) val = obj.getMaxSpeed();
                         stats.setCurrentSpeed(val);
+                        steering.updateAndGet(v -> v * (float) obj.getSteeringPercent());
                     }
                 }
             });
+            stats.setSteering(steering.get());
         }
     }
 }

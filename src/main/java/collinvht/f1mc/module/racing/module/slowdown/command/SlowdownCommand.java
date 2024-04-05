@@ -25,7 +25,7 @@ public class SlowdownCommand extends CommandUtil {
                     steering = Double.parseDouble(args[3]);
                 }
                 ItemStack stack = ((Player) sender).getInventory().getItemInMainHand();
-                double slowDown = Integer.parseInt(args[1]);
+                double slowDown = Double.parseDouble(args[1]);
                 if (stack.getType().isBlock() && stack.getType().isSolid()) {
                     return SlowdownManager.addBlock(stack, slowDown, steering, maxSpeed);
                 }
@@ -47,19 +47,6 @@ public class SlowdownCommand extends CommandUtil {
                 return prefix + "This block is invalid.";
             } else {
                 return prefix + "You have to be a player to do this.";
-            }
-        }, Permissions.FIA_ADMIN, Permissions.FIA_COMMON);
-
-        /*
-        This sets the max speed on the slowdown blocks, whatever happens the speed won't get below this.
-         */
-        addPart("speed", 1, "/slowdown speed [kmh]", (sender, command, label, args) -> {
-            try {
-                double speed = Double.parseDouble(args[1]);
-                SlowdownManager.setMaxSpeed(speed);
-                return prefix + "Max speed changed.";
-            } catch (NumberFormatException e) {
-                return prefix + "Invalid number.";
             }
         }, Permissions.FIA_ADMIN, Permissions.FIA_COMMON);
     }

@@ -2,6 +2,7 @@ package collinvht.f1mc.module.racing.module.team.object;
 
 import collinvht.f1mc.F1MC;
 import collinvht.f1mc.module.racing.module.team.manager.TeamManager;
+import collinvht.f1mc.module.racing.object.race.RaceCar;
 import collinvht.f1mc.util.Utils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -40,6 +41,9 @@ public class TeamObj {
     private ArrayList<UUID> members = new ArrayList<>();
     @Setter
     private ArrayList<UUID> requests = new ArrayList<>();
+
+    @Getter
+    private final ArrayList<RaceCar> raceCars = new ArrayList<>();
 
     public TeamObj(String name) {
         this.teamName = name;

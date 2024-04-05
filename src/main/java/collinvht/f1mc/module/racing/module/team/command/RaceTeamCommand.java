@@ -13,12 +13,22 @@ import static collinvht.f1mc.module.racing.module.team.manager.TeamManager.*;
 public class RaceTeamCommand extends CommandUtil {
     @Override
     protected void initializeCommand(@NotNull CommandSender commandSender) {
-        boolean hasFIAPerms = Permissions.FIA_ADMIN.hasPermission(commandSender) || Permissions.FIA_TEAM.hasPermission(commandSender);
-        commandSender.sendMessage(String.valueOf(hasFIAPerms));
+        Permissions.Permission invertedFIA = Permissions.FIA_TEAM.invertPerms();
+        Permissions.Permission invertedAdmin = Permissions.FIA_ADMIN.invertPerms();
         /*
         This creates a team, and it's needed roles for LuckPerms
          */
         addPart("create", 1, "/raceteam create [team_name]", (sender, command, label, args) -> prefix + createNewTeam(args[1].toLowerCase()), Permissions.FIA_TEAM, Permissions.FIA_ADMIN);
+        /*
+        This spawns a car for the team and links it to the team
+         */
+        addPart("spawn", 2, "/raceteam spawn [team_name] [carmodel]", (sender, command, label, args) -> {
+            if(sender instanceof Player) {
+                return prefix + spawnCar(args[1].toLowerCase(), (Player) sender, args[2]);
+            } else {
+                return prefix + "Only a player can do that";
+            }
+        }, Permissions.FIA_ADMIN, Permissions.FIA_ADMIN);
          /*
         This sets a value of the team,
         /raceteam set [team_name] color [color]
@@ -59,55 +69,50 @@ public class RaceTeamCommand extends CommandUtil {
         addPart("list", 0, "/raceteam list", (sender, command, label, args) -> prefix + TeamManager.listTeams(), Permissions.FIA_TEAM, Permissions.FIA_ADMIN);
 
         /*
-        FIA can't accept kick or leave any team.
+        Send a request to a team
          */
-        if(!hasFIAPerms) {
-            /*
-            Send a request to a team
-             */
-            addPart("request", 1, "/raceteam request [team_name]", (sender, command, label, args) -> prefix + request(args[1].toLowerCase(), ((Player) sender).getUniqueId()));
-            /*
-            This is for owners only,
-            they can accept a member who has requested to join
-             */
-            addPart("accept", 1, "/raceteam accept [player_name]", (sender, command, label, args) -> {
-                if(sender instanceof Player) {
-                    Player player = Bukkit.getPlayer(args[1]);
-                    if (player == null) {
-                        return prefix + "Player doesn't not exist";
-                    }
-                    return prefix + accept(((Player) sender).getUniqueId(), player.getUniqueId());
-                } else {
-                    return prefix + "This is only possible as a player";
+        addPart("request", 1, "/raceteam request [team_name]", (sender, command, label, args) -> prefix + request(args[1].toLowerCase(), ((Player) sender).getUniqueId()), invertedAdmin, invertedFIA);
+        /*
+        This is for owners only,
+        they can accept a member who has requested to join
+         */
+        addPart("accept", 1, "/raceteam accept [player_name]", (sender, command, label, args) -> {
+            if(sender instanceof Player) {
+                Player player = Bukkit.getPlayer(args[1]);
+                if (player == null) {
+                    return prefix + "Player doesn't not exist";
                 }
-            });
-            /*
-            This is for owners only,
-            they can kick any members they desire.
-             */
-            addPart("kick", 1, "/raceteam kick [player_name]", (sender, command, label, args) -> {
-                if (sender instanceof Player) {
-                    Player player = Bukkit.getPlayer(args[1]);
-                    if (player == null) {
-                        return prefix + "Player doesn't exist";
-                    }
-                    return prefix + kickPlayer(((Player) sender).getUniqueId(), player.getUniqueId());
-                } else {
-                    return prefix + "This is only possible as a player";
+                return prefix + accept(((Player) sender).getUniqueId(), player.getUniqueId());
+            } else {
+                return prefix + "This is only possible as a player";
+            }
+        }, invertedAdmin, invertedFIA);
+        /*
+        This is for owners only,
+        they can kick any members they desire.
+         */
+        addPart("kick", 1, "/raceteam kick [player_name]", (sender, command, label, args) -> {
+            if (sender instanceof Player) {
+                Player player = Bukkit.getPlayer(args[1]);
+                if (player == null) {
+                    return prefix + "Player doesn't exist";
                 }
-            });
-            /*
-            This is for members only,
-            this is to leave your current team.
-            Owners can't leave their team.
-             */
-            addPart("leave", 0, "/raceteam leave", (sender, command, label, args) -> {
-                if(sender instanceof Player) {
-                    return prefix + leave(((Player) sender).getUniqueId());
-                } else {
-                    return "This is only possible as a player";
-                }
-            });
-        }
+                return prefix + kickPlayer(((Player) sender).getUniqueId(), player.getUniqueId());
+            } else {
+                return prefix + "This is only possible as a player";
+            }
+        }, invertedAdmin, invertedFIA);
+        /*
+        This is for members only,
+        this is to leave your current team.
+        Owners can't leave their team.
+         */
+        addPart("leave", 0, "/raceteam leave", (sender, command, label, args) -> {
+            if(sender instanceof Player) {
+                return prefix + leave(((Player) sender).getUniqueId());
+            } else {
+                return "This is only possible as a player";
+            }
+        }, invertedAdmin, invertedFIA);
     }
 }

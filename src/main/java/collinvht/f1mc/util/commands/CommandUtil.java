@@ -73,7 +73,7 @@ public abstract class CommandUtil implements CommandExecutor {
      */
     private void sendUsage(CommandSender sender) {
         UsageBuilder builder = new UsageBuilder();
-        parts.forEach((s, commandPart) -> builder.addUsage(commandPart.getUsage(), commandPart.getPermissions().toArray(new Permissions[]{})));
+        parts.forEach((s, commandPart) -> builder.addUsage(commandPart.getUsage(), commandPart.getPermissions().toArray(new Permissions.Permission[]{})));
         sender.sendMessage(DefaultMessages.PREFIX + DefaultMessages.COMMAND_USAGE + builder.buildUsages(sender));
     }
 
@@ -87,7 +87,7 @@ public abstract class CommandUtil implements CommandExecutor {
      * @author Collinvht
      * Adds a commandPart to {@link #parts}
      */
-    protected void addPart(String name, int extraArguments, String usage, CallableCommand<String> function, Permissions... permissions) {
+    protected void addPart(String name, int extraArguments, String usage, CallableCommand<String> function, Permissions.Permission... permissions) {
         if(parts.containsKey(name)) return;
 
         CommandPart part = new CommandPart(name, extraArguments, usage, function);

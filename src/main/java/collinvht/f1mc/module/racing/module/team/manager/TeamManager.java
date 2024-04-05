@@ -2,9 +2,16 @@ package collinvht.f1mc.module.racing.module.team.manager;
 
 import collinvht.f1mc.F1MC;
 import collinvht.f1mc.module.racing.module.team.object.TeamObj;
+import collinvht.f1mc.module.racing.object.race.RaceCar;
+import collinvht.f1mc.module.vehiclesplus.listener.listeners.VPListener;
 import collinvht.f1mc.util.Utils;
 import collinvht.f1mc.util.modules.ModuleBase;
 import lombok.Getter;
+import me.legofreak107.vehiclesplus.vehicles.api.VehiclesPlusAPI;
+import me.legofreak107.vehiclesplus.vehicles.api.objects.spawn.SpawnMode;
+import me.legofreak107.vehiclesplus.vehicles.vehicles.objects.BaseVehicle;
+import me.legofreak107.vehiclesplus.vehicles.vehicles.objects.SpawnedVehicle;
+import me.legofreak107.vehiclesplus.vehicles.vehicles.objects.StorageVehicle;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.model.data.DataType;
 import net.luckperms.api.model.group.Group;
@@ -18,6 +25,7 @@ import org.bukkit.entity.Player;
 import java.io.File;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicReference;
@@ -52,6 +60,33 @@ public class TeamManager extends ModuleBase {
         String str = createTeam(team);
         TEAMS.put(name, team);
         return str;
+    }
+
+    public static String spawnCar(String name, Player player, String vehicleModel) {
+        TeamObj teamObj = TEAMS.get(name);
+        if(teamObj != null) {
+            VehiclesPlusAPI api = VehiclesPlusAPI.getInstance();
+            Optional<BaseVehicle> vehicle = api.getBaseVehicleFromString(vehicleModel);
+            if (vehicle.isPresent()) {
+                StorageVehicle storageVehicle = api.createVehicle(vehicle.get(), player);
+                teamObj.getRaceCars().add(new RaceCar(storageVehicle.spawnVehicle(player.getLocation(), SpawnMode.FORCE), teamObj));
+            } else return "Vehicle Model doesn't exist";
+        } else return "Team doesn't exist";
+        return "Vehicle has been spawned";
+    }
+
+    public static TeamObj getTeamForPlayer(Player player) {
+        for (TeamObj teamObj : TEAMS.values()) {
+            if(teamObj.getMembers().contains(player.getUniqueId())) {
+                return teamObj;
+            }
+            else if(teamObj.getOwner() != null) {
+                if(teamObj.getOwner().equals(player.getUniqueId())) {
+                    return teamObj;
+                }
+            }
+        }
+        return null;
     }
 
     public static String createTeam(TeamObj team) {

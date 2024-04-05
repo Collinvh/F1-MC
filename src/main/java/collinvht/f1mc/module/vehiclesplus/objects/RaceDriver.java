@@ -44,7 +44,6 @@ public class RaceDriver {
     public RaceDriver(Player player) {
         this.driverUUID = player.getUniqueId();
         this.driverName = player.getName();
-//        SetupManager.initializeSetup(uuid);
     }
 
     public DriverLaptimeStorage getLaptimes(Race race) {
@@ -56,8 +55,7 @@ public class RaceDriver {
 
     public void addLaptime(Race race, LaptimeStorage storage) {
         laptimes.get(race).addLaptime(storage);
-//        DiscordManager.updateTimings(RaceMode.PRATICE);
-    }   
+    }
 
     public void setDriving(boolean driving) {
         isDriving = driving;

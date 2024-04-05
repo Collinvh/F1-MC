@@ -12,7 +12,7 @@ import java.util.ArrayList;
 public class CommandPart {
 
     @Getter
-    private final ArrayList<Permissions> permissions;
+    private final ArrayList<Permissions.Permission> permissions;
     @Getter
     private final String partName;
     @Getter
@@ -48,15 +48,15 @@ public class CommandPart {
      * @author Collinvht
      * Add a permission to the usage
      */
-    public void addPermission(Permissions permission) {
+    public void addPermission(Permissions.Permission permission) {
         permissions.add(permission);
     }
     /**
      * @author Collinvht
      * Add multiple permissions to the usage
      */
-    public void addPermissions(Permissions... permission) {
-        for (Permissions permissions1 : permission) {
+    public void addPermissions(Permissions.Permission... permission) {
+        for (Permissions.Permission permissions1 : permission) {
             addPermission(permissions1);
         }
     }

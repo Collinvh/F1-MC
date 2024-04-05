@@ -8,7 +8,7 @@ import org.bukkit.Material;
 public class SlowdownObject {
     private final Material mat;
     @Setter
-    private double maxSpeedPercent;
+    private double maxSpeed;
     @Setter
     private double slowdownSpeed;
     @Setter
@@ -16,7 +16,7 @@ public class SlowdownObject {
 
     public SlowdownObject(Material mat, double maxSpeedPercent, double slowDownSpeed, double steeringPercent) {
         this.mat = mat;
-        this.maxSpeedPercent = maxSpeedPercent;
+        this.maxSpeed = maxSpeedPercent;
         this.slowdownSpeed = slowDownSpeed;
         this.steeringPercent = steeringPercent;
     }

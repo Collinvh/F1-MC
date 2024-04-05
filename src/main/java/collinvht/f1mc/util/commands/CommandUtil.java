@@ -61,6 +61,16 @@ public abstract class CommandUtil implements CommandExecutor {
                 return false;
             }
         } else {
+            if(parts.containsKey("%")) {
+                CommandPart part = parts.get("%");
+                if(part.getExtraArguments() > 0) {
+                    sender.sendMessage(DefaultMessages.PREFIX + DefaultMessages.WRONG_USAGE + part.getUsage());
+                    return false;
+                } else {
+                    sender.sendMessage(part.execute(sender, command, label, args));
+                    return true;
+                }
+            }
             sendUsage(sender);
             return false;
         }

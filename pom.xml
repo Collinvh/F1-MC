@@ -165,6 +165,13 @@
             <systemPath>${pom.basedir}/lib/ItemsAdder_3.6.3-beta-13.jar</systemPath>
         </dependency>
         <dependency>
+            <groupId>tsp.headdb.core</groupId>
+            <artifactId>HeadDB</artifactId>
+            <version>5.0.0-rc.10</version>
+            <scope>system</scope>
+            <systemPath>${pom.basedir}/lib/HeadDB.jar</systemPath>
+        </dependency>
+        <dependency>
             <groupId>xyz.xenondevs.invui</groupId>
             <artifactId>invui</artifactId>
             <version>1.27</version>

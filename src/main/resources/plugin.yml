@@ -2,8 +2,18 @@ name: F1MC
 version: ${project.version}
 main: collinvht.f1mc.F1MC
 api-version: 1.19
-depend: [ VehiclesPlusPro, NametagEdit, WorldEdit, LuckPerms, JDA, ItemsAdder, ProtocolLib ]
-authors: [ Collinvht, SBDeveloper ]
+depend:
+  - VehiclesPlusPro
+  - NametagEdit
+  - WorldEdit
+  - LuckPerms
+  - JDA
+  - ItemsAdder
+  - ProtocolLib
+authors:
+  - Collinvht
+  - SBDeveloper
+
 commands:
   raceteam:
     description: Manage or create teams
@@ -33,9 +43,5 @@ commands:
   tyre:
     permission: projectr.fia.admin
     description: Tyre
-  buildingtools:
-    permission: f1mc.builder
-    description: Building tools
-    aliases: bt
   country:
     description: Sets your country

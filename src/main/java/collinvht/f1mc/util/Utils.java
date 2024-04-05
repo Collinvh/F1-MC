@@ -9,13 +9,14 @@ import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.math.BlockVector3;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.plugin.RegisteredServiceProvider;
+import org.checkerframework.checker.units.qual.A;
+import tsp.headdb.core.api.HeadAPI;
 
 import java.io.*;
 import java.net.MalformedURLException;
@@ -152,16 +153,18 @@ public class Utils {
         }
     }
 
-    public static String getCountry(String addr) {
-        try(InputStream is = new URL("http://ip-api.com/json/" + addr).openStream();
-            Reader reader = new InputStreamReader(is)) {
-            if(gson == null) gson = new GsonBuilder().setPrettyPrinting().create();
-            JsonObject obj = gson.fromJson(reader, JsonObject.class);
-            return obj.has("continentCode") ? obj.get("continentCode").getAsString().toLowerCase() : "unknown";
-        } catch (MalformedURLException e) {
-            throw new RuntimeException("Illegal URL; Internal error");
-        } catch (IOException e) {
-            return "unknown";
-        }
+    public static ItemStack createSkull(int id, String name) {
+        if(HeadAPI.getHeadById(id).isPresent()) {
+            ItemStack stack = HeadAPI.getHeadById(id).get().getItem(UUID.randomUUID());
+            ItemMeta meta = stack.getItemMeta();
+            if (meta != null) {
+                meta.setDisplayName(name);
+                ArrayList<String> strings = new ArrayList<>();
+                strings.add(ChatColor.DARK_GRAY + "Click to change countries!");
+                meta.setLore(strings);
+                stack.setItemMeta(meta);
+            }
+            return stack;
+        } else return new ItemStack(Material.AIR);
     }
 }

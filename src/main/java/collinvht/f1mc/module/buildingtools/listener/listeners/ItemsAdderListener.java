@@ -1,14 +1,11 @@
 package collinvht.f1mc.module.buildingtools.listener.listeners;
 
-import collinvht.f1mc.module.buildingtools.command.commands.BuildingTools;
-import collinvht.f1mc.util.DefaultMessages;
 import dev.lone.itemsadder.api.CustomBlock;
 import dev.lone.itemsadder.api.Events.CustomBlockBreakEvent;
 import dev.lone.itemsadder.api.Events.CustomBlockPlaceEvent;
 import org.bukkit.*;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.Snow;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -24,15 +21,6 @@ public class ItemsAdderListener implements Listener {
             ItemMeta meta = stack.getItemMeta();
             String stripped = ChatColor.stripColor(meta.getDisplayName());
             if(!stripped.contains("Slab") && !stripped.contains("Curbstone")) return;
-            Player player = event.getPlayer();
-            if(!BuildingTools.getPlayers().containsKey(player.getUniqueId())) {
-                player.sendMessage(DefaultMessages.PREFIX + "Can't place curbs outside of building mode");
-                event.setCancelled(true);
-                return;
-            }
-
-
-
             Location location = event.getBlock().getLocation();
             Location above = location.clone().add(0, 1,0);
             World world = location.getWorld();

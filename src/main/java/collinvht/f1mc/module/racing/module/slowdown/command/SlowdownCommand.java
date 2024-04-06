@@ -3,6 +3,8 @@ package collinvht.f1mc.module.racing.module.slowdown.command;
 import collinvht.f1mc.module.racing.module.slowdown.manager.SlowdownManager;
 import collinvht.f1mc.util.Permissions;
 import collinvht.f1mc.util.commands.CommandUtil;
+import dev.lone.itemsadder.api.CustomBlock;
+import me.legofreak107.vehiclesplus.custom.CustomItemStack;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -25,9 +27,17 @@ public class SlowdownCommand extends CommandUtil {
                     steering = Double.parseDouble(args[3]);
                 }
                 ItemStack stack = ((Player) sender).getInventory().getItemInMainHand();
+
+
                 double slowDown = Double.parseDouble(args[1]);
                 if (stack.getType().isBlock() && stack.getType().isSolid()) {
-                    return SlowdownManager.addBlock(stack, slowDown, steering, maxSpeed);
+                    return prefix +     SlowdownManager.addBlock(stack, slowDown, steering, maxSpeed);
+                } else {
+                    CustomBlock block = CustomBlock.byItemStack(stack);
+                    if(block != null) {
+                        sender.sendMessage(block.getNamespacedID());
+                        return prefix + SlowdownManager.addCustomBlock(block.getNamespacedID(), slowDown, steering, maxSpeed);
+                    }
                 }
                 return prefix + "This block is invalid.";
             } else {

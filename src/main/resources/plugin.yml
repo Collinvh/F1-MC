@@ -43,5 +43,17 @@ commands:
   tyre:
     permission: projectr.fia.admin
     description: Tyre
+  creplace:
+    permission: projectr.builder
+    description: Custom replace
+  cset:
+    permission: projectr.builder
+    description: Custom Set
+  creplacenear:
+    permission: projectr.builder
+    description: Custom Replacenear
+  cundo:
+    permission: projectr.builder
+    description: Custom Undo
   country:
     description: Sets your country

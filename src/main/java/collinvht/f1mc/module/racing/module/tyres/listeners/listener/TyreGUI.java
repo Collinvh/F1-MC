@@ -128,7 +128,4 @@ public class TyreGUI implements Listener {
         return pane;
     }
 
-    public static void removePlayer(Player player) {
-        cars.remove(player.getUniqueId());
-    }
 }

@@ -1,5 +1,6 @@
 package collinvht.f1mc.module.racing.object.race;
 
+import collinvht.f1mc.module.racing.object.NamedCuboid;
 import collinvht.f1mc.module.vehiclesplus.listener.listeners.VPListener;
 import collinvht.f1mc.module.vehiclesplus.objects.RaceDriver;
 import collinvht.f1mc.module.racing.object.laptime.LaptimeStorage;
@@ -59,6 +60,14 @@ public class RaceLapStorage {
                         }
                         Location location = player.getLocation();
                         if (raceDriver.isPassedPitExit() || raceMode.isLapped()) {
+                            if(!raceDriver.getLaptimes(race).isInvalidated()) {
+                                for (NamedCuboid cuboid : storage.getLimits().values()) {
+                                    if (cuboid.getCuboid().containsLocation(location)) {
+                                        raceDriver.getLaptimes(race).setInvalidated(true);
+                                        player.sendMessage(ChatColor.RED + "You've invalidated your lap.");
+                                    }
+                                }
+                            }
                             if (!raceDriver.isInPit()) {
                                 if (storage.getPitEntry().getCuboid().containsLocation(location)) {
                                     raceDriver.setInPit();
@@ -70,7 +79,7 @@ public class RaceLapStorage {
                                     laptimeStorage.setPassedS3(false);
                                     laptimeStorage.setS1(System.currentTimeMillis());
                                     if (!raceDriver.getLaptimes(race).isInvalidated() && !raceDriver.isDisqualified()) {
-                                        player.sendMessage(ChatColor.GRAY + "Your time in S1 was " +  laptimeStorage.getS1Color() + Utils.millisToTimeString(laptimeStorage.getS1data().getSectorLength()) + " | " + Utils.millisToTimeString(laptimeStorage.getS1data().getSectorDifference(), "ss.SS"));
+                                        player.sendMessage(ChatColor.GRAY + "Your S1 is " +  laptimeStorage.getS1Color() + Utils.millisToTimeString(laptimeStorage.getS1data().getSectorLength()) + " | " + Utils.millisToTimeString(laptimeStorage.getS1data().getSectorDifference(), "ss.SS"));
                                     }
                                     raceDriver.getLaptimes(race).addSector();
                                     return;
@@ -81,7 +90,7 @@ public class RaceLapStorage {
                                     laptimeStorage.setPassedS2(true);
                                     laptimeStorage.setS2(System.currentTimeMillis());
                                     if (!raceDriver.getLaptimes(race).isInvalidated() && !raceDriver.isDisqualified()) {
-                                        player.sendMessage(ChatColor.GRAY + "Your time in S2 was " +  laptimeStorage.getS2Color() + Utils.millisToTimeString(laptimeStorage.getS2data().getSectorLength()) + " | " + Utils.millisToTimeString(laptimeStorage.getS2data().getSectorDifference(), "ss.SS"));
+                                        player.sendMessage(ChatColor.GRAY + "Your S2 is " +  laptimeStorage.getS2Color() + Utils.millisToTimeString(laptimeStorage.getS2data().getSectorLength()) + " | " + Utils.millisToTimeString(laptimeStorage.getS2data().getSectorDifference(), "ss.SS"));
                                     }
                                     raceDriver.getLaptimes(race).addSector();
                                     return;
@@ -92,12 +101,12 @@ public class RaceLapStorage {
                                     if (laptimeStorage.isPassedS1() && laptimeStorage.isPassedS2()) {
                                         laptimeStorage.setS3(System.currentTimeMillis());
                                         if (!raceDriver.getLaptimes(race).isInvalidated() && !raceDriver.isDisqualified()) {
-                                            player.sendMessage(ChatColor.GRAY + "Your time in S3 was " +  laptimeStorage.getS3Color() + Utils.millisToTimeString(laptimeStorage.getS3data().getSectorLength()) + " | " + Utils.millisToTimeString(laptimeStorage.getS3data().getSectorDifference(), "ss.SS"));
+                                            player.sendMessage(ChatColor.GRAY + "Your S3 is " +  laptimeStorage.getS3Color() + Utils.millisToTimeString(laptimeStorage.getS3data().getSectorLength()) + " | " + Utils.millisToTimeString(laptimeStorage.getS3data().getSectorDifference(), "ss.SS"));
                                             laptimeStorage.createLaptime();
                                             LaptimeStorage clone = laptimeStorage.copy();
                                             laptimeHash.put(raceDriver.getDriverUUID(), clone);
                                             raceDriver.addLaptime(race, clone);
-                                            player.sendMessage(ChatColor.GRAY + "Your lap time was a " + laptimeStorage.getLapColor(true) + Utils.millisToTimeString(laptimeStorage.getLaptime()) + " | " + Utils.millisToTimeString(laptimeStorage.getLapData().getSectorDifference(), "ss.SS"));
+                                            player.sendMessage(ChatColor.GRAY + "Your lap time is " + laptimeStorage.getLapColor(true) + Utils.millisToTimeString(laptimeStorage.getLaptime()) + " | " + Utils.millisToTimeString(laptimeStorage.getLapData().getSectorDifference(), "ss.SS"));
                                         } else {
                                             player.sendMessage(ChatColor.RED + "Your lap time is INVALIDATED.");
                                             raceDriver.getLaptimes(race).setInvalidated(false);

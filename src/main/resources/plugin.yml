@@ -10,6 +10,8 @@ depend:
   - JDA
   - ItemsAdder
   - ProtocolLib
+  - Multiverse-Core
+  - HeadDB
 authors:
   - Collinvht
   - SBDeveloper
@@ -20,40 +22,40 @@ commands:
   race:
     description: Start or manage races
   slowdown:
-    permission: projectr.fia.common
+    permission: f1mc.fia.common
     description: Blockslowdown
   timetrial:
-    permission: projectr.fia.common
-    description: Starts timetrial
+    description: Timetrial
+    permission: f1mc.timetrial
   dsq:
-    permission: projectr.fia.common
+    permission: f1mc.fia.common
     description: Disqualifies someone
   flag:
-    permission: projectr.fia.common
+    permission: f1mc.fia.common
     description: Sets a flag or edits the locations
   warning:
-    permission: projectr.fia.common
+    permission: f1mc.fia.common
     description: Gives a warning
   penalty:
-    permission: projectr.fia.common
+    permission: f1mc.fia.common
     description: Gives a penalty
   announcement:
-    permission: projectr.fia.common
+    permission: f1mc.fia.common
     description: Announce something
   tyre:
-    permission: projectr.fia.admin
+    permission: f1mc.fia.admin
     description: Tyre
   creplace:
-    permission: projectr.builder
+    permission: f1mc.builder
     description: Custom replace
   cset:
-    permission: projectr.builder
+    permission: f1mc.builder
     description: Custom Set
   creplacenear:
-    permission: projectr.builder
+    permission: f1mc.builder
     description: Custom Replacenear
   cundo:
-    permission: projectr.builder
+    permission: f1mc.builder
     description: Custom Undo
   country:
     description: Sets your country

@@ -70,16 +70,18 @@ public class LaptimeStorage {
     public void createLaptime() {
         setLaptime(s1data.getSectorLength() + s2data.getSectorLength() + s3data.getSectorLength());
 
-        DiscordModule module = DiscordModule.getInstance();
-        if(module.isInitialized()) {
-            TextChannel channel = module.getJda().getTextChannelById(1217628051853021194L);
-            if(channel == null) return;
-            EmbedBuilder builder = new EmbedBuilder();
-            builder.addField("New laptime at " + race.getName(), "Driven by" + driver.getDriverName(), true);
-            builder.addBlankField(true);
-            builder.setColor(Color.BLUE);
-            builder.addField("Time:", Utils.millisToTimeString(getLaptime()), false);
-            channel.sendMessage(builder.build()).queue();
+        if(Utils.isEnableDiscordModule()) {
+            DiscordModule module = DiscordModule.getInstance();
+            if (module.isInitialized()) {
+                TextChannel channel = module.getJda().getTextChannelById(1217628051853021194L);
+                if (channel == null) return;
+                EmbedBuilder builder = new EmbedBuilder();
+                builder.addField("New laptime at " + race.getName(), "Driven by" + driver.getDriverName(), true);
+                builder.addBlankField(true);
+                builder.setColor(Color.BLUE);
+                builder.addField("Time:", Utils.millisToTimeString(getLaptime()), false);
+                channel.sendMessage(builder.build()).queue();
+            }
         }
     }
 

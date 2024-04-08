@@ -2,27 +2,32 @@ package collinvht.f1mc.util;
 
 import collinvht.f1mc.F1MC;
 import collinvht.f1mc.module.vehiclesplus.objects.RaceDriver;
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.mysql.cj.jdbc.MysqlDataSource;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.math.BlockVector3;
+import lombok.Getter;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import org.bukkit.*;
-import org.bukkit.entity.Player;
+import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.SkullMeta;
-import org.bukkit.plugin.RegisteredServiceProvider;
-import org.checkerframework.checker.units.qual.A;
+import org.mariadb.jdbc.MariaDbPoolDataSource;
 import tsp.headdb.core.api.HeadAPI;
 
 import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -34,6 +39,27 @@ public class Utils {
     private static WorldEditPlugin worldEdit = null;
 
     private static Gson gson;
+    private static DatabaseConfig databaseConfig;
+    private static MysqlDataSource dataSource;
+
+    @Getter
+    private static boolean enableBuildingModule = true;
+
+    @Getter
+    private static boolean enableDiscordModule = true;
+
+    @Getter
+    private static boolean enableCountryModule = true;
+
+    @Getter
+    private static boolean enableFIAModule = true;
+
+    @Getter
+    private static boolean enableTeamModule = true;
+
+    @Getter
+    private static boolean enableTimeTrial = true;
+
     /*
     Dependant Plugins
 
@@ -62,6 +88,39 @@ public class Utils {
         }
         return null;
     }
+
+    public static MysqlDataSource getDatabase() {
+        if(dataSource == null) {
+            dataSource = new MysqlDataSource();
+            dataSource.setServerName(databaseConfig.getHost());
+            dataSource.setPortNumber(databaseConfig.getPort());
+            dataSource.setDatabaseName(databaseConfig.getDatabase());
+            dataSource.setUser(databaseConfig.getUser());
+            dataSource.setPassword(databaseConfig.getPassword());
+        }
+        return dataSource;
+    }
+
+    public static void setupConfig(F1MC f1MC) {
+        File database = new File(f1MC.getDataFolder(), "database.yml");
+        if(!database.exists()) {
+            database.getParentFile().mkdirs();
+            f1MC.saveResource("database.yml", false);
+        }
+        YamlConfiguration databaseCFG = YamlConfiguration.loadConfiguration(database);
+        databaseConfig = DatabaseConfig.fromYaml(databaseCFG);
+        getDatabase();
+
+        f1MC.saveDefaultConfig();
+        FileConfiguration config = f1MC.getConfig();
+        enableBuildingModule = config.getBoolean("enableBuildingModule");
+        enableDiscordModule = config.getBoolean("enableDiscordModule");
+        enableCountryModule = config.getBoolean("enableCountryModule");
+        enableFIAModule = config.getBoolean("enableFIAModule");
+        enableTeamModule = config.getBoolean("enableTeamModule");
+        enableTimeTrial = config.getBoolean("enableTimeTrial");
+    }
+
     public static double round (double value, int precision) {
         int scale = (int) Math.pow(10, precision);
         return (double) Math.round(value * scale) / scale;

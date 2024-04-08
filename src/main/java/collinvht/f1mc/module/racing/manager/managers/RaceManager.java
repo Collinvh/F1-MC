@@ -94,6 +94,7 @@ public class RaceManager extends ModuleBase {
         if(!raceExists(raceName)) return RacingMessages.RACE_DOES_NOT_EXIST;
         try {
             int modeInt = Integer.parseInt(mode);
+            if(Utils.isEnableDiscordModule()) {
             DiscordModule module = DiscordModule.getInstance();
             if(module.isInitialized()) {
                 TextChannel channel = module.getJda().getTextChannelById(1217628051853021194L);
@@ -104,6 +105,7 @@ public class RaceManager extends ModuleBase {
                     channel.sendMessage(builder.build()).queue();
                 }
             }
+            }
             return RaceListener.startListeningTo(getRace(raceName), modeInt);
         } catch (NumberFormatException e) {
             return DefaultMessages.INVALID_NUMBER;
@@ -113,14 +115,16 @@ public class RaceManager extends ModuleBase {
     public String stopRace(String name) {
         Race race = RACES.get(name);
         if(RaceListener.isListeningToRace(race)) {
-            DiscordModule module = DiscordModule.getInstance();
-            if(module.isInitialized()) {
-                TextChannel channel = module.getJda().getTextChannelById(1217628051853021194L);
-                if(channel != null) {
-                    EmbedBuilder builder = new EmbedBuilder();
-                    builder.addField("Race started at " + name, "", true);
-                    builder.setColor(Color.BLUE);
-                    channel.sendMessage(builder.build()).queue();
+            if(Utils.isEnableDiscordModule()) {
+                DiscordModule module = DiscordModule.getInstance();
+                if (module.isInitialized()) {
+                    TextChannel channel = module.getJda().getTextChannelById(1217628051853021194L);
+                    if (channel != null) {
+                        EmbedBuilder builder = new EmbedBuilder();
+                        builder.addField("Race started at " + name, "", true);
+                        builder.setColor(Color.BLUE);
+                        channel.sendMessage(builder.build()).queue();
+                    }
                 }
             }
             return RaceListener.stopListeningTo(race);
@@ -264,7 +268,7 @@ public class RaceManager extends ModuleBase {
         return RACES.containsKey(raceName);
     }
 
-    public String updateRace(Player player, String raceName, String type, String input) {
+    public String updateRace(Player player, String raceName, String type, String input, String[] extraInput) {
         if(!raceExists(raceName)) return RacingMessages.RACE_DOES_NOT_EXIST;
         Race race = getRace(raceName);
         switch (type.toLowerCase()) {
@@ -290,6 +294,40 @@ public class RaceManager extends ModuleBase {
                         return DefaultMessages.PREFIX + "Spawn has been changed.";
                 }
                 break;
+            }
+            case "offtrack": {
+                try {
+                    Region region = Utils.getSession(player).getSelection(Utils.getAdaptedWorld(player.getWorld()));
+                    String name = input.toLowerCase();
+                    switch (name) {
+                        case "delete": {
+                            if(extraInput != null) {
+                                if (race.getStorage().getLimits().containsKey(extraInput[4].toLowerCase())) {
+                                    race.getStorage().getLimits().remove(extraInput[4].toLowerCase());
+                                    return DefaultMessages.PREFIX + "Removed track limit.";
+                                } else {
+                                    return DefaultMessages.PREFIX + "That name doesn't exist";
+                                }
+                            } else {
+                                return DefaultMessages.PREFIX + "You didn't provide a name";
+                            }
+                        }
+                        case "list": {
+                            StringBuilder str = new StringBuilder(DefaultMessages.PREFIX + "Tracklimits:\n");
+                            for (NamedCuboid limit : race.getStorage().getLimits().values()) {
+                                str.append(limit.getName()).append("\n");
+                            }
+                            return str.toString();
+                        }
+                        default: {
+                            NamedCuboid cuboid = race.getStorage().createNamedCuboidFromSelection(player.getWorld(), region, name);
+                            race.getStorage().getLimits().put(name, cuboid);
+                            return DefaultMessages.PREFIX + "Added tracklimit";
+                        }
+                    }
+                } catch (IncompleteRegionException e) {
+                    return DefaultMessages.INVALID_SELECTION;
+                }
             }
             case "sector": {
                 try {

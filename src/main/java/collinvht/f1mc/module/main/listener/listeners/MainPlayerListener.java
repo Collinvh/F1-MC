@@ -33,7 +33,9 @@ public class MainPlayerListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public static void playerJoinEvent(@NotNull NametagFirstLoadedEvent playerJoinEvent) {
         Player player = playerJoinEvent.getPlayer();
-        CountryManager.updatePlayer(player);
+        if(Utils.isEnableCountryModule()) {
+            CountryManager.updatePlayer(player);
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

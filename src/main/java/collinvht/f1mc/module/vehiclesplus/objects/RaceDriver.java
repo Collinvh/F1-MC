@@ -72,7 +72,7 @@ public class RaceDriver {
         isInPit = false;
         isPassedPitExit = true;
         if(laptimes.get(race).getCurrentLap() != null) {
-            laptimes.get(race).getCurrentLap().getS1data().setSectorStart(System.currentTimeMillis());
+            laptimes.get(race).getCurrentLap().getS1data().setSectorStart(System.currentTimeMillis()-100);
         }
     }
 }

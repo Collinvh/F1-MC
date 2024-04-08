@@ -66,6 +66,7 @@ public class Race {
                 return race;
             }
         } catch (Exception ignored) {
+            ignored.printStackTrace();
         }
         return null;
     }

@@ -3,6 +3,7 @@ package collinvht.f1mc.module.racing.module.fia.command.commands;
 import collinvht.f1mc.module.discord.DiscordModule;
 import collinvht.f1mc.module.vehiclesplus.listener.listeners.VPListener;
 import collinvht.f1mc.module.vehiclesplus.objects.RaceDriver;
+import collinvht.f1mc.util.Utils;
 import collinvht.f1mc.util.commands.CommandUtil;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
@@ -26,16 +27,18 @@ public class DSQCommand extends CommandUtil {
                     if(driver.isDisqualified()) {
                         driver.setDisqualified(false);
                         dsqdPlayer.sendMessage(prefix + "Your disqualification has been revoked");
-                        DiscordModule discordModule = DiscordModule.getInstance();
-                        if(discordModule.isInitialized()) {
-                            JDA jda = discordModule.getJda();
-                            TextChannel channel = jda.getTextChannelById(1217628051853021194L);
-                            if(channel != null) {
-                                EmbedBuilder builder = new EmbedBuilder();
-                                builder.setColor(Color.YELLOW);
-                                builder.setTitle("DSQ | " + args[0]);
-                                builder.addField("Reason", "DSQ has been revoked", true);
-                                channel.sendMessage(builder.build()).queue();
+                        if(Utils.isEnableDiscordModule()) {
+                            DiscordModule discordModule = DiscordModule.getInstance();
+                            if (discordModule.isInitialized()) {
+                                JDA jda = discordModule.getJda();
+                                TextChannel channel = jda.getTextChannelById(1217628051853021194L);
+                                if (channel != null) {
+                                    EmbedBuilder builder = new EmbedBuilder();
+                                    builder.setColor(Color.YELLOW);
+                                    builder.setTitle("DSQ | " + args[0]);
+                                    builder.addField("Reason", "DSQ has been revoked", true);
+                                    channel.sendMessage(builder.build()).queue();
+                                }
                             }
                         }
                         return prefix + "Drivers disqualification has been removed";

@@ -17,6 +17,7 @@ import java.util.UUID;
 public class LaptimeStorage {
     @Getter
     private final RaceDriver driver;
+    @Getter
     private final UUID driverUUID;
 
     @Getter
@@ -54,15 +55,15 @@ public class LaptimeStorage {
     private final Race race;
 
 
-    public LaptimeStorage(UUID driver, Race obj) {
-        this.driver = VPListener.getRACE_DRIVERS().get(driver);
-        this.driverUUID = driver;
+    public LaptimeStorage(RaceDriver driver, Race obj) {
+        this.driver = driver;
+        this.driverUUID = driver.getDriverUUID();
         this.race = obj;
 
-        this.s1data = new SectorData(driver);
-        this.s2data = new SectorData(driver);
-        this.s3data = new SectorData(driver);
-        this.lapData = new SectorData(driver);
+        this.s1data = new SectorData(driver.getDriverUUID());
+        this.s2data = new SectorData(driver.getDriverUUID());
+        this.s3data = new SectorData(driver.getDriverUUID());
+        this.lapData = new SectorData(driver.getDriverUUID());
 
         this.lapUUID = UUID.randomUUID();
     }
@@ -259,7 +260,7 @@ public class LaptimeStorage {
     }
 
     public LaptimeStorage copy () {
-        LaptimeStorage obj = new LaptimeStorage(driverUUID, race);
+        LaptimeStorage obj = new LaptimeStorage(driver, race);
         obj.laptime = laptime;
         obj.s1data = s1data.copy();
         obj.s2data = s2data.copy();

@@ -30,16 +30,11 @@ public class ItemsAdderListener implements Listener {
             if(block == null) return;
 
             block.place(above);
-            BlockData data;
-            if(stripped.contains("Curbstone")) {
-                Snow snow = (Snow) Material.SNOW.createBlockData();
-                snow.setLayers(2);
-                data = snow;
-            } else {
-                data = Material.PETRIFIED_OAK_SLAB.createBlockData();
+            if(stripped.contains("Slab")) {
+                BlockData data = Material.PETRIFIED_OAK_SLAB.createBlockData();
+                block.place(above);
+                location.getWorld().setBlockData(location, data);
             }
-
-            location.getWorld().setBlockData(location, data);
             event.setCancelled(true);
             block.playPlaceSound();
         }

@@ -1,10 +1,19 @@
 package collinvht.f1mc.module.racing.object.laptime;
 
 import collinvht.f1mc.module.racing.object.race.Race;
+import collinvht.f1mc.module.racing.object.race.RaceMode;
+import collinvht.f1mc.util.Utils;
+import com.mysql.cj.jdbc.MysqlDataSource;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.Bukkit;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.LinkedList;
+import java.util.UUID;
 
 public class DriverLaptimeStorage {
 
@@ -24,6 +33,7 @@ public class DriverLaptimeStorage {
     @Getter @Setter
     private LaptimeStorage currentLap;
 
+    @Setter
     @Getter
     private Race race;
 
@@ -37,15 +47,7 @@ public class DriverLaptimeStorage {
         this.race = race;
     }
 
-    public void setRace(Race race) {
-        this.race = race;
-    }
-
-    public void addLaptime(LaptimeStorage laptimeOBJ) {
-
-        if(laptimes.size() == 10) {
-            laptimes.remove(0);
-        }
+    public void addLaptime(LaptimeStorage laptimeOBJ, RaceMode mode) {
         laptimes.add(laptimeOBJ);
 
         bestS1 = checkSectorTime(bestS1, laptimeOBJ.getS1data().getSectorLength());
@@ -58,6 +60,38 @@ public class DriverLaptimeStorage {
             }
         } else {
             fastestLap = laptimeOBJ;
+        }
+        if(mode == RaceMode.TIMETRIAL) {
+            MysqlDataSource dataSource = Utils.getDatabase();
+            try {
+                Connection connection = dataSource.getConnection();
+                PreparedStatement stmt = connection.prepareStatement("SELECT * FROM timetrial_laps WHERE `player_uuid` = \""+ laptimeOBJ.getDriverUUID().toString() +"\" AND `track_name` = \"" + race.getName() + "\";");
+                ResultSet rs = stmt.executeQuery();
+                String id = null;
+                long length = 0;
+                if (rs.next()) {
+                    id = rs.getString("timetrial_id");
+                    length = rs.getLong("lap_length");
+                }
+                if(id != null) {
+                    if(length > laptimeOBJ.getLaptime()) {
+                        PreparedStatement nextStmt = connection.prepareStatement("UPDATE timetrial_laps SET `lap_length`=" + laptimeOBJ.getLaptime() + ", `s1_length`=" + laptimeOBJ.getS1data().getSectorLength() + ", `s2_length`=" + laptimeOBJ.getS2data().getSectorLength() + ", `s3_length`=" + laptimeOBJ.getS3data().getSectorLength() +" WHERE `timetrial_id`=" + id + " AND `track_name` = \""+ race.getName() +"\";");
+                        nextStmt.execute();
+                        race.updateLeaderboard();
+                    }
+                } else {
+                    PreparedStatement nextStmt = connection.prepareStatement("INSERT INTO timetrial_laps (`player_uuid`, `lap_length`, `s1_length`, `s2_length`, `s3_length`, `track_name`) VALUES ('"+ laptimeOBJ.getDriverUUID() +"', "+ laptimeOBJ.getLaptime() + ","+ laptimeOBJ.getS1data().getSectorLength() + ","+ laptimeOBJ.getS2data().getSectorLength() + ","+ laptimeOBJ.getS3data().getSectorLength() +",'" + race.getName() + "');");
+                    nextStmt.execute();
+                    race.updateLeaderboard();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                Bukkit.getLogger().warning("Error adding laptime");
+            }
+        } else {
+            if(laptimes.size() == 10) {
+                //laptimes.remove(0);
+            }
         }
     }
 

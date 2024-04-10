@@ -1,13 +1,28 @@
 package collinvht.f1mc.module.racing.object.race;
 
 import collinvht.f1mc.F1MC;
+import collinvht.f1mc.util.DefaultMessages;
 import collinvht.f1mc.util.Utils;
 import com.google.gson.JsonObject;
+import com.mysql.cj.jdbc.MysqlDataSource;
+import eu.decentsoftware.holograms.api.DHAPI;
+import eu.decentsoftware.holograms.api.holograms.Hologram;
+import eu.decentsoftware.holograms.api.holograms.HologramLine;
+import eu.decentsoftware.holograms.api.holograms.HologramPage;
 import lombok.Getter;
 import lombok.Setter;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 
 import java.io.File;
 import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.UUID;
 
 @Getter
 public class Race {
@@ -28,6 +43,9 @@ public class Race {
     @Setter
     private boolean timeTrialStatus;
 
+    @Setter
+    private Hologram leaderBoard;
+
     public Race(String name, int laps) {
         this.laps = laps;
         this.name = name;
@@ -44,6 +62,7 @@ public class Race {
         mainObject.addProperty("Laps", laps);
         mainObject.addProperty("TimeTrial_Status", timeTrialStatus);
         mainObject.add("TimeTrial_Spawn", storage.ttSpawnJson());
+        mainObject.add("TimeTrial_Leaderboard", storage.ttLeaderboardJson());
         mainObject.add("Cuboids", storage.toJson());
         mainObject.add("Flags", flags.toJson());
 
@@ -58,7 +77,8 @@ public class Race {
 
             RaceCuboidStorage raceStorage = RaceCuboidStorage.fromJson(object.get("Cuboids").getAsJsonObject());
             if(raceStorage != null) {
-                raceStorage.setTimeTrialSpawn(object.get("TimeTrial_Spawn").getAsJsonObject());
+                raceStorage.setTimeTrialSpawnObj(object.get("TimeTrial_Spawn").getAsJsonObject());
+                raceStorage.setTimeTrialLeaderboardObj(object.get("TimeTrial_Leaderboard").getAsJsonObject());
                 Race race = new Race(name, laps);
                 race.setFlags(RaceFlags.fromJson(object.get("Flags").getAsJsonObject()));
                 race.setTimeTrialStatus(ttstatus);
@@ -69,5 +89,39 @@ public class Race {
             ignored.printStackTrace();
         }
         return null;
+    }
+
+    public void updateLeaderboard() {
+        if(!Utils.isEnableTimeTrial()) return;
+        if (DHAPI.getHologram(name + "_leaderboard") != null) {
+            deleteLeaderboard();
+        }
+        Location location = storage.getTimeTrialLeaderboard();
+        if (location.getWorld() != null) {
+            leaderBoard = DHAPI.createHologram(name + "_leaderboard", location.clone().add(0, 5.5,0));
+            leaderBoard.setDisplayRange(20);
+            leaderBoard.setUpdateRange(20);
+            leaderBoard.setAlwaysFacePlayer(false);
+        }
+
+        if(leaderBoard == null) return;
+        MysqlDataSource dataSource = Utils.getDatabase();
+        try {
+            Connection connection = dataSource.getConnection();
+            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM timetrial_laps WHERE `track_name` = '"+ name +"' ORDER BY `lap_length` ASC LIMIT 20;");
+            ResultSet rs = stmt.executeQuery();
+            DHAPI.addHologramLine(leaderBoard, DefaultMessages.PREFIX + "Fastest laps at " + ChatColor.GRAY + name + ChatColor.RESET + ":");
+            int curNumber = 1;
+            while (rs.next()) {
+                UUID uuid = UUID.fromString(rs.getString("player_uuid"));
+                OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
+                DHAPI.addHologramLine(leaderBoard, curNumber + ". " + player.getName() + " : " + Utils.millisToTimeString(rs.getLong("lap_length")));
+                curNumber += 1;
+            }
+        } catch (SQLException ignored) {}
+    }
+
+    public void deleteLeaderboard() {
+        DHAPI.removeHologram(name + "_leaderboard");
     }
 }

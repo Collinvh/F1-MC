@@ -2,9 +2,10 @@ package collinvht.f1mc.module.racing.object.race;
 
 import lombok.Getter;
 
-public enum     RaceMode {
+public enum RaceMode {
     PRACTICE(0, false),
-    LAPPING(1, true);
+    LAPPING(1, true),
+    TIMETRIAL(2, false);
 
     @Getter
     private final int modeId;

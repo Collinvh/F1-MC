@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.jetbrains.annotations.NotNull;
 import xyz.xenondevs.invui.inventory.event.ItemPostUpdateEvent;
 import xyz.xenondevs.invui.inventory.event.ItemPreUpdateEvent;
@@ -69,5 +70,10 @@ public class VPListener implements Listener {
                 RACE_CARS.remove(vehicle.getHolder().getUniqueId());
             }
         }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public static void vehicleDestroyEvent(@NotNull PlayerQuitEvent event) {
+        getRACE_DRIVERS().remove(event.getPlayer().getUniqueId());
     }
 }

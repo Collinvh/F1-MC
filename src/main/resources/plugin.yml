@@ -12,11 +12,14 @@ depend:
   - ProtocolLib
   - Multiverse-Core
   - HeadDB
+  - DecentHolograms
 authors:
   - Collinvht
   - SBDeveloper
 
 commands:
+  discord:
+    description: Discord link
   raceteam:
     description: Manage or create teams
   race:

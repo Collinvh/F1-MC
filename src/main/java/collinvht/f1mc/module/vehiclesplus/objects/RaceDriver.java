@@ -3,6 +3,7 @@ package collinvht.f1mc.module.vehiclesplus.objects;
 import collinvht.f1mc.module.racing.object.laptime.DriverLaptimeStorage;
 import collinvht.f1mc.module.racing.object.laptime.LaptimeStorage;
 import collinvht.f1mc.module.racing.object.race.Race;
+import collinvht.f1mc.module.racing.object.race.RaceMode;
 import lombok.Getter;
 import lombok.Setter;
 import me.legofreak107.vehiclesplus.vehicles.vehicles.objects.SpawnedVehicle;
@@ -53,8 +54,8 @@ public class RaceDriver {
         return laptimes.get(race);
     }
 
-    public void addLaptime(Race race, LaptimeStorage storage) {
-        laptimes.get(race).addLaptime(storage);
+    public void addLaptime(Race race, RaceMode mode, LaptimeStorage storage) {
+        laptimes.get(race).addLaptime(storage, mode);
     }
 
     public void setDriving(boolean driving) {

@@ -50,6 +50,11 @@ public class RaceCuboidStorage {
     @Getter
     private Location timeTrialSpawn;
 
+    @Setter
+    @Getter
+    private Location timeTrialLeaderboard;
+
+
     public static RaceCuboidStorage fromJson(JsonObject cuboids) {
         try {
             RaceCuboidStorage storage = new RaceCuboidStorage();
@@ -150,18 +155,31 @@ public class RaceCuboidStorage {
         }
         return object;
     }
-
-    public void setTimeTrialSpawn(Location timeTrialSpawn) {
-        this.timeTrialSpawn = timeTrialSpawn;
+    public JsonObject ttLeaderboardJson() {
+        JsonObject object = new JsonObject();
+        if(timeTrialLeaderboard != null) {
+            timeTrialLeaderboard.serialize().forEach(((s, o) -> object.addProperty(s, String.valueOf(o))));
+        }
+        return object;
     }
 
-    public void setTimeTrialSpawn(JsonObject ttSpawn) {
+    public void setTimeTrialSpawnObj(JsonObject ttSpawn) {
         if(ttSpawn != null) {
             Map<String, Object> serializableMap = new HashMap<>();
             for (Map.Entry<String, JsonElement> stringJsonElementEntry : ttSpawn.entrySet()) {
                 serializableMap.put(stringJsonElementEntry.getKey(), stringJsonElementEntry.getValue().getAsString());
             }
             this.timeTrialSpawn = Location.deserialize(serializableMap);
+        }
+    }
+
+    public void setTimeTrialLeaderboardObj(JsonObject ttLeaderboard) {
+        if(ttLeaderboard != null) {
+            Map<String, Object> serializableMap = new HashMap<>();
+            for (Map.Entry<String, JsonElement> stringJsonElementEntry : ttLeaderboard.entrySet()) {
+                serializableMap.put(stringJsonElementEntry.getKey(), stringJsonElementEntry.getValue().getAsString());
+            }
+            this.timeTrialLeaderboard = Location.deserialize(serializableMap);
         }
     }
 }

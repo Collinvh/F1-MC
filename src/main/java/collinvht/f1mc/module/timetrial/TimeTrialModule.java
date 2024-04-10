@@ -6,10 +6,12 @@ import collinvht.f1mc.util.modules.CommandModuleBase;
 import org.bukkit.Bukkit;
 
 public class TimeTrialModule extends CommandModuleBase {
+    private static TimeTrialManager manager;
     @Override
     public void load() {
         attachModule(new TimeTrialListener());
-        registerCommand("timetrial", new TimeTrialManager());
+        manager = new TimeTrialManager();
+        registerCommand("timetrial", manager, manager);
     }
 
     @Override
@@ -17,9 +19,9 @@ public class TimeTrialModule extends CommandModuleBase {
         TimeTrialManager.getSessionHashMap().forEach((uuid, timeTrialSession) -> {
             if(Bukkit.getPlayer(timeTrialSession.getPlayer().getUniqueId()) != null) {
                 timeTrialSession.getSpawnedVehicle().getStorageVehicle().removeVehicle(Bukkit.getPlayer(timeTrialSession.getPlayer().getUniqueId()));
-                Bukkit.getPlayer(timeTrialSession.getPlayer().getUniqueId()).teleport(timeTrialSession.getPrevLoc());
-                timeTrialSession.stop();
+                timeTrialSession.getPlayer().teleport(timeTrialSession.getPrevLoc());
             }
         });
+        manager.unload();
     }
 }

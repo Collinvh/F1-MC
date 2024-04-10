@@ -8,4 +8,9 @@ public class RacingManagers extends ModuleBase {
     public void load() {
         attachModule(new RaceManager());
     }
+
+    @Override
+    public void saveModule() {
+        RaceManager.getRACES().forEach((s, race) -> race.deleteLeaderboard());
+    }
 }

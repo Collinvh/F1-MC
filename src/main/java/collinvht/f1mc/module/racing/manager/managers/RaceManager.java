@@ -15,12 +15,14 @@ import collinvht.f1mc.util.modules.ModuleBase;
 import com.google.gson.JsonObject;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.regions.Region;
+import lombok.Getter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.TextChannel;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.units.qual.A;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -30,15 +32,15 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.UUID;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class RaceManager extends ModuleBase {
     private static RaceManager instance;
 
+    @Getter
     private static final HashMap<String, Race> RACES = new HashMap<>();
 
     public RaceManager() {
@@ -64,9 +66,7 @@ public class RaceManager extends ModuleBase {
 
     private void saveRaces() {
         if(!RACES.isEmpty()) {
-            RACES.forEach((s, race) ->  {
-                race.saveJson();
-            });
+            RACES.forEach((s, race) -> race.saveJson());
         }
         RaceListener.stopListening();
     }
@@ -76,11 +76,15 @@ public class RaceManager extends ModuleBase {
         if(raceFiles.exists()) {
             File[] races = raceFiles.listFiles();
             if(races != null) {
+                ArrayList<String> names = new ArrayList<>();
                 for (File raceFile : races) {
                     try {
                         Race race = Race.createRaceFromJson((JsonObject) Utils.readJson(raceFile.getAbsolutePath()));
                         if(race != null) {
+                            if(names.contains(race.getName())) return;
                             RACES.put(race.getName(), race);
+                            race.updateLeaderboard();
+                            names.add(race.getName());
                         }
                     } catch (Exception e) {
                         Bukkit.getLogger().severe(raceFile.getAbsolutePath() + " failed to load.");
@@ -289,9 +293,17 @@ public class RaceManager extends ModuleBase {
                     case "enable":
                         race.setTimeTrialStatus(true);
                         return DefaultMessages.PREFIX + "Enabled timetrial on this track.";
+                    case "spawn":
                     case "setspawn":
                         race.getStorage().setTimeTrialSpawn(player.getLocation());
                         return DefaultMessages.PREFIX + "Spawn has been changed.";
+                    case "leader":
+                    case "leaderboard":
+                    case "setleaderboard":
+                    case "setleader":
+                        race.getStorage().setTimeTrialLeaderboard(player.getLocation());
+                        race.updateLeaderboard();
+                        return DefaultMessages.PREFIX + "Leaderboard has been changed.";
                 }
                 break;
             }

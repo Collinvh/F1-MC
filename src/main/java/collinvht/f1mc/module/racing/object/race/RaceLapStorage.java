@@ -55,11 +55,14 @@ public class RaceLapStorage {
                     LaptimeStorage laptimeStorage = raceDriver.getLaptimes(race).getCurrentLap();
                     if (raceDriver.getVehicle() != null) {
                         if (laptimeStorage == null) {
-                            laptimeStorage = new LaptimeStorage(player.getUniqueId(), race);
+                            laptimeStorage = new LaptimeStorage(raceDriver, race);
+                            if(raceMode == RaceMode.TIMETRIAL) {
+                                laptimeStorage.getS1data().setSectorStart(System.currentTimeMillis()-100);
+                            }
                             raceDriver.getLaptimes(race).setCurrentLap(laptimeStorage);
                         }
                         Location location = player.getLocation();
-                        if (raceDriver.isPassedPitExit() || raceMode.isLapped()) {
+                        if (raceDriver.isPassedPitExit() || raceMode.isLapped() || raceMode == RaceMode.TIMETRIAL) {
                             if(!raceDriver.getLaptimes(race).isInvalidated()) {
                                 for (NamedCuboid cuboid : storage.getLimits().values()) {
                                     if (cuboid.getCuboid().containsLocation(location)) {
@@ -68,7 +71,7 @@ public class RaceLapStorage {
                                     }
                                 }
                             }
-                            if (!raceDriver.isInPit()) {
+                            if (!raceDriver.isInPit() && raceMode != RaceMode.TIMETRIAL) {
                                 if (storage.getPitEntry().getCuboid().containsLocation(location)) {
                                     raceDriver.setInPit();
                                 }
@@ -81,7 +84,7 @@ public class RaceLapStorage {
                                     if (!raceDriver.getLaptimes(race).isInvalidated() && !raceDriver.isDisqualified()) {
                                         player.sendMessage(ChatColor.GRAY + "Your S1 is " +  laptimeStorage.getS1Color() + Utils.millisToTimeString(laptimeStorage.getS1data().getSectorLength()) + " | " + Utils.millisToTimeString(laptimeStorage.getS1data().getSectorDifference(), "ss.SS"));
                                     }
-                                    raceDriver.getLaptimes(race).addSector();
+                                    if(raceMode != RaceMode.TIMETRIAL) raceDriver.getLaptimes(race).addSector();
                                     return;
                                 }
                             }
@@ -92,7 +95,7 @@ public class RaceLapStorage {
                                     if (!raceDriver.getLaptimes(race).isInvalidated() && !raceDriver.isDisqualified()) {
                                         player.sendMessage(ChatColor.GRAY + "Your S2 is " +  laptimeStorage.getS2Color() + Utils.millisToTimeString(laptimeStorage.getS2data().getSectorLength()) + " | " + Utils.millisToTimeString(laptimeStorage.getS2data().getSectorDifference(), "ss.SS"));
                                     }
-                                    raceDriver.getLaptimes(race).addSector();
+                                    if(raceMode != RaceMode.TIMETRIAL) raceDriver.getLaptimes(race).addSector();
                                     return;
                                 }
                             }
@@ -105,13 +108,13 @@ public class RaceLapStorage {
                                             laptimeStorage.createLaptime();
                                             LaptimeStorage clone = laptimeStorage.copy();
                                             laptimeHash.put(raceDriver.getDriverUUID(), clone);
-                                            raceDriver.addLaptime(race, clone);
+                                            raceDriver.addLaptime(race, raceMode, clone);
                                             player.sendMessage(ChatColor.GRAY + "Your lap time is " + laptimeStorage.getLapColor(true) + Utils.millisToTimeString(laptimeStorage.getLaptime()) + " | " + Utils.millisToTimeString(laptimeStorage.getLapData().getSectorDifference(), "ss.SS"));
                                         } else {
                                             player.sendMessage(ChatColor.RED + "Your lap time is INVALIDATED.");
                                             raceDriver.getLaptimes(race).setInvalidated(false);
                                         }
-                                        raceDriver.getLaptimes(race).addSector();
+                                        if(raceMode != RaceMode.TIMETRIAL) raceDriver.getLaptimes(race).addSector();
 
                                         laptimeStorage.setPassedS1(false);
                                         laptimeStorage.setPassedS2(false);
@@ -145,8 +148,6 @@ public class RaceLapStorage {
                             }
                         }
                     }
-                } else {
-                    VPListener.getRACE_DRIVERS().remove(raceDriver.getDriverUUID());
                 }
             }
         }

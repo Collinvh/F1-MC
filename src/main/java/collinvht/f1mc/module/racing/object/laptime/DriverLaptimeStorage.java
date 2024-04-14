@@ -62,32 +62,7 @@ public class DriverLaptimeStorage {
             fastestLap = laptimeOBJ;
         }
         if(mode == RaceMode.TIMETRIAL) {
-            MysqlDataSource dataSource = Utils.getDatabase();
-            try {
-                Connection connection = dataSource.getConnection();
-                PreparedStatement stmt = connection.prepareStatement("SELECT * FROM timetrial_laps WHERE `player_uuid` = \""+ laptimeOBJ.getDriverUUID().toString() +"\" AND `track_name` = \"" + race.getName() + "\";");
-                ResultSet rs = stmt.executeQuery();
-                String id = null;
-                long length = 0;
-                if (rs.next()) {
-                    id = rs.getString("timetrial_id");
-                    length = rs.getLong("lap_length");
-                }
-                if(id != null) {
-                    if(length > laptimeOBJ.getLaptime()) {
-                        PreparedStatement nextStmt = connection.prepareStatement("UPDATE timetrial_laps SET `lap_length`=" + laptimeOBJ.getLaptime() + ", `s1_length`=" + laptimeOBJ.getS1data().getSectorLength() + ", `s2_length`=" + laptimeOBJ.getS2data().getSectorLength() + ", `s3_length`=" + laptimeOBJ.getS3data().getSectorLength() +" WHERE `timetrial_id`=" + id + " AND `track_name` = \""+ race.getName() +"\";");
-                        nextStmt.execute();
-                        race.updateLeaderboard();
-                    }
-                } else {
-                    PreparedStatement nextStmt = connection.prepareStatement("INSERT INTO timetrial_laps (`player_uuid`, `lap_length`, `s1_length`, `s2_length`, `s3_length`, `track_name`) VALUES ('"+ laptimeOBJ.getDriverUUID() +"', "+ laptimeOBJ.getLaptime() + ","+ laptimeOBJ.getS1data().getSectorLength() + ","+ laptimeOBJ.getS2data().getSectorLength() + ","+ laptimeOBJ.getS3data().getSectorLength() +",'" + race.getName() + "');");
-                    nextStmt.execute();
-                    race.updateLeaderboard();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-                Bukkit.getLogger().warning("Error adding laptime");
-            }
+
         } else {
             if(laptimes.size() == 10) {
                 //laptimes.remove(0);

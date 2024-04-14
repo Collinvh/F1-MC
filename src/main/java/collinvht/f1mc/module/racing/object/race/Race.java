@@ -115,7 +115,7 @@ public class Race {
             while (rs.next()) {
                 UUID uuid = UUID.fromString(rs.getString("player_uuid"));
                 OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
-                DHAPI.addHologramLine(leaderBoard, curNumber + ". " + player.getName() + " : " + Utils.millisToTimeString(rs.getLong("lap_length")));
+                DHAPI.addHologramLine(leaderBoard, curNumber + ". " + ChatColor.GRAY + player.getName() + " : " + ChatColor.RESET + Utils.millisToTimeString(rs.getLong("lap_length")));
                 curNumber += 1;
             }
         } catch (SQLException ignored) {}

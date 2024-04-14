@@ -152,31 +152,27 @@ public class SlowdownManager extends ModuleBase {
                 block = player.getLocation().clone().add(0, -1.2, 0).getBlock();
             }
             float steering = vehicle.getBaseVehicle().getTurningRadiusSettings().getBase();
+            float acceleration = vehicle.getBaseVehicle().getAccelerationSettings().getBase();
+            float braking = vehicle.getBaseVehicle().getBrakeSettings().getBase();
             if(block.getType() == Material.NOTE_BLOCK) {
                 CustomBlock customBlock = CustomBlock.byAlreadyPlaced(block);
                 if(customBlock != null) {
                     if (customslowDowns.get(customBlock.getNamespacedID()) != null) {
                         SlowdownIAObject obj = customslowDowns.get(customBlock.getNamespacedID());
-                        double speedReduction = obj.getSlowdownSpeed();
-                        if (curSpeed >= obj.getMaxSpeed()) {
-                            double val = (curSpeed - (speedReduction));
-                            if (val <= obj.getMaxSpeed()) val = obj.getMaxSpeed();
-                            stats.setCurrentSpeed(val);
-                            steering *= (float) obj.getSteeringPercent();
-                        }
+                        steering *= (float) obj.getSteeringPercent();
+                        acceleration *= (float) (obj.getSteeringPercent()*2);
+                        braking *= (float) (obj.getSteeringPercent()*2);
                     }
                 }
             } else if (slowDowns.containsKey(block.getType())) {
                 SlowdownObject obj = slowDowns.get(block.getType());
-                double speedReduction = obj.getSlowdownSpeed();
-                if (curSpeed >= obj.getMaxSpeed()) {
-                    double val = (curSpeed - (speedReduction));
-                    if (val <= obj.getMaxSpeed()) val = obj.getMaxSpeed();
-                    stats.setCurrentSpeed(val);
-                    steering *= (float) obj.getSteeringPercent();
-                }
+                steering *= (float) obj.getSteeringPercent();
+                acceleration *= (float) (obj.getSteeringPercent());
+                braking *= (float) (obj.getSteeringPercent());
             }
             stats.setSteering(steering);
+            stats.setAcceleration(acceleration);
+            stats.setBrakeForce(braking);
         }
     }
 }

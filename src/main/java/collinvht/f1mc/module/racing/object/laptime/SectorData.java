@@ -13,20 +13,20 @@ public class SectorData {
     @Getter @Setter
     private ChatColor sectorColor = ChatColor.RESET;
 
-    @Getter
+    @Getter @Setter
     private long sectorLength;
 
     @Getter @Setter
     private long sectorDifference;
 
-    @Setter
+    @Setter @Getter
     private long sectorStart;
 
     public SectorData(UUID driver) {
         this.driver = driver;
     }
 
-    public void setSectorLength(long sectorLength) {
+    public void setSectorLengthL(long sectorLength) {
         this.sectorLength = (sectorLength - sectorStart);
     }
 

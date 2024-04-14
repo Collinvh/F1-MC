@@ -28,6 +28,7 @@ commands:
     permission: f1mc.fia.common
     description: Blockslowdown
   timetrial:
+    aliases: tt
     description: Timetrial
     permission: f1mc.timetrial
   dsq:

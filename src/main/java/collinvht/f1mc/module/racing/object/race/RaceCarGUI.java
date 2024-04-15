@@ -36,6 +36,7 @@ public class RaceCarGUI {
     private final VirtualInventory minigame_3;
     private final VirtualInventory minigame_4;
     private Gui minigameGui;
+    @Getter
     private boolean isInMini_game;
 
     public RaceCarGUI(RaceCar car) {

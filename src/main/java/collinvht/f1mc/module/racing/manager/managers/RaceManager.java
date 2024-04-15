@@ -313,7 +313,7 @@ public class RaceManager extends ModuleBase {
                     String name = input.toLowerCase();
                     switch (name) {
                         case "delete": {
-                            if(extraInput != null) {
+                            if(extraInput[4] != null) {
                                 if (race.getStorage().getLimits().containsKey(extraInput[4].toLowerCase())) {
                                     race.getStorage().getLimits().remove(extraInput[4].toLowerCase());
                                     return DefaultMessages.PREFIX + "Removed track limit.";
@@ -367,6 +367,72 @@ public class RaceManager extends ModuleBase {
                             race.getStorage().setS3(cuboid);
                             return DefaultMessages.PREFIX + "S3 has been changed.";
                         }
+                        case "mini_1":
+                            if(extraInput[4] != null) {
+                                if(extraInput[4].equalsIgnoreCase("delete")) {
+                                    if(extraInput[5] != null) {
+                                        race.getStorage().getS1_mini().remove(extraInput[5]);
+                                        return DefaultMessages.PREFIX + "Mini in s1 has been removed";
+                                    } else {
+                                        return DefaultMessages.PREFIX + "Invalid arguments";
+                                    }
+                                } else if (extraInput[4].equalsIgnoreCase("list")) {
+                                    StringBuilder str = new StringBuilder(DefaultMessages.PREFIX + "Minis:\n");
+                                    for (NamedCuboid limit : race.getStorage().getS1_mini().values()) {
+                                        str.append(limit.getName()).append("\n");
+                                    }
+                                    return str.toString();
+                                }
+                                NamedCuboid cuboid = race.getStorage().createNamedCuboidFromSelection(player.getWorld(), region, extraInput[4]);
+                                race.getStorage().getS1_mini().put(extraInput[4], cuboid);
+                                return DefaultMessages.PREFIX + "Mini in s1 has been added.";
+                            } else {
+                                return DefaultMessages.PREFIX + "Invalid arguments";
+                            }
+                        case "mini_2":
+                            if(extraInput[4] != null) {
+                                if(extraInput[4].equalsIgnoreCase("delete")) {
+                                    if(extraInput[5] != null) {
+                                        race.getStorage().getS2_mini().remove(extraInput[5]);
+                                        return DefaultMessages.PREFIX + "Mini in s2 has been removed";
+                                    } else {
+                                        return DefaultMessages.PREFIX + "Invalid arguments";
+                                    }
+                                } else if (extraInput[4].equalsIgnoreCase("list")) {
+                                    StringBuilder str = new StringBuilder(DefaultMessages.PREFIX + "Minis:\n");
+                                    for (NamedCuboid limit : race.getStorage().getS2_mini().values()) {
+                                        str.append(limit.getName()).append("\n");
+                                    }
+                                    return str.toString();
+                                }
+                                NamedCuboid cuboid = race.getStorage().createNamedCuboidFromSelection(player.getWorld(), region, extraInput[4]);
+                                race.getStorage().getS2_mini().put(extraInput[4], cuboid);
+                                return DefaultMessages.PREFIX + "Mini in s2 has been added.";
+                            } else {
+                                return DefaultMessages.PREFIX + "Invalid arguments";
+                            }
+                        case "mini_3":
+                            if(extraInput[4] != null) {
+                                if(extraInput[4].equalsIgnoreCase("delete")) {
+                                    if(extraInput[5] != null) {
+                                        race.getStorage().getS3_mini().remove(extraInput[5]);
+                                        return DefaultMessages.PREFIX + "Mini in s3 has been removed";
+                                    } else {
+                                        return DefaultMessages.PREFIX + "Invalid arguments";
+                                    }
+                                } else if (extraInput[4].equalsIgnoreCase("list")) {
+                                    StringBuilder str = new StringBuilder(DefaultMessages.PREFIX + "Minis:\n");
+                                    for (NamedCuboid limit : race.getStorage().getS3_mini().values()) {
+                                        str.append(limit.getName()).append("\n");
+                                    }
+                                    return str.toString();
+                                }
+                                NamedCuboid cuboid = race.getStorage().createNamedCuboidFromSelection(player.getWorld(), region, extraInput[4]);
+                                race.getStorage().getS3_mini().put(extraInput[4], cuboid);
+                                return DefaultMessages.PREFIX + "Mini in s3 has been added.";
+                            } else {
+                                return DefaultMessages.PREFIX + "Invalid arguments";
+                            }
                         default: {
                             return DefaultMessages.PREFIX + "Not an valid sector";
                         }

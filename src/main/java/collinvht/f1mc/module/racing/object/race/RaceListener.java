@@ -48,14 +48,6 @@ public class RaceListener {
             return "Not the whole track has been setup, this is required to start";
         }
 
-
-        if(Utils.isEnableDiscordModule()) {
-            DiscordModule discordModule = DiscordModule.getInstance();
-            if (discordModule.isInitialized()) {
-                JDA jda = discordModule.getJda();
-            }
-        }
-
         return DefaultMessages.PREFIX + "Race started.";
     }
 

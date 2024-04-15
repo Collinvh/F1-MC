@@ -15,6 +15,7 @@ import org.bukkit.World;
 import org.checkerframework.checker.units.qual.N;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,9 +24,15 @@ public class RaceCuboidStorage {
     Sectors
      */
     @Setter @Getter
+    private HashMap<String, NamedCuboid> S1_mini = new HashMap<>();
+    @Setter @Getter
     private NamedCuboid S1;
     @Setter @Getter
+    private HashMap<String, NamedCuboid> S2_mini = new HashMap<>();
+    @Setter @Getter
     private NamedCuboid S2;
+    @Setter @Getter
+    private HashMap<String, NamedCuboid> S3_mini = new HashMap<>();
     @Setter @Getter
     private NamedCuboid S3;
 
@@ -61,7 +68,7 @@ public class RaceCuboidStorage {
             for (Map.Entry<String, JsonElement> entries : cuboids.entrySet()) {
                 JsonObject object = entries.getValue().getAsJsonObject();
                 String cuboidName = entries.getKey();
-                if(!cuboidName.equals("offTracks")) {
+                if(!cuboidName.equals("offTracks") && !cuboidName.contains("_mini")) {
                     Map<String, String> serializableMap = new HashMap<>();
                     for (Map.Entry<String, JsonElement> stringJsonElementEntry : object.entrySet()) {
                         serializableMap.put(stringJsonElementEntry.getKey(), stringJsonElementEntry.getValue().getAsString());
@@ -101,6 +108,55 @@ public class RaceCuboidStorage {
                     storage.getLimits().put(cuboidName, new NamedCuboid(cuboid, cuboidName));
                 }
             }
+
+            JsonElement s1_mini = cuboids.get("s1_mini");
+            if(s1_mini != null) {
+                if(s1_mini instanceof JsonObject s1_mini_obj) {
+                    for (Map.Entry<String, JsonElement> entries : s1_mini_obj.entrySet()) {
+                        JsonObject object = entries.getValue().getAsJsonObject();
+                        String cuboidName = entries.getKey();
+
+                        Map<String, String> serializableMap = new HashMap<>();
+                        for (Map.Entry<String, JsonElement> stringJsonElementEntry : object.entrySet()) {
+                            serializableMap.put(stringJsonElementEntry.getKey(), stringJsonElementEntry.getValue().getAsString());
+                        }
+                        Cuboid cuboid = Cuboid.deserialize(serializableMap);
+                        storage.getS1_mini().put(cuboidName, new NamedCuboid(cuboid, cuboidName));
+                    }
+                }
+            }
+            JsonElement s2_mini = cuboids.get("s2_mini");
+            if(s2_mini != null) {
+                if(s2_mini instanceof JsonObject s2_mini_obj) {
+                    for (Map.Entry<String, JsonElement> entries : s2_mini_obj.entrySet()) {
+                        JsonObject object = entries.getValue().getAsJsonObject();
+                        String cuboidName = entries.getKey();
+
+                        Map<String, String> serializableMap = new HashMap<>();
+                        for (Map.Entry<String, JsonElement> stringJsonElementEntry : object.entrySet()) {
+                            serializableMap.put(stringJsonElementEntry.getKey(), stringJsonElementEntry.getValue().getAsString());
+                        }
+                        Cuboid cuboid = Cuboid.deserialize(serializableMap);
+                        storage.getS2_mini().put(cuboidName, new NamedCuboid(cuboid, cuboidName));
+                    }
+                }
+            }
+            JsonElement s3_mini = cuboids.get("s3_mini");
+            if(s3_mini != null) {
+                if(s3_mini instanceof JsonObject s3_mini_obj) {
+                    for (Map.Entry<String, JsonElement> entries : s3_mini_obj.entrySet()) {
+                        JsonObject object = entries.getValue().getAsJsonObject();
+                        String cuboidName = entries.getKey();
+
+                        Map<String, String> serializableMap = new HashMap<>();
+                        for (Map.Entry<String, JsonElement> stringJsonElementEntry : object.entrySet()) {
+                            serializableMap.put(stringJsonElementEntry.getKey(), stringJsonElementEntry.getValue().getAsString());
+                        }
+                        Cuboid cuboid = Cuboid.deserialize(serializableMap);
+                        storage.getS3_mini().put(cuboidName, new NamedCuboid(cuboid, cuboidName));
+                    }
+                }
+            }
             return storage;
         } catch (Exception e) {
             e.printStackTrace();
@@ -127,18 +183,37 @@ public class RaceCuboidStorage {
                 object.add(namedCuboid.getName(), cuboidObj);
             }
         }
+        JsonObject s1_minis = arrayToObject(S1_mini.values());
+        if(s1_minis != null) object.add("s1_mini", s1_minis);
+        JsonObject s2_minis = arrayToObject(S2_mini.values());
+        if(s2_minis != null) object.add("s2_mini", s2_minis);
+        JsonObject s3_minis = arrayToObject(S3_mini.values());
+        if(s3_minis != null) object.add("s3_mini", s3_minis);
+
         JsonObject newObject = new JsonObject();
-        if(limits.size() > 0) {
-        for (NamedCuboid namedCuboid : limits.values()) {
-            if(namedCuboid != null) {
-                JsonObject cuboidObj = new JsonObject();
-                Cuboid cuboid = namedCuboid.getCuboid();
-                cuboid.serialize().forEach((s, o) -> cuboidObj.addProperty(s, String.valueOf(o)));
-                newObject.add(namedCuboid.getName(), cuboidObj);
+        if(!limits.isEmpty()) {
+            for (NamedCuboid namedCuboid : limits.values()) {
+                if (namedCuboid != null) {
+                    JsonObject cuboidObj = new JsonObject();
+                    Cuboid cuboid = namedCuboid.getCuboid();
+                    cuboid.serialize().forEach((s, o) -> cuboidObj.addProperty(s, String.valueOf(o)));
+                    newObject.add(namedCuboid.getName(), cuboidObj);
+                }
             }
         }
-        }
         object.add("offTracks", newObject);
+        return object;
+    }
+
+    private JsonObject arrayToObject(Collection<NamedCuboid> arrayList) {
+        if(arrayList.isEmpty()) return null;
+        JsonObject object = new JsonObject();
+        for (NamedCuboid namedCuboid : arrayList) {
+            JsonObject cuboidObj = new JsonObject();
+            Cuboid cuboid = namedCuboid.getCuboid();
+            cuboid.serialize().forEach((s, o) -> cuboidObj.addProperty(s, String.valueOf(o)));
+            object.add(namedCuboid.getName(), cuboidObj);
+        }
         return object;
     }
 

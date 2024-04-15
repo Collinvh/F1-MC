@@ -1,6 +1,7 @@
 package collinvht.f1mc.module.racing.object.laptime;
 
 import collinvht.f1mc.module.discord.DiscordModule;
+import collinvht.f1mc.module.racing.object.NamedCuboid;
 import collinvht.f1mc.module.vehiclesplus.listener.listeners.VPListener;
 import collinvht.f1mc.module.racing.object.race.Race;
 import collinvht.f1mc.module.vehiclesplus.objects.RaceDriver;
@@ -12,6 +13,7 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import org.bukkit.ChatColor;
 
 import java.awt.*;
+import java.util.HashMap;
 import java.util.UUID;
 
 public class LaptimeStorage {
@@ -26,15 +28,18 @@ public class LaptimeStorage {
     @Getter
     private long laptime;
 
-//    @Getter @Setter
-//    private Tyres tyre = Tyres.NULLTYRE;
-
     @Getter
     private SectorData s1data;
     @Getter
+    private final HashMap<Integer, SectorData> s1_minis = new HashMap<>();
+    @Getter
     private SectorData s2data;
     @Getter
+    private final HashMap<Integer, SectorData> s2_minis = new HashMap<>();
+    @Getter
     private SectorData s3data;
+    @Getter
+    private final HashMap<Integer, SectorData> s3_minis = new HashMap<>();
 
     @Getter @Setter
     private boolean passedS1;
@@ -266,7 +271,6 @@ public class LaptimeStorage {
         obj.s2data = s2data.copy();
         obj.s3data= s3data.copy();
         obj.lapData = lapData.copy();
-//        obj.tyre = tyre;
         return obj;
     }
 }

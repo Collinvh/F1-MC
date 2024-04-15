@@ -2,6 +2,7 @@ package collinvht.f1mc.module.racing.object.laptime;
 
 import collinvht.f1mc.module.racing.object.race.Race;
 import collinvht.f1mc.module.racing.object.race.RaceMode;
+import collinvht.f1mc.module.vehiclesplus.objects.RaceDriver;
 import collinvht.f1mc.util.Utils;
 import com.mysql.cj.jdbc.MysqlDataSource;
 import lombok.Getter;
@@ -84,6 +85,14 @@ public class DriverLaptimeStorage {
 
     public void addSector() {
         sectors += 1;
+    }
+
+    public LaptimeStorage getCurrentLap(RaceDriver raceDriver) {
+        if(currentLap == null) {
+            currentLap = new LaptimeStorage(raceDriver, race);
+            currentLap.getS1data().setSectorStart(System.currentTimeMillis()-100);
+        }
+        return currentLap;
     }
 
     public void resetLaptimes() {

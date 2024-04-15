@@ -29,7 +29,6 @@ public class RaceCar {
     private RaceDriver player;
     @Getter
     private final RaceCarGUI raceCarGUI;
-    private final HashMap<Player, Window> viewers = new HashMap<>();
     private BaseVehicle baseVehicle;
 
     public RaceCar(SpawnedVehicle spawnedVehicle, TeamObj linkedTeam) {

@@ -34,8 +34,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class TyreGUI implements Listener {
     public static String prefix = DefaultMessages.PREFIX;
-    private static final HashMap<UUID, RaceCar> cars = new HashMap<>();
-
     public static void open(Player player, TeamObj teamObject) {
         if(teamObject != null) {
             ArrayList<RaceCar> raceCars = teamObject.getRaceCars();
@@ -44,6 +42,10 @@ public class TyreGUI implements Listener {
                 int sizeInPit = 0;
                 for (RaceCar raceCar : raceCars) {
                     if (raceCar.getPlayer() != null) {
+                        if(raceCar.getRaceCarGUI().isInMini_game()) {
+                            raceCar.getRaceCarGUI().openWindow(player);
+                            return;
+                        }
                         sizeInPit += raceCar.getPlayer().isInPit() ? 1 : 0;
                     }
                 }
@@ -80,7 +82,6 @@ public class TyreGUI implements Listener {
                                                                 }
 
                                                                 if (object.getVehicle().getCurrentSpeedInKm() <= 1) {
-                                                                    cars.put(event.getWhoClicked().getUniqueId(), skullCar);
                                                                     skullCar.getRaceCarGUI().openWindow(player);
                                                                 } else {
                                                                     event.getWhoClicked().sendMessage(prefix + "Car is moving..");

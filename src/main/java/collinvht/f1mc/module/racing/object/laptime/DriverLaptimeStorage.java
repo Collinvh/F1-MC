@@ -51,23 +51,19 @@ public class DriverLaptimeStorage {
     public void addLaptime(LaptimeStorage laptimeOBJ, RaceMode mode) {
         laptimes.add(laptimeOBJ);
 
-        bestS1 = checkSectorTime(bestS1, laptimeOBJ.getS1data().getSectorLength());
-        bestS2 = checkSectorTime(bestS2, laptimeOBJ.getS2data().getSectorLength());
-        bestS3 = checkSectorTime(bestS3, laptimeOBJ.getS3data().getSectorLength());
+        bestS1 = checkSectorTime(bestS1, laptimeOBJ.getS1().getSectorLength());
+        bestS2 = checkSectorTime(bestS2, laptimeOBJ.getS2().getSectorLength());
+        bestS3 = checkSectorTime(bestS3, laptimeOBJ.getS3().getSectorLength());
 
         if(fastestLap != null) {
-            if (checkLapTime(fastestLap.getLaptime(), laptimeOBJ.getLaptime())) {
+            if (checkLapTime(fastestLap.getLapData().getSectorLength(), laptimeOBJ.getLapData().getSectorLength())) {
                 fastestLap = laptimeOBJ;
             }
         } else {
             fastestLap = laptimeOBJ;
         }
-        if(mode == RaceMode.TIMETRIAL) {
-
-        } else {
-            if(laptimes.size() == 10) {
-                //laptimes.remove(0);
-            }
+        if(laptimes.size() == 10) {
+            laptimes.remove(0);
         }
     }
 
@@ -85,14 +81,6 @@ public class DriverLaptimeStorage {
 
     public void addSector() {
         sectors += 1;
-    }
-
-    public LaptimeStorage getCurrentLap(RaceDriver raceDriver) {
-        if(currentLap == null) {
-            currentLap = new LaptimeStorage(raceDriver, race);
-            currentLap.getS1data().setSectorStart(System.currentTimeMillis()-100);
-        }
-        return currentLap;
     }
 
     public void resetLaptimes() {

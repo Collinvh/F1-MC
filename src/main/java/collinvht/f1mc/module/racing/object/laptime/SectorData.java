@@ -22,6 +22,9 @@ public class SectorData {
     @Setter @Getter
     private long sectorStart;
 
+    @Getter @Setter
+    private String sectorName;
+
     public SectorData(UUID driver) {
         this.driver = driver;
     }

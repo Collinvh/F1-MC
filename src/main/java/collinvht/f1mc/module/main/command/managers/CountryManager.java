@@ -55,7 +55,6 @@ public class CountryManager extends ModuleBase {
                     String countryShort = object2.get("countryShort").getAsString();
                     String countryImg = object2.get("countryImg").getAsString();
                     int headID = object2.get("headID").getAsInt();
-                    Bukkit.getLogger().warning(String.valueOf(headID));
                     ArrayList<UUID> uuids = new ArrayList<>();
                     JsonArray array1 = object2.get("playerUUIDS").getAsJsonArray();
                     for (JsonElement element : array1) {

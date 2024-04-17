@@ -81,6 +81,12 @@ public class TyreGUI implements Listener {
                                                                     return;
                                                                 }
 
+                                                                if(skullCar.getLinkedVehicle().getHolder().getLocation().distance(click.getPlayer().getLocation()) > 5) {
+                                                                    event.getWhoClicked().sendMessage(prefix + "Car is not close enough");
+                                                                    event.setCancelled(true);
+                                                                    return;
+                                                                }
+
                                                                 if (object.getVehicle().getCurrentSpeedInKm() <= 1) {
                                                                     skullCar.getRaceCarGUI().openWindow(player);
                                                                 } else {

@@ -7,13 +7,20 @@ import collinvht.f1mc.module.racing.module.tyres.obj.TyreBaseObject;
 import collinvht.f1mc.util.Permissions;
 import collinvht.f1mc.util.commands.CommandUtil;
 import de.tr7zw.changeme.nbtapi.NBTItem;
+import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import xyz.xenondevs.invui.window.Window;
 
-public class TyreCommand extends CommandUtil {
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.List;
+
+public class TyreCommand extends CommandUtil implements TabCompleter {
     @Override
     protected void initializeCommand(@NotNull CommandSender commandSender) {
         addPart("get", 0, "/tyre get", (sender, command, label, args) -> {
@@ -86,5 +93,33 @@ public class TyreCommand extends CommandUtil {
                     return prefix + "Invalid type\nTypes are durability|degradation|steering|extraspeed";
             }
         }, Permissions.FIA_ADMIN);
+    }
+
+    @Nullable
+    @Override
+    public List<String> onTabComplete(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
+        if(Permissions.FIA_ADMIN.hasPermission(commandSender)) {
+            ArrayList<String> list = new ArrayList<>();
+            if(args.length == 1) {
+                list.add("get");
+                list.add("debug");
+                list.add("track");
+                list.add("set");
+                return list;
+            }
+            if(args.length == 2) {
+                if(args[0].equalsIgnoreCase("track")) {
+                    RaceManager.getRACES().forEach((s1, race) -> list.add(s1));
+                }
+                if(args[0].equalsIgnoreCase("set")) {
+                    list.add("durability");
+                    list.add("degradation");
+                    list.add("steering");
+                    list.add("extraspeed");
+                }
+                return list;
+            }
+        }
+        return null;
     }
 }

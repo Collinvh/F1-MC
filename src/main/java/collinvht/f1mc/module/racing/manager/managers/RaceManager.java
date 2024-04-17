@@ -163,7 +163,7 @@ public class RaceManager extends ModuleBase {
                     LinkedHashMap<RaceDriver, Long> sectors = new LinkedHashMap<>();
                     drivers.forEach((unused, driver) -> {
                         if (driver.getLaptimes(race).getFastestLap() != null) {
-                            sectors.put(driver, driver.getLaptimes(race).getFastestLap().getLaptime());
+                            sectors.put(driver, driver.getLaptimes(race).getFastestLap().getLapData().getSectorLength());
                         }
                     });
 
@@ -231,7 +231,7 @@ public class RaceManager extends ModuleBase {
                     LinkedList<LaptimeStorage> list = driver.getLaptimes(race).getLaptimes();
                     if (!list.isEmpty()) {
                         builder.append(RacingMessages.LAST_10_LAPS);
-                        list.forEach(laptimeOBJ -> builder.append(ChatColor.BOLD).append(ChatColor.GREEN).append(Utils.millisToTimeString(laptimeOBJ.getLaptime())).append(" | ").append(ChatColor.RESET).append(Utils.millisToTimeString(laptimeOBJ.getS1data().getSectorLength())).append("/").append(Utils.millisToTimeString(laptimeOBJ.getS2data().getSectorLength())).append("/").append(Utils.millisToTimeString(laptimeOBJ.getS3data().getSectorLength())).append("\n"));
+                        list.forEach(laptimeOBJ -> builder.append(ChatColor.BOLD).append(ChatColor.GREEN).append(Utils.millisToTimeString(laptimeOBJ.getLapData().getSectorLength())).append(" | ").append(ChatColor.RESET).append(Utils.millisToTimeString(laptimeOBJ.getS1().getSectorLength())).append("/").append(Utils.millisToTimeString(laptimeOBJ.getS2().getSectorLength())).append("/").append(Utils.millisToTimeString(laptimeOBJ.getS3().getSectorLength())).append("\n"));
                         return builder.toString();
                     } else {
                         return RacingMessages.NO_LAPS_DRIVEN;
@@ -493,7 +493,7 @@ public class RaceManager extends ModuleBase {
                 if(!race.getRaceLapStorage().getRaceMode().isLapped()) {
                     drivers.forEach((unused, driver) -> {
                         if (driver.getLaptimes(race).getFastestLap() != null) {
-                            sectors.put(driver, driver.getLaptimes(race).getFastestLap().getLaptime());
+                            sectors.put(driver, driver.getLaptimes(race).getFastestLap().getLapData().getSectorLength());
                         }
                     });
                 } else {

@@ -11,7 +11,7 @@ public class SlowdownModule extends CommandModuleBase {
     @Override
     public void load() {
         Bukkit.getLogger().info("[F1MC] [Racing] Enabling Slowdown Module");
-        registerCommand("slowdown", new SlowdownCommand());
+        registerCommand("slowdown", new SlowdownCommand(), new SlowdownCommand());
         attachModule(new SlowdownManager());
         Bukkit.getLogger().info("[F1MC] [Racing] Enabled Slowdown Module");
     }

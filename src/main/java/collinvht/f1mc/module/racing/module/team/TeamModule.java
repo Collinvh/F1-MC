@@ -11,7 +11,7 @@ public class TeamModule extends CommandModuleBase {
     public void load() {
         Bukkit.getLogger().info("[F1MC] [Racing] Enabling Team Module");
         attachModule(new TeamManager());
-        registerCommand("raceteam", new RaceTeamCommand());
+        registerCommand("raceteam", new RaceTeamCommand(), new RaceTeamCommand());
         Bukkit.getLogger().info("[F1MC] [Racing] Enabled Team Module");
     }
 }

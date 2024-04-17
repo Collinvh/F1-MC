@@ -6,6 +6,6 @@ import collinvht.f1mc.util.modules.CommandModuleBase;
 public class RacingCommands extends CommandModuleBase {
     @Override
     public void load() {
-        registerCommand("race", new RaceCommand());
+        registerCommand("race", new RaceCommand(), new RaceCommand());
     }
 }

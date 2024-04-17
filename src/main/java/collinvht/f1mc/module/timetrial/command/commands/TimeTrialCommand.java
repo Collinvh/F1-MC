@@ -121,14 +121,27 @@ public class TimeTrialCommand extends CommandUtil implements TabCompleter {
                         yield list;
                     }
                 };
-            } else if (args.length == 1){
+            }
+            if(args.length == 3) {
+                if(args[0].equalsIgnoreCase("rival")) {
+                    for (OfflinePlayer offlinePlayer : Bukkit.getOfflinePlayers()) {
+                        if (offlinePlayer.hasPlayedBefore()) {
+                            list.add(offlinePlayer.getName());
+                        }
+                    }
+                    list.add("reset");
+                    list.add("none");
+                    return list;
+                }
+            }
+            if (args.length == 1){
                 list.add("fastest");
                 list.add("fastest");
                 list.add("car");
                 list.add("reset");
                 list.add("rival");
+                return list;
             }
-            return list;
         }
         return null;
     }

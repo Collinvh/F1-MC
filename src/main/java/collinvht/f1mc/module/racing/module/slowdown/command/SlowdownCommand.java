@@ -5,12 +5,18 @@ import collinvht.f1mc.util.Permissions;
 import collinvht.f1mc.util.commands.CommandUtil;
 import dev.lone.itemsadder.api.CustomBlock;
 import me.legofreak107.vehiclesplus.custom.CustomItemStack;
+import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public class SlowdownCommand extends CommandUtil {
+import java.util.ArrayList;
+import java.util.List;
+
+public class SlowdownCommand extends CommandUtil implements TabCompleter {
     @Override
     protected void initializeCommand(@NotNull CommandSender commandSender) {
         /*
@@ -59,5 +65,17 @@ public class SlowdownCommand extends CommandUtil {
                 return prefix + "You have to be a player to do this.";
             }
         }, Permissions.FIA_ADMIN, Permissions.FIA_COMMON);
+    }
+
+    @Nullable
+    @Override
+    public List<String> onTabComplete(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] strings) {
+        if(strings.length == 1) {
+            ArrayList<String> list = new ArrayList<>();
+            list.add("add");
+            list.add("remove");
+            return list;
+        }
+        return null;
     }
 }

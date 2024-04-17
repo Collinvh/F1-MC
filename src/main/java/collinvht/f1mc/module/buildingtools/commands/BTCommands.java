@@ -9,9 +9,8 @@ import collinvht.f1mc.util.modules.CommandModuleBase;
 public class BTCommands extends CommandModuleBase {
     @Override
     public void load() {
-        registerCommand("creplace", new CustomReplace());
-        registerCommand("cset", new CustomSet());
-        registerCommand("creplacenear", new CustomReplacenear());
+        registerCommand("creplace", new CustomReplace(), new CustomReplace());
+        registerCommand("cset", new CustomSet(), new CustomSet());
         registerCommand("cundo", new CustomUndo());
     }
 }

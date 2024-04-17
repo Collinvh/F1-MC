@@ -7,7 +7,6 @@ import collinvht.f1mc.module.racing.object.race.RaceMode;
 import lombok.Getter;
 import lombok.Setter;
 import me.legofreak107.vehiclesplus.vehicles.vehicles.objects.SpawnedVehicle;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -42,6 +41,9 @@ public class RaceDriver {
     @Getter @Setter
     private boolean disqualified;
 
+    @Getter @Setter
+    private int speedingFlags;
+
     public RaceDriver(Player player) {
         this.driverUUID = player.getUniqueId();
         this.driverName = player.getName();
@@ -73,7 +75,7 @@ public class RaceDriver {
         isInPit = false;
         isPassedPitExit = true;
         if(laptimes.get(race).getCurrentLap() != null) {
-            laptimes.get(race).getCurrentLap().getS1data().setSectorStart(System.currentTimeMillis()-100);
+            laptimes.get(race).getCurrentLap().getS1().setSectorStart(System.currentTimeMillis()-100);
         }
     }
 }

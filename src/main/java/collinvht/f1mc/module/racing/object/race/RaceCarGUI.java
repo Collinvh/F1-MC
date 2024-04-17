@@ -39,6 +39,8 @@ public class RaceCarGUI {
     @Getter
     private boolean isInMini_game;
 
+    private final int runnableID;
+
     public RaceCarGUI(RaceCar car) {
         this.car = car;
         int[] sizes = new int[]{1};
@@ -53,6 +55,13 @@ public class RaceCarGUI {
         minigame_2.setPreUpdateHandler(event -> event.setCancelled(true));
         minigame_3.setPreUpdateHandler(event -> event.setCancelled(true));
         minigame_4.setPreUpdateHandler(event -> event.setCancelled(true));
+        BukkitRunnable runnable = new BukkitRunnable() {
+            @Override
+            public void run() {
+                canContinue();
+            }
+        };
+        runnableID = runnable.runTaskTimer(F1MC.getInstance(), 0, 20).getTaskId();
 
         this.bandGui = createTyreInventory();
     }
@@ -88,6 +97,8 @@ public class RaceCarGUI {
     }
     private boolean isWaitingOnTask;
     public void ItemPreUpdate(ItemPreUpdateEvent event) {
+        if(!canContinue()) return;
+
         if(isWaitingOnTask) {
             Bukkit.getLogger().warning("isWaiting");
             event.setCancelled(true);
@@ -154,6 +165,7 @@ public class RaceCarGUI {
     }
 
     public void checkIfComplete() {
+        if(!canContinue()) return;
         if(minigame_1.getItem(0).getType() == Material.LIME_STAINED_GLASS_PANE && minigame_2.getItem(0).getType() == Material.LIME_STAINED_GLASS_PANE && minigame_3.getItem(0).getType() == Material.LIME_STAINED_GLASS_PANE && minigame_4.getItem(0).getType() == Material.LIME_STAINED_GLASS_PANE) {
             Set<Player> players = minigameGui.findAllCurrentViewers();
             if(removeTyre) {
@@ -183,5 +195,26 @@ public class RaceCarGUI {
             }
         }
         return null;
+    }
+
+    public boolean canContinue() {
+        if(car.getLinkedVehicle() == null) {
+            for (Player allCurrentViewer : bandGui.findAllCurrentViewers()) {
+                allCurrentViewer.closeInventory();
+            }
+            return false;
+        } else {
+            if(car.getLinkedVehicle().getCurrentSpeedInKm() > 1) {
+                for (Player allCurrentViewer : bandGui.findAllCurrentViewers()) {
+                    allCurrentViewer.closeInventory();
+                }
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void stopTimer() {
+        Bukkit.getScheduler().cancelTask(runnableID);
     }
 }

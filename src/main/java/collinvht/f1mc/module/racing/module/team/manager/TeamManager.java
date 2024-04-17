@@ -34,6 +34,7 @@ public class TeamManager extends ModuleBase {
     @Getter
     private static TeamManager instance;
 
+    @Getter
     private static final HashMap<String, TeamObj> TEAMS = new HashMap<>();
 
     private static LuckPerms luckPerms;
@@ -267,7 +268,7 @@ public class TeamManager extends ModuleBase {
     }
 
     public static String listTeams() {
-        if(TEAMS.size() == 0) return "No teams are created yet.";
+        if(TEAMS.isEmpty()) return "No teams are created yet.";
         StringBuilder builder = new StringBuilder();
         builder.append("Team list\n");
         TEAMS.forEach((s, team) -> builder.append(s).append("\n"));

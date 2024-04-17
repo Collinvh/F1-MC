@@ -3,14 +3,21 @@ package collinvht.f1mc.module.racing.module.team.command;
 import collinvht.f1mc.module.racing.module.team.manager.TeamManager;
 import collinvht.f1mc.util.Permissions;
 import collinvht.f1mc.util.commands.CommandUtil;
+import me.legofreak107.vehiclesplus.vehicles.api.VehiclesPlusAPI;
 import org.bukkit.Bukkit;
+import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static collinvht.f1mc.module.racing.module.team.manager.TeamManager.*;
 
-public class RaceTeamCommand extends CommandUtil {
+public class RaceTeamCommand extends CommandUtil implements TabCompleter {
     @Override
     protected void initializeCommand(@NotNull CommandSender commandSender) {
         Permissions.Permission invertedFIA = Permissions.FIA_TEAM.invertPerms();
@@ -114,5 +121,60 @@ public class RaceTeamCommand extends CommandUtil {
                 return "This is only possible as a player";
             }
         }, invertedAdmin, invertedFIA);
+    }
+
+    @Nullable
+    @Override
+    public List<String> onTabComplete(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
+        ArrayList<String> list = new ArrayList<>();
+        if(Permissions.FIA_TEAM.hasPermission(commandSender) || Permissions.FIA_ADMIN.hasPermission(commandSender)) {
+            if(args.length == 1) {
+                list.add("create");
+                list.add("spawn");
+                list.add("set");
+                list.add("add");
+                list.add("remove");
+                list.add("delete");
+                list.add("list");
+                return list;
+            }
+            if(args.length == 2) {
+                return switch (args[0]) {
+                    case "spawn", "set", "add", "remove", "delete" -> {
+                        TeamManager.getTEAMS().forEach((s1, teamObj) -> list.add(s1));
+                        yield list;
+                    }
+                    default -> null;
+                };
+            }
+            if(args.length == 3) {
+                if(args[0].equalsIgnoreCase("spawn")) {
+                    VehiclesPlusAPI.getVehicleManager().getBaseVehicleMap().forEach((s1, baseVehicle) -> list.add(s1));
+                    return list;
+                }
+                if(args[0].equalsIgnoreCase("set")) {
+                    list.add("color");
+                    list.add("owner");
+                    list.add("prefix");
+                    list.add("name");
+                    return list;
+                }
+            }
+        } else {
+            if(args.length == 1) {
+                list.add("request");
+                list.add("accept");
+                list.add("kick");
+                list.add("leave");
+                return list;
+            }
+            if(args.length == 2) {
+                if(args[0].equalsIgnoreCase("request")) {
+                    TeamManager.getTEAMS().forEach((s1, teamObj) -> list.add(s1));
+                    return list;
+                }
+            }
+        }
+        return null;
     }
 }

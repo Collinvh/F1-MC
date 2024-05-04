@@ -41,7 +41,7 @@ public class TimeTrialCommand extends CommandUtil implements TabCompleter {
             if(sender instanceof Player player) {
                 return prefix + TimeTrialManager.resetLap(player.getUniqueId(), args[1]);
             } else {
-                return prefix +"Your nota a player";
+                return prefix +"Your not a a player";
             }
         })));
         addPart("rival", 2, "/timetrial rival [track] [name]", ((sender, command, label, args) -> {
@@ -88,7 +88,9 @@ public class TimeTrialCommand extends CommandUtil implements TabCompleter {
                     number += 1;
                     UUID uuid = UUID.fromString(rs.getString("player_uuid"));
                     OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
-                    list.append(number).append(". ").append(player.getName()).append(" : ").append(Utils.millisToTimeString(rs.getLong("lap_length"))).append(" Sectors: \nS1: ").append(Utils.millisToTimeString(rs.getLong("s1_length"))).append(" | S2: ").append(Utils.millisToTimeString(rs.getLong("s2_length"))).append(" | S3: ").append(Utils.millisToTimeString(rs.getLong("s3_length"))).append("\n");
+                    String vehicleName = rs.getString("vehicle_name").replace("f1mc.", "");
+                    String finalVehicleName = (vehicleName.substring(0, 1).toUpperCase() + vehicleName.substring(1)).replace(".", " ").replace("_", " ");
+                    list.append(number).append(". ").append(finalVehicleName).append(" ").append(player.getName()).append(" : ").append(Utils.millisToTimeString(rs.getLong("lap_length"))).append(" Sectors: \nS1: ").append(Utils.millisToTimeString(rs.getLong("s1_length"))).append(" | S2: ").append(Utils.millisToTimeString(rs.getLong("s2_length"))).append(" | S3: ").append(Utils.millisToTimeString(rs.getLong("s3_length"))).append("\n");
                 }
                 if(!list.isEmpty()) {
                     return prefix + "Top 5"+ (offset != 0 ? " on Page " + (offset/5)+1 : "") +":\n" + list + "=-=-=-=-=-=-=-=-=-=-=-=-=";

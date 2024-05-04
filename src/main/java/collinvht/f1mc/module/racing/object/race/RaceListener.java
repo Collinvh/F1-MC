@@ -24,11 +24,25 @@ public class RaceListener {
         task = new TimerTask() {
             @Override
             public void run() {
-                VPListener.getRACE_DRIVERS().forEach((uuid, raceDriver) ->  {
-                    for (Race race : LISTENING) {
-                        race.getRaceLapStorage().update(raceDriver);
+                ArrayList<Race> removingRaces = new ArrayList<>();
+                for (Race race : LISTENING) {
+                    if(race.getRaceTimer() != null) {
+                        race.getRaceTimer().update();
+                        if(race.getRaceTimer().isFinished()) {
+                            removingRaces.add(race);
+                            Bukkit.getLogger().warning(RaceManager.getInstance().getRaceResult(race.getName(), "fastest", null));
+                            break;
+                        }
                     }
-                });
+                    VPListener.getRACE_DRIVERS().forEach((uuid, driver) -> {
+                        if(driver.isDriving() && !driver.isFinished()) {
+                            race.getRaceLapStorage().update(driver);
+                        }
+                    });
+                }
+                if(!removingRaces.isEmpty()) {
+                    LISTENING.removeAll(removingRaces);
+                }
             }
         };
         if(timer == null) timer = new Timer("F1MC RaceListener");

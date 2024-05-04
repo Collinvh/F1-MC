@@ -11,6 +11,7 @@ import lombok.Getter;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -40,6 +41,8 @@ public class RaceCarGUI {
     private boolean isInMini_game;
 
     private final int runnableID;
+
+    private Player intialOpenedPlayer;
 
     public RaceCarGUI(RaceCar car) {
         this.car = car;
@@ -104,28 +107,41 @@ public class RaceCarGUI {
             event.setCancelled(true);
             return;
         }
-        if(TyreManager.isTyre(event.getNewItem())) {
+        if(!car.getPlayer().isInPit() || car.getLinkedVehicle().getCurrentSpeedInKm() > 0) {
+            event.setCancelled(true);
+        }
+        if(TyreManager.isTyre(event.getNewItem()) && event.getPreviousItem() == null) {
             isWaitingOnTask = true;
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    startMinigame(event.getPreviousItem() != null, event.getNewItem());
+                    startMinigame(false, event.getNewItem());
                     isWaitingOnTask = false;
                 }
             }.runTaskLater(F1MC.getInstance(), 1);
             event.setCancelled(false);
         } else if(event.getPreviousItem() != null) {
-            Bukkit.getLogger().warning("previtem not null");
-            startMinigame(true, event.getNewItem());
-            event.setCancelled(true);
+            if(event.getNewItem() == null) {
+                isWaitingOnTask = true;
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        startMinigame(true, event.getNewItem());
+                        isWaitingOnTask = false;
+                    }
+                }.runTaskLater(F1MC.getInstance(), 1);
+                event.setCancelled(true);
+            } else {
+                event.setCancelled(true);
+            }
         } else {
-            Bukkit.getLogger().warning("just cancel it mf");
             event.setCancelled(true);
         }
     }
 
     public void openWindow(Player player) {
         Window window;
+        if(intialOpenedPlayer == null) intialOpenedPlayer = player;
         if(isInMini_game) {
             window = Window.single()
                     .setViewer(player)
@@ -139,6 +155,20 @@ public class RaceCarGUI {
                     .setTitle(ChatColor.of("#767676") + "Change Tyre")
                     .build();
         }
+        window.addCloseHandler(new BukkitRunnable() {
+            @Override
+            public void run() {
+                if(player == intialOpenedPlayer) {
+                    intialOpenedPlayer = null;
+                    for (Player allCurrentViewer : bandGui.findAllCurrentViewers()) {
+                        allCurrentViewer.closeInventory();
+                    }
+                    for (Player allCurrentViewer : minigameGui.findAllCurrentViewers()) {
+                        allCurrentViewer.closeInventory();
+                    }
+                }
+            }
+        });
         window.open();
     }
 
@@ -175,9 +205,9 @@ public class RaceCarGUI {
                 }
                 bandInventory.forceSetItem(UpdateReason.SUPPRESSED,0, newItem);
             }
-            players.forEach(player -> {
+            players.forEach(p -> {
                 Window window = Window.single()
-                        .setViewer(player)
+                        .setViewer(p)
                         .setGui(bandGui)
                         .setTitle(ChatColor.of("#767676") + "Change Tyre")
                         .build();
@@ -203,13 +233,6 @@ public class RaceCarGUI {
                 allCurrentViewer.closeInventory();
             }
             return false;
-        } else {
-            if(car.getLinkedVehicle().getCurrentSpeedInKm() > 1) {
-                for (Player allCurrentViewer : bandGui.findAllCurrentViewers()) {
-                    allCurrentViewer.closeInventory();
-                }
-                return false;
-            }
         }
         return true;
     }

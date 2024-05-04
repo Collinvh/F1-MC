@@ -130,7 +130,7 @@
             <artifactId>VehiclesPlusPro</artifactId>
             <version>2.4.3</version>
             <scope>system</scope>
-            <systemPath>${pom.basedir}/lib/VehiclesPlus.jar</systemPath>
+            <systemPath>${pom.basedir}/lib/VehiclesPlus-2.4.3.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>net.dv8tion</groupId>
@@ -180,6 +180,28 @@
             <artifactId>decentholograms</artifactId>
             <version>2.8.6</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.megavex</groupId>
+            <artifactId>scoreboard-library-api</artifactId>
+            <version>2.1.6</version>
+        </dependency>
+        <dependency>
+            <groupId>net.megavex</groupId>
+            <artifactId>scoreboard-library-implementation</artifactId>
+            <version>2.1.6</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.megavex</groupId>
+            <artifactId>scoreboard-library-modern</artifactId>
+            <version>2.1.6</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.kyori</groupId>
+            <artifactId>adventure-platform-bukkit</artifactId>
+            <version>4.0.1</version>
         </dependency>
     </dependencies>
 </project>

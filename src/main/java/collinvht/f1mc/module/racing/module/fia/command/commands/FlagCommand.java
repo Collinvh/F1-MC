@@ -58,9 +58,15 @@ public class FlagCommand extends CommandUtil {
                         if (type == FlagType.SC || type == FlagType.VSC) {
                             FlagManager.setAll(race, type);
                             onlinePlayer.sendMessage(prefix + type.getChatColor() + type.getName() + " deployed, reduce speed to " + type.getMaxSpeed() + "km/h.");
+                            if(RaceManager.getTimingRace() != null) {
+                                RaceManager.getTimingRace().getRaceTimer().setPaused(false);
+                            }
                         } else if (type == FlagType.GREEN) {
                             FlagManager.set(race, type, sector);
                             onlinePlayer.sendMessage(prefix + type.getChatColor() + type.getName() + " flag in sector "+ sector +". You can continue to race!");
+                            if(RaceManager.getTimingRace() != null) {
+                                RaceManager.getTimingRace().getRaceTimer().setPaused(false);
+                            }
                         } else {
                             boolean stopSession = type.isStopsSession();
                             StringBuilder builder = new StringBuilder();
@@ -68,11 +74,17 @@ public class FlagCommand extends CommandUtil {
                             if(!stopSession) {
                                 builder.append(" in sector ").append(sector);
                                 FlagManager.set(race, type, sector);
+                                if(RaceManager.getTimingRace() != null) {
+                                    RaceManager.getTimingRace().getRaceTimer().setPaused(false);
+                                }
                             }
                             builder.append(", reduce speed to ").append(type.getMaxSpeed()).append("km/h");
                             if(stopSession) {
                                 builder.append("\nAfter that return to the pit-lane.");
                                 FlagManager.setAll(race, type);
+                                if(RaceManager.getTimingRace() != null) {
+                                    RaceManager.getTimingRace().getRaceTimer().setPaused(true);
+                                }
                             }
                             onlinePlayer.sendMessage(builder.toString());
                         }
@@ -81,6 +93,12 @@ public class FlagCommand extends CommandUtil {
                     FlagType type = FlagType.fromString(args[2]);
                     if (type == null) return "Invalid flag type";
                     FlagManager.setAll(race, type);
+                    if(RaceManager.getTimingRace() != null) {
+                        RaceManager.getTimingRace().getRaceTimer().setPaused(type.isStopsSession());
+                        if(type.isStopsSession()) {
+                            RaceManager.getTimingRace().getRaceTimer().setRed();
+                        }
+                    }
                     for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
                         if (type == FlagType.SC || type == FlagType.VSC) {
                             onlinePlayer.sendMessage(prefix + type.getChatColor() + type.getName() + " deployed, reduce speed to " + type.getMaxSpeed() + "km/h.");

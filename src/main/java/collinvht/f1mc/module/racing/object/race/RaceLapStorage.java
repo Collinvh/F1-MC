@@ -1,6 +1,7 @@
 package collinvht.f1mc.module.racing.object.race;
 
 import collinvht.f1mc.module.discord.DiscordModule;
+import collinvht.f1mc.module.racing.manager.managers.RaceManager;
 import collinvht.f1mc.module.racing.module.fia.command.commands.DSQCommand;
 import collinvht.f1mc.module.racing.object.Cuboid;
 import collinvht.f1mc.module.racing.object.NamedCuboid;
@@ -12,6 +13,7 @@ import collinvht.f1mc.module.racing.object.laptime.LaptimeStorage;
 import collinvht.f1mc.util.DefaultMessages;
 import collinvht.f1mc.util.Permissions;
 import collinvht.f1mc.util.Utils;
+import de.tr7zw.changeme.nbtapi.NBTItem;
 import lombok.Getter;
 import lombok.Setter;
 import me.legofreak107.vehiclesplus.vehicles.vehicles.objects.SpawnedVehicle;
@@ -68,12 +70,14 @@ public class RaceLapStorage {
         if(raceDriver.isFinished()) return;
         Player player = Bukkit.getPlayer(raceDriver.getDriverUUID());
         if(player == null) return;
+        if(!player.isOnline()) return;
+        if(raceDriver.getVehicle() == null) return;
         if(raceDriver.isDisqualified())  {
             if(raceDriver.isInPit()) {
-                if(raceDriver.getVehicle() == null) return;
                 if(raceDriver.getVehicle().getCurrentSpeedInKm() > 140) {
                     if(raceDriver.getSpeedingFlags() >= 30) {
-                        player.ban(prefix + "Speeding in the pits and continuing to do so", Duration.of(200, ChronoUnit.MINUTES), "F1-MC Plugin", true);
+                        //TODO:
+                        //player.ban(prefix + "Speeding in the pits and continuing to do so", Duration.of(200, ChronoUnit.MINUTES), "F1-MC Plugin", true);
                         raceDriver.setSpeedingFlags(0);
                     } else {
                         raceDriver.setSpeedingFlags(raceDriver.getSpeedingFlags()+1);
@@ -84,8 +88,15 @@ public class RaceLapStorage {
             }
             return;
         }
-        if(!player.isOnline()) return;
-        if(raceDriver.getVehicle() == null) return;
+        if(RaceManager.getDrivingPlayers().get(player) != null) {
+            if(RaceManager.getDrivingPlayers().get(player) != race) {
+                RaceManager.getDrivingPlayers().put(player, race);
+            }
+        } else {
+            RaceManager.getDrivingPlayers().put(player, race);
+        }
+
+
         DriverLaptimeStorage driverLaptimeStorage = raceDriver.getLaptimes(race);
         LaptimeStorage storage = driverLaptimeStorage.getCurrentLap();
         if(storage == null) {
@@ -103,6 +114,7 @@ public class RaceLapStorage {
                 Cuboid pitExit = race.getStorage().getPitExit().getCuboid();
                 if(pitExit.containsLocation(location)) {
                     raceDriver.setPassedPitExit(race);
+                    Bukkit.getLogger().warning("pitout");
                 } else {
                     if(spawnedVehicle.getCurrentSpeedInKm() > 80) {
                         if(spawnedVehicle.getCurrentSpeedInKm() > 130) {
@@ -275,11 +287,29 @@ public class RaceLapStorage {
                     if (!driverLaptimeStorage.isInvalidated()) {
                         player.sendMessage(prefix + ChatColor.GRAY + "Your S3 is " + ChatColor.RESET + Utils.millisToTimeString(laptimeStorage.getS3().getSectorLength()));
                         player.sendMessage(prefix + ChatColor.GRAY + "Your lap time is " + ChatColor.RESET + Utils.millisToTimeString(laptimeStorage.getLapData().getSectorLength()));
+                        driverLaptimeStorage.addLaptime(storage.copy(), raceMode);
                     } else {
                         player.sendMessage(prefix + ChatColor.RED + "Your S3 is " + Utils.millisToTimeString(laptimeStorage.getS3().getSectorLength()));
                         player.sendMessage(prefix + ChatColor.RED + "Your lap is invalid | " + Utils.millisToTimeString(laptimeStorage.getLapData().getSectorLength()));
                         driverLaptimeStorage.setInvalidated(false);
                     }
+                    raceDriver.setCurrentLap(raceDriver.getCurrentLap() + 1);
+                    if (raceMode.isLapped()) {
+                        if (raceDriver.getCurrentLap() >= race.getLaps()) {
+                            raceDriver.setFinished(true);
+                            final int position = finishers.size() + 1;
+                            finishers.put(position, raceDriver.getDriverUUID());
+
+                            player.sendMessage(ChatColor.GRAY + "You finished on position " + position);
+
+                            for (Player p : Bukkit.getOnlinePlayers()) {
+                                if (Permissions.FIA_ADMIN.hasPermission(p) || Permissions.FIA_RACE.hasPermission(p)) {
+                                    p.sendMessage(player.getDisplayName() + " finished on position " + position);
+                                }
+                            }
+                        }
+                    }
+
                     laptimeStorage.getCuboids().clear();
                     laptimeStorage.getS1_minis().clear();
                     laptimeStorage.getS2_minis().clear();

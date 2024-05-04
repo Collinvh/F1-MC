@@ -86,7 +86,6 @@ public class DriverLaptimeStorage {
     public void resetLaptimes() {
         laptimes = new LinkedList<>();
         sectors = 0;
-        currentLap = null;
         fastestLap = null;
         bestS1 = 0;
         bestS2 = 0;

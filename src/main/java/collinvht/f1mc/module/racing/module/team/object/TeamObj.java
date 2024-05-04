@@ -115,7 +115,7 @@ public class TeamObj {
             JsonArray memberArray = json.getAsJsonArray("members");
 
 
-            TeamObj team = new TeamObj(name);
+            TeamObj team = new TeamObj(name.toLowerCase());
             team.setTeamColor(ChatColor.getByChar(color.charAt(1)));
             team.setGroupName(groupname);
             if(json.get("Owner") != null) {
@@ -207,7 +207,7 @@ public class TeamObj {
     }
 
     public void addMember(UUID uuid) {
-        members.add(uuid);
+        this.members.add(uuid);
         LuckPerms luckPerms = Utils.getLuckperms();
 
         Group group = luckPerms.getGroupManager().getGroup(groupName);
@@ -226,7 +226,7 @@ public class TeamObj {
     }
 
     public void removeMember(UUID uuid) {
-        members.remove(uuid);
+        this.members.remove(uuid);
         LuckPerms luckPerms = Utils.getLuckperms();
 
         Group group = luckPerms.getGroupManager().getGroup(groupName);

@@ -1,6 +1,9 @@
 package collinvht.f1mc.module.racing.module.team.command;
 
 import collinvht.f1mc.module.racing.module.team.manager.TeamManager;
+import collinvht.f1mc.module.racing.module.tyres.commands.command.TyreCommand;
+import collinvht.f1mc.module.racing.module.tyres.listeners.TyreListeners;
+import collinvht.f1mc.module.racing.module.tyres.listeners.listener.TyreGUI;
 import collinvht.f1mc.util.Permissions;
 import collinvht.f1mc.util.commands.CommandUtil;
 import me.legofreak107.vehiclesplus.vehicles.api.VehiclesPlusAPI;
@@ -63,7 +66,7 @@ public class RaceTeamCommand extends CommandUtil implements TabCompleter {
             if (player == null) {
                 return prefix + "Player doesn't exist";
             }
-            return prefix + removeMember(args[1].toLowerCase(), player.getUniqueId());
+            return prefix + removeMember(args[1].toLowerCase(), player);
         }, Permissions.FIA_TEAM, Permissions.FIA_ADMIN);
 
         /*
@@ -94,6 +97,12 @@ public class RaceTeamCommand extends CommandUtil implements TabCompleter {
                 return prefix + "This is only possible as a player";
             }
         }, invertedAdmin, invertedFIA);
+        addPart("tyregui", 1, "/raceteam tyregui [team]", ((sender, command, label, args) -> {
+            if(sender instanceof Player) {
+                TyreGUI.open((Player) sender, TeamManager.getTEAMS().get(args[1].toLowerCase()));
+            }
+            return prefix + "Opened gui";
+        }), Permissions.FIA_ADMIN);
         /*
         This is for owners only,
         they can kick any members they desire.
@@ -134,13 +143,14 @@ public class RaceTeamCommand extends CommandUtil implements TabCompleter {
                 list.add("set");
                 list.add("add");
                 list.add("remove");
+                list.add("tyregui");
                 list.add("delete");
                 list.add("list");
                 return list;
             }
             if(args.length == 2) {
                 return switch (args[0]) {
-                    case "spawn", "set", "add", "remove", "delete" -> {
+                    case "spawn", "set", "add", "remove", "delete", "tyregui" -> {
                         TeamManager.getTEAMS().forEach((s1, teamObj) -> list.add(s1));
                         yield list;
                     }

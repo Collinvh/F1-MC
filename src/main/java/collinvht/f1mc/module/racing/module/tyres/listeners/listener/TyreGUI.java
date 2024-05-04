@@ -36,6 +36,7 @@ public class TyreGUI implements Listener {
     public static String prefix = DefaultMessages.PREFIX;
     public static void open(Player player, TeamObj teamObject) {
         if(teamObject != null) {
+            Bukkit.getLogger().warning(teamObject.getTeamPrefix());
             ArrayList<RaceCar> raceCars = teamObject.getRaceCars();
 
             if (!raceCars.isEmpty()) {
@@ -46,8 +47,8 @@ public class TyreGUI implements Listener {
                             raceCar.getRaceCarGUI().openWindow(player);
                             return;
                         }
-                        sizeInPit += raceCar.getPlayer().isInPit() ? 1 : 0;
                     }
+                    sizeInPit += 1;
                 }
                 if(sizeInPit > 0) {
                     Gui gui = Gui.normal()
@@ -81,7 +82,7 @@ public class TyreGUI implements Listener {
                                                                     return;
                                                                 }
 
-                                                                if(skullCar.getLinkedVehicle().getHolder().getLocation().distance(click.getPlayer().getLocation()) > 5) {
+                                                                if(skullCar.getLinkedVehicle().getHolder().getLocation().distance(click.getPlayer().getLocation()) > 10) {
                                                                     event.getWhoClicked().sendMessage(prefix + "Car is not close enough");
                                                                     event.setCancelled(true);
                                                                     return;

@@ -2,6 +2,7 @@ package collinvht.f1mc.module.racing.manager.managers;
 
 import collinvht.f1mc.F1MC;
 import collinvht.f1mc.module.discord.DiscordModule;
+import collinvht.f1mc.module.racing.object.race.RaceTimer;
 import collinvht.f1mc.module.vehiclesplus.listener.listeners.VPListener;
 import collinvht.f1mc.module.vehiclesplus.objects.RaceDriver;
 import collinvht.f1mc.module.racing.object.NamedCuboid;
@@ -16,8 +17,10 @@ import com.google.gson.JsonObject;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.regions.Region;
 import lombok.Getter;
+import lombok.Setter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.TextChannel;
+import org.apache.commons.collections4.map.ListOrderedMap;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -42,6 +45,13 @@ public class RaceManager extends ModuleBase {
 
     @Getter
     private static final HashMap<String, Race> RACES = new HashMap<>();
+    @Getter
+    private static final HashMap<Player, Race> drivingPlayers = new HashMap<>();
+
+    @Getter
+    private static boolean isRunningTimer;
+    @Getter
+    private static Race timingRace;
 
     public RaceManager() {
         RaceListener.initialize();
@@ -62,6 +72,11 @@ public class RaceManager extends ModuleBase {
     @Override
     public void saveModule() {
         saveRaces();
+        if(timingRace != null) {
+            if(timingRace.getRaceTimer() != null) {
+                timingRace.getRaceTimer().stop();
+            }
+        }
     }
 
     private void saveRaces() {
@@ -110,7 +125,11 @@ public class RaceManager extends ModuleBase {
                 }
             }
             }
-            return RaceListener.startListeningTo(getRace(raceName), modeInt);
+            Race race = getRace(raceName);
+            if(race.getRaceTimer() != null) {
+                if (race.getRaceTimer().isFinished()) race.setRaceTimer(null);
+            }
+            return RaceListener.startListeningTo(race, modeInt);
         } catch (NumberFormatException e) {
             return DefaultMessages.INVALID_NUMBER;
         }
@@ -167,7 +186,7 @@ public class RaceManager extends ModuleBase {
                         }
                     });
 
-                    LinkedHashMap<RaceDriver, Long> treeMap = Utils.sortByValueDesc(sectors);
+                    ListOrderedMap<RaceDriver, Long> treeMap = Utils.sortByValueDesc(sectors);
                     if (treeMap.values().toArray().length > 0) {
                         StringBuilder builder = new StringBuilder();
                         builder.append(RacingMessages.FASTEST_LAPS);
@@ -205,7 +224,7 @@ public class RaceManager extends ModuleBase {
 
                     drivers.forEach((unused, driver) -> sectors.put(driver, (long) driver.getLaptimes(race).getSectors()));
 
-                    LinkedHashMap<RaceDriver, Long> treeMap = Utils.sortByValueDesc(sectors);
+                    ListOrderedMap<RaceDriver, Long> treeMap = Utils.sortByValueDesc(sectors);
 
 
                     if (!treeMap.isEmpty()) {
@@ -505,7 +524,7 @@ public class RaceManager extends ModuleBase {
                     });
                 }
                 AtomicInteger pos = new AtomicInteger();
-                LinkedHashMap<RaceDriver, Long> treeMap = Utils.sortByValueDesc(sectors);
+                ListOrderedMap<RaceDriver, Long> treeMap = Utils.sortByValueDesc(sectors);
                 if (treeMap.values().toArray().length > 0) {
                     treeMap.forEach((driver, unused) -> {
                         pos.getAndIncrement();
@@ -562,9 +581,49 @@ public class RaceManager extends ModuleBase {
             }
             return "Image created";
         } catch (IOException e) {
-            e.printStackTrace();
+            Bukkit.getLogger().severe(e.getMessage());
             return "Error creating image.";
         }
     }
+    public String stopTimer() {
+        if(!isRunningTimer) return "No timer running at the moment";
+        timingRace.getRaceTimer().stop();
+        return "Timer Stopped";
+    }
 
+    public static void setIsRunningTimer(boolean bool) {
+        if(!bool) {
+            timingRace = null;
+        }
+        isRunningTimer = bool;
+    }
+
+    public void startTimerForNewPlayer(Player player) {
+        if(isRunningTimer && timingRace != null) {
+            timingRace.getRaceTimer().addPlayer(player);
+        }
+    }
+    public String createTimer(String race, String arg) {
+        if(isRunningTimer) return "There is already a timer running!";
+        if(!raceExists(race)) return RacingMessages.RACE_DOES_NOT_EXIST;
+        Race raceObj = getRace(race);
+        if(RaceListener.isListeningToRace(raceObj)) {
+            if(raceObj.getRaceLapStorage().getRaceMode().isLapped()) {
+                return "Can't start a timer for a lapped mode.";
+            }
+        }
+        try {
+            double length = Double.parseDouble(arg);
+            raceObj.setRaceTimer(new RaceTimer((long) ((length*1000)*60)));
+            timingRace = raceObj;
+            isRunningTimer = true;
+            return "Timer Started";
+        } catch (NumberFormatException e) {
+            return DefaultMessages.INVALID_NUMBER;
+        }
+    }
+
+    public Race getRaceForPlayer(Player player) {
+        return getDrivingPlayers().get(player);
+    }
 }

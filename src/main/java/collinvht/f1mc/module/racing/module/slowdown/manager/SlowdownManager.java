@@ -13,6 +13,8 @@ import com.google.gson.JsonObject;
 import dev.lone.itemsadder.api.CustomBlock;
 import me.legofreak107.vehiclesplus.vehicles.vehicles.objects.SpawnedVehicle;
 import me.legofreak107.vehiclesplus.vehicles.vehicles.objects.VehicleStats;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -120,22 +122,22 @@ public class SlowdownManager extends ModuleBase {
             }
         }
         vehicleRunnable = new BukkitRunnable() {
-            double update = 10;
             @Override
             public void run() {
                 VPListener.getRACE_DRIVERS().forEach((uuid, raceDriver) -> {
                     if(raceDriver.getVehicle() != null) {
                         if(raceDriver.isDriving()) {
                             update(raceDriver);
+                            if(raceDriver.getVehicle() != null) {
+                                if (Bukkit.getPlayer(raceDriver.getDriverUUID()) != null) {
+                                    SpawnedVehicle spawnedVehicle = raceDriver.getVehicle();
+                                    Bukkit.getPlayer(raceDriver.getDriverUUID()).spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy("Speed: " + spawnedVehicle.getCurrentSpeedInKm() + " | Fuel: " + spawnedVehicle.getStorageVehicle().getVehicleStats().getCurrentFuel()));
+                                }
+                            }
                         }
                     }
                 });
-                if(update == 10) {
-                    VPListener.getRACE_CARS().forEach((uuid, car) -> car.updateTyre());
-                    update = 0;
-                } else {
-                    update += 1;
-                }
+                VPListener.getRACE_CARS().forEach((uuid, car) -> car.updateTyre());
             }
         }.runTaskTimer(F1MC.getInstance(), 0, 0).getTaskId();
 
@@ -151,8 +153,10 @@ public class SlowdownManager extends ModuleBase {
             if(block.getBlockData() instanceof Slab) {
                 block = player.getLocation().clone().add(0, -1.2, 0).getBlock();
             }
-            float steering = vehicle.getBaseVehicle().getTurningRadiusSettings().getBase();
-            float acceleration = vehicle.getBaseVehicle().getAccelerationSettings().getBase();
+            float steering = vehicle.getBaseVehicle().getTurningRadiusSettings().getLowSpeed();
+            float steeringHigh = vehicle.getBaseVehicle().getTurningRadiusSettings().getHighSpeed();
+            float acceleration = vehicle.getBaseVehicle().getAccelerationSettings().getLowSpeed();
+            float accelerationHigh = vehicle.getBaseVehicle().getAccelerationSettings().getHighSpeed();
             float braking = vehicle.getBaseVehicle().getBrakeSettings().getBase();
             if(block.getType() == Material.NOTE_BLOCK) {
                 CustomBlock customBlock = CustomBlock.byAlreadyPlaced(block);
@@ -160,18 +164,24 @@ public class SlowdownManager extends ModuleBase {
                     if (customslowDowns.get(customBlock.getNamespacedID()) != null) {
                         SlowdownIAObject obj = customslowDowns.get(customBlock.getNamespacedID());
                         steering *= (float) obj.getSteeringPercent();
+                        steeringHigh *= (float) obj.getSteeringPercent();
                         acceleration *= (float) (obj.getSteeringPercent()*2);
+                        accelerationHigh *= (float) (obj.getSteeringPercent()*2);
                         braking *= (float) (obj.getSteeringPercent()*2);
                     }
                 }
             } else if (slowDowns.containsKey(block.getType())) {
                 SlowdownObject obj = slowDowns.get(block.getType());
                 steering *= (float) obj.getSteeringPercent();
-                acceleration *= (float) (obj.getSteeringPercent());
-                braking *= (float) (obj.getSteeringPercent());
+                steeringHigh *= (float) obj.getSteeringPercent();
+                acceleration *= (float) (obj.getSteeringPercent()*2);
+                accelerationHigh *= (float) (obj.getSteeringPercent()*2);
+                braking *= (float) (obj.getSteeringPercent()*2);
             }
-            stats.setSteering(steering);
-            stats.setAcceleration(acceleration);
+            stats.setLowSpeedSteering(steering);
+            stats.setHighSpeedSteering(steeringHigh);
+            stats.setLowSpeedAcceleration(acceleration);
+            stats.setHighSpeedAcceleration(accelerationHigh);
             stats.setBrakeForce(braking);
         }
     }

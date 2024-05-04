@@ -11,6 +11,10 @@ import com.sk89q.worldedit.math.BlockVector3;
 import lombok.Getter;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
+import net.megavex.scoreboardlibrary.api.ScoreboardLibrary;
+import net.megavex.scoreboardlibrary.api.exception.NoPacketAdapterAvailableException;
+import net.megavex.scoreboardlibrary.api.noop.NoopScoreboardLibrary;
+import org.apache.commons.collections4.map.ListOrderedMap;
 import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -32,6 +36,7 @@ import java.util.*;
 public class Utils {
     private static LuckPerms luckPerms = null;
     private static WorldEditPlugin worldEdit = null;
+    private static ScoreboardLibrary scoreboardLibrary = null;
 
     private static Gson gson;
     private static DatabaseConfig databaseConfig;
@@ -82,6 +87,17 @@ public class Utils {
             Bukkit.getPluginManager().disablePlugin(F1MC.getInstance());
         }
         return null;
+    }
+
+    public static ScoreboardLibrary getScoreboardLibrary() {
+        try {
+            scoreboardLibrary = ScoreboardLibrary.loadScoreboardLibrary(F1MC.getInstance());
+        } catch (NoPacketAdapterAvailableException e) {
+            // If no packet adapter was found, you can fallback to the no-op implementation:
+            scoreboardLibrary = new NoopScoreboardLibrary();
+            F1MC.getInstance().getLogger().warning("No scoreboard packet adapter available!");
+        }
+        return scoreboardLibrary;
     }
 
     public static MysqlDataSource getDatabase() {
@@ -161,12 +177,12 @@ public class Utils {
     /*
     Sorts a map descending. Used for fastest laps finish positions ect.
      */
-    public static LinkedHashMap<RaceDriver, Long> sortByValueDesc(Map<RaceDriver, Long> map) {
+    public static ListOrderedMap<RaceDriver, Long> sortByValueDesc(Map<RaceDriver, Long> map) {
         List<Map.Entry<RaceDriver, Long>> list = new LinkedList<>(map.entrySet());
         list.sort((o1, o2) -> o2.getValue().compareTo(o1.getValue()));
         Collections.reverse(list);
 
-        LinkedHashMap<RaceDriver, Long> result = new LinkedHashMap<>();
+        ListOrderedMap<RaceDriver, Long> result = new ListOrderedMap<>();
         for (Map.Entry<RaceDriver, Long> entry : list) {
             result.put(entry.getKey(), entry.getValue());
         }

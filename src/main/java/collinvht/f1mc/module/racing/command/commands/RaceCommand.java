@@ -25,6 +25,39 @@ public class RaceCommand extends CommandUtil implements TabCompleter {
      */
     @Override
     protected void initializeCommand(@NotNull CommandSender commandSender) {
+        addPart("timer", 1, "/race timer [name] {length}", (sender, command, label, args) -> {
+            if(args.length > 2) {
+                return prefix + racing.createTimer(args[1].toLowerCase(), args[2]);
+            } else {
+                if(args[1].equalsIgnoreCase("stop")) {
+                    return prefix + racing.stopTimer();
+                } else if(args[1].equalsIgnoreCase("pause")) {
+                    if(RaceManager.getTimingRace() != null) {
+                        if(RaceManager.getTimingRace().getRaceTimer().isPaused()) {
+                            RaceManager.getTimingRace().getRaceTimer().setPaused(true);
+                            return prefix + "Timer paused";
+                        } else {
+                            return prefix + "Timer is already paused";
+                        }
+                    } else {
+                        return prefix + "No timer running";
+                    }
+                } else if(args[1].equalsIgnoreCase("unpause")) {
+                    if(RaceManager.getTimingRace() != null) {
+                        if(RaceManager.getTimingRace().getRaceTimer().isPaused()) {
+                            RaceManager.getTimingRace().getRaceTimer().setPaused(false);
+                            return prefix + "Timer unpaused";
+                        } else {
+                            return prefix + "Timer hasn't been paused";
+                        }
+                    } else {
+                        return prefix + "No timer running";
+                    }
+                } else {
+                    return prefix + "Invalid arguments.";
+                }
+            }
+        }, Permissions.FIA_RACE, Permissions.FIA_ADMIN);
         addPart("start", 2, "/race start [name] [mode]", (sender, command, label, args) -> racing.startRace(args[1].toLowerCase(), args[2]), Permissions.FIA_RACE, Permissions.FIA_ADMIN);
         addPart("stop", 1, "/race stop [name]", (sender, command, label, args) -> racing.stopRace(args[1].toLowerCase()), Permissions.FIA_RACE, Permissions.FIA_ADMIN);
         addPart("reset", 1, "/race reset [name]", (sender, command, label, args) -> racing.resetRace(args[1].toLowerCase()), Permissions.FIA_RACE, Permissions.FIA_ADMIN);
@@ -40,11 +73,35 @@ public class RaceCommand extends CommandUtil implements TabCompleter {
     @Nullable
     @Override
     public List<String> onTabComplete(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] arg) {
+        ArrayList<String> list = new ArrayList<>();
+        if(arg.length == 1) {
+            list.add("get");
+        }
+        if(arg.length == 2) {
+            if(arg[0].equalsIgnoreCase("get")) {
+                RaceManager.getRACES().forEach((s1, race) -> list.add(race.getName()));
+            }
+        }
+        if(arg.length == 3) {
+            if(arg[0].equalsIgnoreCase("get")) {
+                list.add("fastest");
+                list.add("result");
+                list.add("position");
+                list.add("record");
+            }
+        }
         if(Permissions.FIA_RACE.hasPermission(commandSender) || Permissions.FIA_ADMIN.hasPermission(commandSender)) {
-            ArrayList<String> list = new ArrayList<>();
             if (arg.length == 2) {
                 return switch (arg[0]) {
-                    case "stop", "reset", "toimage", "delete", "get", "update", "start" -> {
+                    case "timer" -> {
+                        list.add("stop");
+                        list.add("pause");
+                        list.add("unpause");
+                        RaceManager.getRACES().forEach((s1, race) -> list.add(race.getName()));
+                        yield list;
+                    }
+
+                    case "stop", "reset", "toimage", "delete", "update", "start" -> {
                         RaceManager.getRACES().forEach((s1, race) -> list.add(race.getName()));
                         yield list;
                     }
@@ -68,6 +125,7 @@ public class RaceCommand extends CommandUtil implements TabCompleter {
                         list.add("name");
                         yield list;
                     }
+                    case "get" -> list;
                     default -> null;
                 };
             }
@@ -101,6 +159,7 @@ public class RaceCommand extends CommandUtil implements TabCompleter {
                             list.add("pitexit");
                             yield list;
                         }
+                        case "get" -> list;
                         default -> null;
                     };
                 }
@@ -139,11 +198,11 @@ public class RaceCommand extends CommandUtil implements TabCompleter {
             }
             if(arg.length == 1) {
                 list.add("start");
+                list.add("timer");
                 list.add("stop");
                 list.add("reset");
                 list.add("toimage");
                 list.add("delete");
-                list.add("get");
                 list.add("create");
                 list.add("list");
                 list.add("update");
@@ -151,6 +210,7 @@ public class RaceCommand extends CommandUtil implements TabCompleter {
             }
         }
 
-        return null;
+        if(list.isEmpty()) return null;
+        return list;
     }
 }

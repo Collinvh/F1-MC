@@ -46,16 +46,24 @@ public class RaceCar {
             if (tyre == null) {
                 stats.setCurrentSpeed(0.0);
                 stats.setSpeed(0);
-                stats.setSteering(0.0f);
+                stats.setLowSpeedSteering(0.0f);
+                stats.setHighSpeedSteering(0.0f);
             } else {
-                tyre = raceCarGUI.getTyre();
-                stats.setSpeed((int) (baseVehicle.getSpeedSettings().getBase() + tyre.getDouble("f1mc.extraSpeed")));
-                stats.setSteering((float) (baseVehicle.getTurningRadiusSettings().getBase() + tyre.getDouble("f1mc.steering")));
-
                 double dura = tyre.getDouble("f1mc.dura");
-                double degrate = tyre.getDouble("f1mc.degradationRate");
-                tyre.setDouble("f1mc.dura", (dura-degrate * (getLinkedVehicle().getCurrentSpeedInKm())/100));
+                double degrate = tyre.getDouble("f1mc.degradationRate")/20;
+                if(dura <= 0) {
+                    stats.setSpeed(10);
+                    return;
+                }
+                if(!player.isInPit()) {
+                    stats.setSpeed((int) (baseVehicle.getSpeedSettings().getBase() + tyre.getDouble("f1mc.extraSpeed")));
+                } else {
+                    stats.setSpeed(79);
+                }
+                stats.setLowSpeedSteering((float) (baseVehicle.getTurningRadiusSettings().getLowSpeed() + tyre.getDouble("f1mc.steering")));
+                stats.setHighSpeedSteering((float) (baseVehicle.getTurningRadiusSettings().getHighSpeed() + tyre.getDouble("f1mc.steering")));
 
+                tyre.setDouble("f1mc.dura", (dura-degrate * (getLinkedVehicle().getCurrentSpeedInKm())/100));
                 ArrayList<String> lore = new ArrayList<>();
                 lore.add(ChatColor.GRAY + "Durability left = " + Utils.round(dura - degrate, 1) + "/" + tyre.getDouble("f1mc.maxdura"));
                 lore.add(ChatColor.GRAY + "Extra Speed = " + tyre.getDouble("f1mc.extraSpeed") + "km/h");

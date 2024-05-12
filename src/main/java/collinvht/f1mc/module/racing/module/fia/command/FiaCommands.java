@@ -7,7 +7,7 @@ public class FiaCommands extends CommandModuleBase {
     @Override
     public void load() {
         registerCommand("flag", new FlagCommand());
-        registerCommand("dsq", new DSQCommand());
+        registerCommand("dsq", new DSQCommand(), new DSQCommand());
         registerCommand("penalty", new PenaltyCommand());
         registerCommand("warning", new WarningCommand());
         registerCommand("announcement", new AnnouncementCommand());

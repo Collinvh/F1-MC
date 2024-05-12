@@ -3,14 +3,12 @@ package collinvht.f1mc.module.racing.module.team.manager;
 import collinvht.f1mc.F1MC;
 import collinvht.f1mc.module.racing.module.team.object.TeamObj;
 import collinvht.f1mc.module.racing.object.race.RaceCar;
-import collinvht.f1mc.module.vehiclesplus.listener.listeners.VPListener;
 import collinvht.f1mc.util.Utils;
 import collinvht.f1mc.util.modules.ModuleBase;
 import lombok.Getter;
 import me.legofreak107.vehiclesplus.vehicles.api.VehiclesPlusAPI;
 import me.legofreak107.vehiclesplus.vehicles.api.objects.spawn.SpawnMode;
 import me.legofreak107.vehiclesplus.vehicles.vehicles.objects.BaseVehicle;
-import me.legofreak107.vehiclesplus.vehicles.vehicles.objects.SpawnedVehicle;
 import me.legofreak107.vehiclesplus.vehicles.vehicles.objects.StorageVehicle;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.model.data.DataType;
@@ -28,12 +26,12 @@ import java.util.HashMap;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class TeamManager extends ModuleBase {
     @Getter
     private static TeamManager instance;
 
+    @Getter
     private static final HashMap<String, TeamObj> TEAMS = new HashMap<>();
 
     private static LuckPerms luckPerms;
@@ -56,6 +54,7 @@ public class TeamManager extends ModuleBase {
     }
 
     public static String createNewTeam(String name) {
+        name = name.toLowerCase();
         TeamObj team = new TeamObj(name);
         String str = createTeam(team);
         TEAMS.put(name, team);
@@ -176,14 +175,13 @@ public class TeamManager extends ModuleBase {
     }
 
 
-    public static String removeMember(String team, UUID uuid) {
-        TeamObj teamObj = TEAMS.get(team);
-        if(teamObj != null) {
-            TeamObj currentTeam = getTeamFromUUID(uuid);
-            if(currentTeam != null) currentTeam.removeMember(uuid);
-            teamObj.removeMember(uuid);
-            if(teamObj.getOwner() == uuid) teamObj.setOwner(null, true);
-            return "Member removed.";
+    public static String removeMember(String team, Player player) {
+        if(player != null) {
+            TeamObj teamObj = getTEAMS().get(team.toLowerCase());
+            if (teamObj != null) {
+                teamObj.removeMember(player.getUniqueId());
+                return "Member removed.";
+            }
         }
         return "Team doesn't exist.";
     }
@@ -201,7 +199,7 @@ public class TeamManager extends ModuleBase {
     public static String leave(UUID uuid) {
         TeamObj team = getTeamFromUUID(uuid);
         if(team != null) {
-            if(team.getOwner() == uuid) {
+            if(team.getOwner().equals(uuid)) {
                 return "You are the owner of this team.";
             }
             team.removeMember(uuid);
@@ -213,7 +211,7 @@ public class TeamManager extends ModuleBase {
     public static String accept(UUID owner, UUID uuid) {
         TeamObj team = getTeamFromUUID(owner);
         if(team != null) {
-            if(team.getOwner() == owner) {
+            if(team.getOwner().equals(owner)) {
                 if(team.getMembers().contains(uuid)) return "Player is already in your team.";
                 TeamObj uuidteam = getTeamFromUUID(uuid);
                 if(uuidteam != null) {
@@ -267,7 +265,7 @@ public class TeamManager extends ModuleBase {
     }
 
     public static String listTeams() {
-        if(TEAMS.size() == 0) return "No teams are created yet.";
+        if(TEAMS.isEmpty()) return "No teams are created yet.";
         StringBuilder builder = new StringBuilder();
         builder.append("Team list\n");
         TEAMS.forEach((s, team) -> builder.append(s).append("\n"));
@@ -275,13 +273,13 @@ public class TeamManager extends ModuleBase {
     }
 
     private static TeamObj getTeamFromUUID(UUID uuid) {
-        AtomicReference<TeamObj> team = new AtomicReference<>();
+        final TeamObj[] raceTeam = new TeamObj[1];
         TEAMS.forEach((s, team1) -> {
             if(team1.getMembers().contains(uuid)) {
-                team.set(team1);
+                raceTeam[0] = team1;
             }
         });
-        return team.get();
+        return raceTeam[0];
     }
 
     private void loadTeams() {

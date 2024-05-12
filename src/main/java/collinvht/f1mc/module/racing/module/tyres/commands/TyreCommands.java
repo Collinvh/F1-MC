@@ -6,6 +6,6 @@ import collinvht.f1mc.util.modules.CommandModuleBase;
 public class TyreCommands extends CommandModuleBase {
     @Override
     public void load() {
-        registerCommand("tyre", new TyreCommand());
+        registerCommand("tyre", new TyreCommand(), new TyreCommand());
     }
 }

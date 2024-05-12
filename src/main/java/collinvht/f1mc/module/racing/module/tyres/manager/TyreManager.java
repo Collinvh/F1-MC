@@ -3,8 +3,6 @@ package collinvht.f1mc.module.racing.module.tyres.manager;
 import collinvht.f1mc.F1MC;
 import collinvht.f1mc.module.racing.module.tyres.listeners.TyreListeners;
 import collinvht.f1mc.module.racing.module.tyres.obj.TyreBaseObject;
-import collinvht.f1mc.module.racing.object.race.RaceCar;
-import collinvht.f1mc.module.vehiclesplus.listener.listeners.VPListener;
 import collinvht.f1mc.util.Utils;
 import collinvht.f1mc.util.modules.ModuleBase;
 import com.google.gson.JsonArray;
@@ -23,22 +21,46 @@ import java.io.File;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class TyreManager extends ModuleBase {
     @Getter
     private static final HashMap<String, TyreBaseObject> tyres = new HashMap<>();
     @Getter @Setter
     private static String track = "none";
+
     public static boolean isTyre(ItemStack stack) {
         if(stack == null) return false;
         if(stack.getType().isAir()) return false;
         if(stack.getAmount() <= 0) return false;
         NBTItem item = new NBTItem(stack);
         if(item.hasCustomNbtData()) {
-            return item.hasTag("f1mc.isTyre");
+            if(item.hasTag("f1mc.isTyre")) {
+                return item.getString("f1mc.track").equalsIgnoreCase(track);
+            }
         }
         Bukkit.getLogger().warning("notyre");
         return false;
+    }
+
+    public static String getTyreName(ItemStack stack) {
+        if(stack == null) return "Null";
+        if(stack.getType().isAir()) return "Null";
+        if(stack.getAmount() <= 0) return "Null";
+        NBTItem item = new NBTItem(stack);
+        if(item.hasCustomNbtData()) {
+            if(item.hasTag("f1mc.tyreName")) {
+                return item.getString("f1mc.tyreName");
+            } else {
+                ItemMeta meta = stack.getItemMeta();
+                if(meta != null) {
+                    Bukkit.getLogger().warning(meta.getDisplayName().replace("Tyre", "").replace(" ", "").replace("§7", ""));
+                    return meta.getDisplayName().replace("Tyre", "").replace(" ", "").replace("§7", "");
+                }
+                return "Null";
+            }
+        }
+        return "Null";
     }
 
     public static ItemStack getTyre(String tyreName) {
@@ -57,6 +79,7 @@ public class TyreManager extends ModuleBase {
         NBTItem nbtTyre = new NBTItem(tyre);
         nbtTyre.setBoolean("f1mc.isTyre", true);
         nbtTyre.setDouble("f1mc.dura", tyreBaseObject.getMaxDurability());
+        nbtTyre.setString("f1mc.name", tyreBaseObject.getName());
         nbtTyre.setDouble("f1mc.maxdura", tyreBaseObject.getMaxDurability());
         nbtTyre.setDouble("f1mc.steering", tyreBaseObject.getSteering());
         nbtTyre.setDouble("f1mc.extraSpeed", tyreBaseObject.getExtraSpeed());
@@ -71,6 +94,9 @@ public class TyreManager extends ModuleBase {
         if(files.exists()) {
             try {
                 JsonObject object = (JsonObject) Utils.readJson(files.getAbsolutePath());
+                if(object.get("currentTrack") != null) {
+                    track = object.get("currentTrack").getAsString();
+                }
                 JsonArray array = object.getAsJsonArray("tyres");
                 for (JsonElement jsonElement : array) {
                     JsonObject object2 = jsonElement.getAsJsonObject();
@@ -104,6 +130,7 @@ public class TyreManager extends ModuleBase {
             object2.addProperty("maxDura", tyre.getMaxDurability());
             mainObject.add(object2);
         });
+        object.addProperty("currentTrack", track);
         object.add("tyres", mainObject);
 
         Utils.saveJSON(path, "tyres", object);

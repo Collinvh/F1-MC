@@ -112,8 +112,10 @@ public class TimeTrialManager {
     }
 
     public static void unload() {
-        timeTrialHolders.forEach((uuid, timeTrialHolder) -> timeTrialHolder.stop());
-        timeTrialHolders.clear();
+        if (!timeTrialHolders.isEmpty()) {
+            timeTrialHolders.forEach((uuid, timeTrialHolder) -> timeTrialHolder.stop());
+            timeTrialHolders.clear();
+        }
         File path = Paths.get(F1MC.getInstance().getDataFolder() + "/storage/").toFile();
         JsonObject object = new JsonObject();
         JsonArray mainObject = new JsonArray();
@@ -125,10 +127,6 @@ public class TimeTrialManager {
         });
         object.add("array", mainObject);
 
-        Utils.saveJSON(path, "timetrial", object);
-
-        timeTrialHolders.forEach((uuid, timeTrialHolder) -> timeTrialHolder.stop());
-        timeTrialHolders.clear();
         File path2 = Paths.get(F1MC.getInstance().getDataFolder() + "/storage/").toFile();
         JsonObject object2 = new JsonObject();
         JsonArray mainObject2 = new JsonArray();
@@ -148,28 +146,31 @@ public class TimeTrialManager {
         object2.add("array", mainObject2);
 
         Utils.saveJSON(path2, "timetrial_rivals", object2);
+        Utils.saveJSON(path, "timetrial", object);
     }
 
     public static Gui getGui(Player player) {
         if(timeTrialHolders.containsKey(player.getUniqueId())) {
             if (gui == null) {
-                gui = Gui.normal().setStructure("# # # # # # # # #", "# # A # B # C # #", "# # # # R # # # #")
-                        .addIngredient('A', createTrack("mexico", 43921, "&aMexico City"))
-                        .addIngredient('B', createTrack("hockenheim", 43579, "&aHockenheim"))
-                        .addIngredient('C', createTrack("gb", 44711, "&aEngland"))
+                gui = Gui.normal().setStructure("# # # # # # # # #", "# # B # A # C # #", "! # # # R # # # !")
+                        .addIngredient('A', createTrack("india", 43730, "&aIndia"))
+                        .addIngredient('B', createTrack("gb", 44709, "&aGB"))
+                        .addIngredient('C', createTrack("mexico", 43921, "&aMexico"))
                         .addIngredient('R', new SimpleItem(Utils.emptyStack(Material.RED_STAINED_GLASS_PANE), (click -> {
                             timeTrialHolders.get(click.getPlayer().getUniqueId()).stop();
                             timeTrialHolders.remove(click.getPlayer().getUniqueId());
                         })))
+                        .addIngredient('!', new SimpleItem(Utils.createSkull(1223, "DLC"), (click) -> click.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&',"&cComing soon!"))))
                         .addIngredient('#', new SimpleItem(Utils.emptyStack(Material.GRAY_STAINED_GLASS_PANE))).build();
             }
             return gui;
         } else {
             if (gui2 == null) {
-                gui2 = Gui.normal().setStructure("# # # # # # # # #", "# # A # B # C # #", "# # # # # # # # #")
-                        .addIngredient('A', createTrack("mexico", 43921, "&aMexico City"))
-                        .addIngredient('B', createTrack("hockenheim", 43579, "&aHockenheimring Baden-Württemberg"))
-                        .addIngredient('C', createTrack("gb", 44711, "&aSilverstone Circuit"))
+                gui2 = Gui.normal().setStructure("# # # # # # # # #", "# # B # A # C # #", "! # # # # # # # !")
+                        .addIngredient('A', createTrack("india", 43730, "&aIndia"))
+                        .addIngredient('B', createTrack("gb", 44709, "&aGB"))
+                        .addIngredient('C', createTrack("mexico", 43921, "&aMexico"))
+                        .addIngredient('!', new SimpleItem(Utils.createSkull(1223, "DLC"), (click) -> click.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&',"&cComing soon!"))))
                         .addIngredient('#', new SimpleItem(Utils.emptyStack(Material.GRAY_STAINED_GLASS_PANE))).build();
             }
             return gui2;
@@ -191,7 +192,7 @@ public class TimeTrialManager {
     }
 
     private static void createTrackClick(@NotNull Click click, String track) {
-        Optional<BaseVehicle> baseVehicle = VehiclesPlusAPI.getInstance().getBaseVehicleFromString(carPreference.getOrDefault(click.getPlayer().getUniqueId(), "f1car"));
+        Optional<BaseVehicle> baseVehicle = VehiclesPlusAPI.getInstance().getBaseVehicleFromString(carPreference.getOrDefault(click.getPlayer().getUniqueId(), "f1base"));
         if(baseVehicle.isPresent()) {
             Race race = RaceManager.getInstance().getRace(track);
             if(race != null) {
@@ -241,7 +242,7 @@ public class TimeTrialManager {
             Connection connection = dataSource.getConnection();
             PreparedStatement stmt = connection.prepareStatement("DELETE FROM timetrial_laps WHERE `player_uuid` = \""+ uniqueId +"\" AND `track_name` = \"" + arg.toLowerCase() + "\";");
             int update = stmt.executeUpdate();
-            if(update == 1) {
+            if(update >= 1) {
                 race.updateLeaderboard();
                 return "Reset your lap at " + arg.toLowerCase();
             }

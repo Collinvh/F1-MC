@@ -5,18 +5,24 @@ import collinvht.f1mc.module.vehiclesplus.listener.listeners.VPListener;
 import collinvht.f1mc.module.vehiclesplus.objects.RaceDriver;
 import collinvht.f1mc.util.Utils;
 import collinvht.f1mc.util.commands.CommandUtil;
+import ia.m.S;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.TextChannel;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
-public class DSQCommand extends CommandUtil {
+public class DSQCommand extends CommandUtil implements TabCompleter {
     @Override
     protected void initializeCommand(@NotNull CommandSender commandSender) {
         addPart("remove", 1, "/dsq remove [playername]", ((sender, command, label, args) -> {
@@ -24,10 +30,10 @@ public class DSQCommand extends CommandUtil {
             if (dsqdPlayer != null) {
                 RaceDriver driver = VPListener.getRACE_DRIVERS().get(dsqdPlayer.getUniqueId());
                 if (driver != null) {
-                    if(driver.isDisqualified()) {
+                    if (driver.isDisqualified()) {
                         driver.setDisqualified(false);
                         dsqdPlayer.sendMessage(prefix + "Your disqualification has been revoked");
-                        if(Utils.isEnableDiscordModule()) {
+                        if (Utils.isEnableDiscordModule()) {
                             DiscordModule discordModule = DiscordModule.getInstance();
                             if (discordModule.isInitialized()) {
                                 JDA jda = discordModule.getJda();
@@ -53,7 +59,7 @@ public class DSQCommand extends CommandUtil {
         }));
         addPart("%", 1, "/dsq [playername] [reason]", ((sender, command, label, args) -> {
             Player dsqdPlayer = Bukkit.getPlayer(args[0]);
-            if(dsqdPlayer != null) {
+            if (dsqdPlayer != null) {
                 RaceDriver driver = VPListener.getRACE_DRIVERS().get(dsqdPlayer.getUniqueId());
                 if (driver != null) {
                     if (driver.isDriving()) {
@@ -93,5 +99,29 @@ public class DSQCommand extends CommandUtil {
             }
             return prefix + "Player doesn't exist";
         }));
+    }
+
+    @Nullable
+    @Override
+    public List<String> onTabComplete(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
+        if(args.length == 1) {
+            ArrayList<String> list = new ArrayList<>();
+            list.add("remove");
+            for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+                list.add(onlinePlayer.getName());
+            }
+            return list;
+        }
+        if(args.length == 2) {
+            ArrayList<String> list = new ArrayList<>();
+            if(args[0].equalsIgnoreCase("remove")) {
+                VPListener.getRACE_DRIVERS().forEach((uuid, raceDriver) -> {
+                    if(raceDriver.isDisqualified()) list.add(raceDriver.getDriverName());
+                });
+            }
+            return list;
+        }
+
+        return null;
     }
 }

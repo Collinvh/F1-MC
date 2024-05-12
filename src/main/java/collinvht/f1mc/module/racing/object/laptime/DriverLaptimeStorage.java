@@ -2,6 +2,7 @@ package collinvht.f1mc.module.racing.object.laptime;
 
 import collinvht.f1mc.module.racing.object.race.Race;
 import collinvht.f1mc.module.racing.object.race.RaceMode;
+import collinvht.f1mc.module.vehiclesplus.objects.RaceDriver;
 import collinvht.f1mc.util.Utils;
 import com.mysql.cj.jdbc.MysqlDataSource;
 import lombok.Getter;
@@ -43,6 +44,15 @@ public class DriverLaptimeStorage {
     @Getter @Setter
     private LaptimeStorage fastestLap;
 
+    @Getter @Setter
+    private int invalidCooldown = 3;
+
+    @Getter @Setter
+    private int invalidFlags = 0;
+
+    @Getter @Setter
+    private int penalty = 0;
+
     public DriverLaptimeStorage(Race race) {
         this.race = race;
     }
@@ -50,23 +60,19 @@ public class DriverLaptimeStorage {
     public void addLaptime(LaptimeStorage laptimeOBJ, RaceMode mode) {
         laptimes.add(laptimeOBJ);
 
-        bestS1 = checkSectorTime(bestS1, laptimeOBJ.getS1data().getSectorLength());
-        bestS2 = checkSectorTime(bestS2, laptimeOBJ.getS2data().getSectorLength());
-        bestS3 = checkSectorTime(bestS3, laptimeOBJ.getS3data().getSectorLength());
+        bestS1 = checkSectorTime(bestS1, laptimeOBJ.getS1().getSectorLength());
+        bestS2 = checkSectorTime(bestS2, laptimeOBJ.getS2().getSectorLength());
+        bestS3 = checkSectorTime(bestS3, laptimeOBJ.getS3().getSectorLength());
 
         if(fastestLap != null) {
-            if (checkLapTime(fastestLap.getLaptime(), laptimeOBJ.getLaptime())) {
+            if (checkLapTime(fastestLap.getLapData().getSectorLength(), laptimeOBJ.getLapData().getSectorLength())) {
                 fastestLap = laptimeOBJ;
             }
         } else {
             fastestLap = laptimeOBJ;
         }
-        if(mode == RaceMode.TIMETRIAL) {
-
-        } else {
-            if(laptimes.size() == 10) {
-                //laptimes.remove(0);
-            }
+        if(laptimes.size() == 10) {
+            laptimes.remove(0);
         }
     }
 
@@ -82,18 +88,21 @@ public class DriverLaptimeStorage {
         } else return true;
     }
 
+    @Getter @Setter
+    private long lastPassedSectorTime = -1;
     public void addSector() {
         sectors += 1;
+        lastPassedSectorTime = System.currentTimeMillis();
     }
 
     public void resetLaptimes() {
         laptimes = new LinkedList<>();
         sectors = 0;
-        currentLap = null;
         fastestLap = null;
         bestS1 = 0;
         bestS2 = 0;
         bestS3 = 0;
+        penalty = 0;
         invalidated = false;
     }
 }

@@ -41,7 +41,7 @@ public class TimeTrialCommand extends CommandUtil implements TabCompleter {
             if(sender instanceof Player player) {
                 return prefix + TimeTrialManager.resetLap(player.getUniqueId(), args[1]);
             } else {
-                return prefix +"Your nota a player";
+                return prefix +"Your not a a player";
             }
         })));
         addPart("rival", 2, "/timetrial rival [track] [name]", ((sender, command, label, args) -> {
@@ -51,12 +51,16 @@ public class TimeTrialCommand extends CommandUtil implements TabCompleter {
         }));
         addPart("car", 1, "/timetrial car [name]", ((sender, command, label, args) -> {
             if(sender instanceof Player player) {
-                if (args[1].equals("f1car")) {
+                if (args[1].equals("f1base")) {
                     TimeTrialManager.removeF1CarPrefrence(player.getUniqueId());
                 } else {
                     Optional<BaseVehicle> vehicle = VehiclesPlusAPI.getInstance().getBaseVehicleFromString(args[1].toLowerCase());
                     if(vehicle.isPresent()) {
-                        TimeTrialManager.addF1CarPreference(((Player) sender).getUniqueId(), args[1].toLowerCase());
+                        if(sender.hasPermission(vehicle.get().getPermissions().getRidePermission())) {
+                            TimeTrialManager.addF1CarPreference(((Player) sender).getUniqueId(), args[1].toLowerCase());
+                        } else {
+                            return prefix + "No permissions for that car!";
+                        }
                     } else {
                         return prefix + "Invalid car name.";
                     }
@@ -88,7 +92,9 @@ public class TimeTrialCommand extends CommandUtil implements TabCompleter {
                     number += 1;
                     UUID uuid = UUID.fromString(rs.getString("player_uuid"));
                     OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
-                    list.append(number).append(". ").append(player.getName()).append(" : ").append(Utils.millisToTimeString(rs.getLong("lap_length"))).append(" Sectors: \nS1: ").append(Utils.millisToTimeString(rs.getLong("s1_length"))).append(" | S2: ").append(Utils.millisToTimeString(rs.getLong("s2_length"))).append(" | S3: ").append(Utils.millisToTimeString(rs.getLong("s3_length"))).append("\n");
+                    String vehicleName = rs.getString("vehicle_name").replace("f1mc.", "");
+                    String finalVehicleName = (vehicleName.substring(0, 1).toUpperCase() + vehicleName.substring(1)).replace(".", " ").replace("_", " ");
+                    list.append(number).append(". ").append(finalVehicleName).append(" ").append(player.getName()).append(" : ").append(Utils.millisToTimeString(rs.getLong("lap_length"))).append(" Sectors: \nS1: ").append(Utils.millisToTimeString(rs.getLong("s1_length"))).append(" | S2: ").append(Utils.millisToTimeString(rs.getLong("s2_length"))).append(" | S3: ").append(Utils.millisToTimeString(rs.getLong("s3_length"))).append("\n");
                 }
                 if(!list.isEmpty()) {
                     return prefix + "Top 5"+ (offset != 0 ? " on Page " + (offset/5)+1 : "") +":\n" + list + "=-=-=-=-=-=-=-=-=-=-=-=-=";
@@ -121,14 +127,27 @@ public class TimeTrialCommand extends CommandUtil implements TabCompleter {
                         yield list;
                     }
                 };
-            } else if (args.length == 1){
+            }
+            if(args.length == 3) {
+                if(args[0].equalsIgnoreCase("rival")) {
+                    for (OfflinePlayer offlinePlayer : Bukkit.getOfflinePlayers()) {
+                        if (offlinePlayer.hasPlayedBefore()) {
+                            list.add(offlinePlayer.getName());
+                        }
+                    }
+                    list.add("reset");
+                    list.add("none");
+                    return list;
+                }
+            }
+            if (args.length == 1){
                 list.add("fastest");
                 list.add("fastest");
                 list.add("car");
                 list.add("reset");
                 list.add("rival");
+                return list;
             }
-            return list;
         }
         return null;
     }

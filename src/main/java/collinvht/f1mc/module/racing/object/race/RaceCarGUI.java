@@ -1,6 +1,9 @@
 package collinvht.f1mc.module.racing.object.race;
 
 import collinvht.f1mc.F1MC;
+import collinvht.f1mc.module.discord.DiscordModule;
+import collinvht.f1mc.module.racing.module.team.manager.TeamManager;
+import collinvht.f1mc.module.racing.module.team.object.TeamObj;
 import collinvht.f1mc.module.racing.module.tyres.manager.TyreManager;
 import collinvht.f1mc.module.racing.module.tyres.obj.TyreBaseObject;
 import collinvht.f1mc.module.racing.module.tyres.obj.TyreClickItem;
@@ -8,9 +11,13 @@ import collinvht.f1mc.util.Utils;
 import com.sk89q.worldedit.blocks.BaseItem;
 import de.tr7zw.changeme.nbtapi.NBTItem;
 import lombok.Getter;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -23,6 +30,7 @@ import xyz.xenondevs.invui.item.ItemProvider;
 import xyz.xenondevs.invui.item.impl.SimpleItem;
 import xyz.xenondevs.invui.window.Window;
 
+import java.awt.*;
 import java.util.Set;
 import java.util.UUID;
 
@@ -36,7 +44,12 @@ public class RaceCarGUI {
     private final VirtualInventory minigame_3;
     private final VirtualInventory minigame_4;
     private Gui minigameGui;
+    @Getter
     private boolean isInMini_game;
+
+    private final int runnableID;
+
+    private Player intialOpenedPlayer;
 
     public RaceCarGUI(RaceCar car) {
         this.car = car;
@@ -52,6 +65,13 @@ public class RaceCarGUI {
         minigame_2.setPreUpdateHandler(event -> event.setCancelled(true));
         minigame_3.setPreUpdateHandler(event -> event.setCancelled(true));
         minigame_4.setPreUpdateHandler(event -> event.setCancelled(true));
+        BukkitRunnable runnable = new BukkitRunnable() {
+            @Override
+            public void run() {
+                canContinue();
+            }
+        };
+        runnableID = runnable.runTaskTimer(F1MC.getInstance(), 0, 20).getTaskId();
 
         this.bandGui = createTyreInventory();
     }
@@ -87,6 +107,8 @@ public class RaceCarGUI {
     }
     private boolean isWaitingOnTask;
     public void ItemPreUpdate(ItemPreUpdateEvent event) {
+        if(!canContinue()) return;
+
         if(isWaitingOnTask) {
             Bukkit.getLogger().warning("isWaiting");
             event.setCancelled(true);
@@ -114,6 +136,7 @@ public class RaceCarGUI {
 
     public void openWindow(Player player) {
         Window window;
+        if(intialOpenedPlayer == null) intialOpenedPlayer = player;
         if(isInMini_game) {
             window = Window.single()
                     .setViewer(player)
@@ -127,6 +150,20 @@ public class RaceCarGUI {
                     .setTitle(ChatColor.of("#767676") + "Change Tyre")
                     .build();
         }
+        window.addCloseHandler(new BukkitRunnable() {
+            @Override
+            public void run() {
+                if(player == intialOpenedPlayer) {
+                    intialOpenedPlayer = null;
+                    for (Player allCurrentViewer : bandGui.findAllCurrentViewers()) {
+                        allCurrentViewer.closeInventory();
+                    }
+                    for (Player allCurrentViewer : minigameGui.findAllCurrentViewers()) {
+                        allCurrentViewer.closeInventory();
+                    }
+                }
+            }
+        });
         window.open();
     }
 
@@ -153,18 +190,63 @@ public class RaceCarGUI {
     }
 
     public void checkIfComplete() {
+        if(!canContinue()) return;
         if(minigame_1.getItem(0).getType() == Material.LIME_STAINED_GLASS_PANE && minigame_2.getItem(0).getType() == Material.LIME_STAINED_GLASS_PANE && minigame_3.getItem(0).getType() == Material.LIME_STAINED_GLASS_PANE && minigame_4.getItem(0).getType() == Material.LIME_STAINED_GLASS_PANE) {
             Set<Player> players = minigameGui.findAllCurrentViewers();
             if(removeTyre) {
                 if (!players.isEmpty()) {
                     Player randomPlayer = players.stream().findAny().get();
                     randomPlayer.getInventory().addItem(bandInventory.getItem(0));
+                    if(Utils.isEnableDiscordModule()) {
+                        DiscordModule discordModule = DiscordModule.getInstance();
+                        if (discordModule.isInitialized()) {
+                            TeamObj teamObj = TeamManager.getTeamForPlayer(randomPlayer);
+                            if(teamObj != null) {
+                                JDA jda = discordModule.getJda();
+                                TextChannel channel = jda.getTextChannelById(1217628051853021194L);
+                                if (channel != null) {
+                                    EmbedBuilder builder = new EmbedBuilder();
+                                    builder.setColor(teamObj.getTeamColor().getColor());
+                                    builder.setTitle("Tyre change | " + teamObj.getTeamName());
+                                    builder.addField("Previous Tyre", TyreManager.getTyreName(bandInventory.getItem(0)), true);
+                                    builder.addField("New Tyre", TyreManager.getTyreName(newItem), true);
+                                    builder.addBlankField(true);
+                                    builder.addField("Player", car.getPlayer().getDriverName(), true);
+                                    channel.sendMessage(builder.build()).queue();
+                                }
+                            }
+                        }
+                    }
                 }
                 bandInventory.forceSetItem(UpdateReason.SUPPRESSED,0, newItem);
+            } else {
+                if(Utils.isEnableDiscordModule()) {
+                    if (!players.isEmpty()) {
+                        Player randomPlayer = players.stream().findAny().get();
+                        randomPlayer.getInventory().addItem(bandInventory.getItem(0));
+                        DiscordModule discordModule = DiscordModule.getInstance();
+                        if (discordModule.isInitialized()) {
+                            TeamObj teamObj = TeamManager.getTeamForPlayer(randomPlayer);
+                            if (teamObj != null) {
+                                JDA jda = discordModule.getJda();
+                                TextChannel channel = jda.getTextChannelById(1217628051853021194L);
+                                if (channel != null) {
+                                    EmbedBuilder builder = new EmbedBuilder();
+                                    builder.setColor(teamObj.getTeamColor().getColor());
+                                    builder.setTitle("Tyre change | " + teamObj.getTeamName());
+                                    builder.addField("New Tyre", TyreManager.getTyreName(newItem), true);
+                                    builder.addBlankField(true);
+                                    builder.addField("Player", car.getPlayer().getDriverName(), true);
+                                    channel.sendMessage(builder.build()).queue();
+                                }
+                            }
+                        }
+                    }
+                }
             }
-            players.forEach(player -> {
+            players.forEach(p -> {
                 Window window = Window.single()
-                        .setViewer(player)
+                        .setViewer(p)
                         .setGui(bandGui)
                         .setTitle(ChatColor.of("#767676") + "Change Tyre")
                         .build();
@@ -182,5 +264,19 @@ public class RaceCarGUI {
             }
         }
         return null;
+    }
+
+    public boolean canContinue() {
+        if(car.getLinkedVehicle() == null) {
+            for (Player allCurrentViewer : bandGui.findAllCurrentViewers()) {
+                allCurrentViewer.closeInventory();
+            }
+            return false;
+        }
+        return true;
+    }
+
+    public void stopTimer() {
+        Bukkit.getScheduler().cancelTask(runnableID);
     }
 }

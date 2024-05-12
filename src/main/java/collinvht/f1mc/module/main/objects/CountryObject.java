@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.checkerframework.checker.units.qual.A;
@@ -25,7 +26,7 @@ public class CountryObject {
     private final String countryShort;
     private final String countryImg;
     private final int headID;
-    private final ItemStack stack;
+    private ItemStack stack;
     @Setter
     private ArrayList<UUID> players = new ArrayList<>();
 
@@ -47,13 +48,25 @@ public class CountryObject {
             }
             this.headID = 223;
         } else this.headID = id;
-        this.stack = Utils.createSkull(headID, name);
     }
 
     public void addPlayer(Player player) {
         CountryManager.getPlayerPerCountry().put(player.getUniqueId(), this);
         players.add(player.getUniqueId());
         updateTag(player);
+    }
+
+    public ItemStack getStack() {
+        if(stack != null) {
+            if(stack.getItemMeta() != null) {
+                if(stack.getType() != Material.AIR) {
+                    return stack;
+                }
+            }
+        }
+        String name = ChatColor.RESET + "" + ChatColor.GRAY + countryName.substring(0, 1).toUpperCase() + countryName.substring(1).replace("_", " ");
+        this.stack = Utils.createSkull(headID, name);
+        return stack;
     }
 
     public void updateTag(Player player) {

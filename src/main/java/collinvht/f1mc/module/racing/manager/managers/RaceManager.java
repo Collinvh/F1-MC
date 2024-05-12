@@ -2,6 +2,8 @@ package collinvht.f1mc.module.racing.manager.managers;
 
 import collinvht.f1mc.F1MC;
 import collinvht.f1mc.module.discord.DiscordModule;
+import collinvht.f1mc.module.racing.object.PenaltyCuboid;
+import collinvht.f1mc.module.racing.object.race.RaceTimer;
 import collinvht.f1mc.module.vehiclesplus.listener.listeners.VPListener;
 import collinvht.f1mc.module.vehiclesplus.objects.RaceDriver;
 import collinvht.f1mc.module.racing.object.NamedCuboid;
@@ -18,11 +20,11 @@ import com.sk89q.worldedit.regions.Region;
 import lombok.Getter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.TextChannel;
+import org.apache.commons.collections4.map.ListOrderedMap;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.units.qual.A;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -32,16 +34,22 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class RaceManager extends ModuleBase {
     private static RaceManager instance;
 
     @Getter
     private static final HashMap<String, Race> RACES = new HashMap<>();
+    @Getter
+    private static final HashMap<Player, Race> drivingPlayers = new HashMap<>();
+
+    @Getter
+    private static boolean isRunningTimer;
+    @Getter
+    private static Race timingRace;
 
     public RaceManager() {
         RaceListener.initialize();
@@ -62,13 +70,18 @@ public class RaceManager extends ModuleBase {
     @Override
     public void saveModule() {
         saveRaces();
+        if(timingRace != null) {
+            if(timingRace.getRaceTimer() != null) {
+                timingRace.getRaceTimer().stop();
+            }
+        }
     }
 
     private void saveRaces() {
         if(!RACES.isEmpty()) {
             RACES.forEach((s, race) -> race.saveJson());
         }
-        RaceListener.stopListening();
+        RaceListener.stopListening(false);
     }
 
     private void loadRaces() {
@@ -110,7 +123,11 @@ public class RaceManager extends ModuleBase {
                 }
             }
             }
-            return RaceListener.startListeningTo(getRace(raceName), modeInt);
+            Race race = getRace(raceName);
+            if(race.getRaceTimer() != null) {
+                if (race.getRaceTimer().isFinished()) race.setRaceTimer(null);
+            }
+            return RaceListener.startListeningTo(race, modeInt);
         } catch (NumberFormatException e) {
             return DefaultMessages.INVALID_NUMBER;
         }
@@ -125,8 +142,44 @@ public class RaceManager extends ModuleBase {
                     TextChannel channel = module.getJda().getTextChannelById(1217628051853021194L);
                     if (channel != null) {
                         EmbedBuilder builder = new EmbedBuilder();
-                        builder.addField("Race started at " + name, "", true);
+                        builder.addField("Race result | ", name, true);
                         builder.setColor(Color.BLUE);
+                        HashMap<UUID, RaceDriver> drivers = VPListener.getRACE_DRIVERS();
+                        if(!race.getRaceLapStorage().getRaceMode().isLapped()) {
+                            if (drivers.values().toArray().length > 0) {
+                                LinkedHashMap<RaceDriver, Long> sectors = new LinkedHashMap<>();
+                                drivers.forEach((unused, driver) -> {
+                                    if (driver.getLaptimes(race).getFastestLap() != null) {
+                                        sectors.put(driver, driver.getLaptimes(race).getFastestLap().getLapData().getSectorLength());
+                                    }
+                                });
+
+                                ListOrderedMap<RaceDriver, Long> treeMap = Utils.sortByValueDesc(sectors);
+                                if (treeMap.values().toArray().length > 0) {
+                                    AtomicInteger pos = new AtomicInteger();
+                                    treeMap.forEach((driver, aLong) -> {
+                                        OfflinePlayer player = Bukkit.getOfflinePlayer(driver.getDriverUUID());
+                                        pos.getAndIncrement();
+                                        builder.addField(pos.get() + ".", player.getName() + " " + Utils.millisToTimeString(driver.getLaptimes(race).getFastestLap().getLapData().getSectorLength()), false);
+                                    });
+                                }
+                            }
+                        } else {
+                            AtomicReference<RaceDriver> p1Finisher = new AtomicReference<>();
+                            race.getRaceLapStorage().getFinishers().forEach((integer, uuid) -> {
+                                OfflinePlayer player = Bukkit.getOfflinePlayer(uuid.getDriverUUID());
+                                if(integer > 1) {
+                                    if(p1Finisher.get() != null) {
+                                        builder.addField(integer + ". | ", player.getName() + " +" + Utils.millisToTimeString(p1Finisher.get().getFinishTime()-uuid.getFinishTime()), false);
+                                    } else {
+                                        builder.addField(integer + ". | ", player.getName(), false);
+                                    }
+                                } else {
+                                    p1Finisher.set(uuid);
+                                    builder.addField(integer + ". | ", player.getName(), false);
+                                }
+                            });
+                        }
                         channel.sendMessage(builder.build()).queue();
                     }
                 }
@@ -163,11 +216,11 @@ public class RaceManager extends ModuleBase {
                     LinkedHashMap<RaceDriver, Long> sectors = new LinkedHashMap<>();
                     drivers.forEach((unused, driver) -> {
                         if (driver.getLaptimes(race).getFastestLap() != null) {
-                            sectors.put(driver, driver.getLaptimes(race).getFastestLap().getLaptime());
+                            sectors.put(driver, driver.getLaptimes(race).getFastestLap().getLapData().getSectorLength());
                         }
                     });
 
-                    LinkedHashMap<RaceDriver, Long> treeMap = Utils.sortByValueDesc(sectors);
+                    ListOrderedMap<RaceDriver, Long> treeMap = Utils.sortByValueDesc(sectors);
                     if (treeMap.values().toArray().length > 0) {
                         StringBuilder builder = new StringBuilder();
                         builder.append(RacingMessages.FASTEST_LAPS);
@@ -187,7 +240,7 @@ public class RaceManager extends ModuleBase {
                     StringBuilder builder = new StringBuilder();
                     builder.append(RacingMessages.RACE_RESULT);
                     race.getRaceLapStorage().getFinishers().forEach((integer, uuid) -> {
-                        OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
+                        OfflinePlayer player = Bukkit.getOfflinePlayer(uuid.getDriverUUID());
                         builder.append(integer).append(". | ").append(player.getName()).append("\n");
                     });
                     return builder.toString();
@@ -205,7 +258,7 @@ public class RaceManager extends ModuleBase {
 
                     drivers.forEach((unused, driver) -> sectors.put(driver, (long) driver.getLaptimes(race).getSectors()));
 
-                    LinkedHashMap<RaceDriver, Long> treeMap = Utils.sortByValueDesc(sectors);
+                    ListOrderedMap<RaceDriver, Long> treeMap = Utils.sortByValueDesc(sectors);
 
 
                     if (!treeMap.isEmpty()) {
@@ -231,7 +284,7 @@ public class RaceManager extends ModuleBase {
                     LinkedList<LaptimeStorage> list = driver.getLaptimes(race).getLaptimes();
                     if (!list.isEmpty()) {
                         builder.append(RacingMessages.LAST_10_LAPS);
-                        list.forEach(laptimeOBJ -> builder.append(ChatColor.BOLD).append(ChatColor.GREEN).append(Utils.millisToTimeString(laptimeOBJ.getLaptime())).append(" | ").append(ChatColor.RESET).append(Utils.millisToTimeString(laptimeOBJ.getS1data().getSectorLength())).append("/").append(Utils.millisToTimeString(laptimeOBJ.getS2data().getSectorLength())).append("/").append(Utils.millisToTimeString(laptimeOBJ.getS3data().getSectorLength())).append("\n"));
+                        list.forEach(laptimeOBJ -> builder.append(ChatColor.BOLD).append(ChatColor.GREEN).append(Utils.millisToTimeString(laptimeOBJ.getLapData().getSectorLength())).append(" | ").append(ChatColor.RESET).append(Utils.millisToTimeString(laptimeOBJ.getS1().getSectorLength())).append("/").append(Utils.millisToTimeString(laptimeOBJ.getS2().getSectorLength())).append("/").append(Utils.millisToTimeString(laptimeOBJ.getS3().getSectorLength())).append("\n"));
                         return builder.toString();
                     } else {
                         return RacingMessages.NO_LAPS_DRIVEN;
@@ -313,7 +366,7 @@ public class RaceManager extends ModuleBase {
                     String name = input.toLowerCase();
                     switch (name) {
                         case "delete": {
-                            if(extraInput != null) {
+                            if(extraInput[4] != null) {
                                 if (race.getStorage().getLimits().containsKey(extraInput[4].toLowerCase())) {
                                     race.getStorage().getLimits().remove(extraInput[4].toLowerCase());
                                     return DefaultMessages.PREFIX + "Removed track limit.";
@@ -332,7 +385,15 @@ public class RaceManager extends ModuleBase {
                             return str.toString();
                         }
                         default: {
-                            NamedCuboid cuboid = race.getStorage().createNamedCuboidFromSelection(player.getWorld(), region, name);
+                            int flags = 0;
+                            if(extraInput[4] != null) {
+                                try {
+                                    flags = Integer.parseInt(extraInput[4]);
+                                } catch (NumberFormatException e) {
+                                    return DefaultMessages.PREFIX + "Invalid Number";
+                                }
+                            }
+                            PenaltyCuboid cuboid = race.getStorage().createPenaltyCuboidFromSelection(player.getWorld(), region, name, flags);
                             race.getStorage().getLimits().put(name, cuboid);
                             return DefaultMessages.PREFIX + "Added tracklimit";
                         }
@@ -367,6 +428,72 @@ public class RaceManager extends ModuleBase {
                             race.getStorage().setS3(cuboid);
                             return DefaultMessages.PREFIX + "S3 has been changed.";
                         }
+                        case "mini_1":
+                            if(extraInput[4] != null) {
+                                if(extraInput[4].equalsIgnoreCase("delete")) {
+                                    if(extraInput[5] != null) {
+                                        race.getStorage().getS1_mini().remove(extraInput[5]);
+                                        return DefaultMessages.PREFIX + "Mini in s1 has been removed";
+                                    } else {
+                                        return DefaultMessages.PREFIX + "Invalid arguments";
+                                    }
+                                } else if (extraInput[4].equalsIgnoreCase("list")) {
+                                    StringBuilder str = new StringBuilder(DefaultMessages.PREFIX + "Minis:\n");
+                                    for (NamedCuboid limit : race.getStorage().getS1_mini().values()) {
+                                        str.append(limit.getName()).append("\n");
+                                    }
+                                    return str.toString();
+                                }
+                                NamedCuboid cuboid = race.getStorage().createNamedCuboidFromSelection(player.getWorld(), region, extraInput[4]);
+                                race.getStorage().getS1_mini().put(extraInput[4], cuboid);
+                                return DefaultMessages.PREFIX + "Mini in s1 has been added.";
+                            } else {
+                                return DefaultMessages.PREFIX + "Invalid arguments";
+                            }
+                        case "mini_2":
+                            if(extraInput[4] != null) {
+                                if(extraInput[4].equalsIgnoreCase("delete")) {
+                                    if(extraInput[5] != null) {
+                                        race.getStorage().getS2_mini().remove(extraInput[5]);
+                                        return DefaultMessages.PREFIX + "Mini in s2 has been removed";
+                                    } else {
+                                        return DefaultMessages.PREFIX + "Invalid arguments";
+                                    }
+                                } else if (extraInput[4].equalsIgnoreCase("list")) {
+                                    StringBuilder str = new StringBuilder(DefaultMessages.PREFIX + "Minis:\n");
+                                    for (NamedCuboid limit : race.getStorage().getS2_mini().values()) {
+                                        str.append(limit.getName()).append("\n");
+                                    }
+                                    return str.toString();
+                                }
+                                NamedCuboid cuboid = race.getStorage().createNamedCuboidFromSelection(player.getWorld(), region, extraInput[4]);
+                                race.getStorage().getS2_mini().put(extraInput[4], cuboid);
+                                return DefaultMessages.PREFIX + "Mini in s2 has been added.";
+                            } else {
+                                return DefaultMessages.PREFIX + "Invalid arguments";
+                            }
+                        case "mini_3":
+                            if(extraInput[4] != null) {
+                                if(extraInput[4].equalsIgnoreCase("delete")) {
+                                    if(extraInput[5] != null) {
+                                        race.getStorage().getS3_mini().remove(extraInput[5]);
+                                        return DefaultMessages.PREFIX + "Mini in s3 has been removed";
+                                    } else {
+                                        return DefaultMessages.PREFIX + "Invalid arguments";
+                                    }
+                                } else if (extraInput[4].equalsIgnoreCase("list")) {
+                                    StringBuilder str = new StringBuilder(DefaultMessages.PREFIX + "Minis:\n");
+                                    for (NamedCuboid limit : race.getStorage().getS3_mini().values()) {
+                                        str.append(limit.getName()).append("\n");
+                                    }
+                                    return str.toString();
+                                }
+                                NamedCuboid cuboid = race.getStorage().createNamedCuboidFromSelection(player.getWorld(), region, extraInput[4]);
+                                race.getStorage().getS3_mini().put(extraInput[4], cuboid);
+                                return DefaultMessages.PREFIX + "Mini in s3 has been added.";
+                            } else {
+                                return DefaultMessages.PREFIX + "Invalid arguments";
+                            }
                         default: {
                             return DefaultMessages.PREFIX + "Not an valid sector";
                         }
@@ -427,7 +554,7 @@ public class RaceManager extends ModuleBase {
                 if(!race.getRaceLapStorage().getRaceMode().isLapped()) {
                     drivers.forEach((unused, driver) -> {
                         if (driver.getLaptimes(race).getFastestLap() != null) {
-                            sectors.put(driver, driver.getLaptimes(race).getFastestLap().getLaptime());
+                            sectors.put(driver, driver.getLaptimes(race).getFastestLap().getLapData().getSectorLength());
                         }
                     });
                 } else {
@@ -439,7 +566,7 @@ public class RaceManager extends ModuleBase {
                     });
                 }
                 AtomicInteger pos = new AtomicInteger();
-                LinkedHashMap<RaceDriver, Long> treeMap = Utils.sortByValueDesc(sectors);
+                ListOrderedMap<RaceDriver, Long> treeMap = Utils.sortByValueDesc(sectors);
                 if (treeMap.values().toArray().length > 0) {
                     treeMap.forEach((driver, unused) -> {
                         pos.getAndIncrement();
@@ -496,9 +623,49 @@ public class RaceManager extends ModuleBase {
             }
             return "Image created";
         } catch (IOException e) {
-            e.printStackTrace();
+            Bukkit.getLogger().severe(e.getMessage());
             return "Error creating image.";
         }
     }
+    public String stopTimer() {
+        if(!isRunningTimer) return "No timer running at the moment";
+        timingRace.getRaceTimer().stop();
+        return "Timer Stopped";
+    }
 
+    public static void setIsRunningTimer(boolean bool) {
+        if(!bool) {
+            timingRace = null;
+        }
+        isRunningTimer = bool;
+    }
+
+    public void startTimerForNewPlayer(Player player) {
+        if(isRunningTimer && timingRace != null) {
+            timingRace.getRaceTimer().addPlayer(player);
+        }
+    }
+    public String createTimer(String race, String arg) {
+        if(isRunningTimer) return "There is already a timer running!";
+        if(!raceExists(race)) return RacingMessages.RACE_DOES_NOT_EXIST;
+        Race raceObj = getRace(race);
+        if(RaceListener.isListeningToRace(raceObj)) {
+            if(raceObj.getRaceLapStorage().getRaceMode().isLapped()) {
+                return "Can't start a timer for a lapped mode.";
+            }
+        }
+        try {
+            double length = Double.parseDouble(arg);
+            raceObj.setRaceTimer(new RaceTimer((long) ((length*1000)*60)));
+            timingRace = raceObj;
+            isRunningTimer = true;
+            return "Timer Started";
+        } catch (NumberFormatException e) {
+            return DefaultMessages.INVALID_NUMBER;
+        }
+    }
+
+    public Race getRaceForPlayer(Player player) {
+        return getDrivingPlayers().get(player);
+    }
 }

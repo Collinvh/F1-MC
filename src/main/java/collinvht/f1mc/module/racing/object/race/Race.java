@@ -46,6 +46,10 @@ public class Race {
     @Setter
     private Hologram leaderBoard;
 
+    @Getter @Setter
+    private RaceTimer raceTimer;
+
+
     public Race(String name, int laps) {
         this.laps = laps;
         this.name = name;
@@ -97,6 +101,7 @@ public class Race {
             deleteLeaderboard();
         }
         Location location = storage.getTimeTrialLeaderboard();
+        if(location == null) return;
         if (location.getWorld() != null) {
             leaderBoard = DHAPI.createHologram(name + "_leaderboard", location.clone().add(0, 5.5,0));
             leaderBoard.setDisplayRange(20);
@@ -115,7 +120,9 @@ public class Race {
             while (rs.next()) {
                 UUID uuid = UUID.fromString(rs.getString("player_uuid"));
                 OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
-                DHAPI.addHologramLine(leaderBoard, curNumber + ". " + ChatColor.GRAY + player.getName() + " : " + ChatColor.RESET + Utils.millisToTimeString(rs.getLong("lap_length")));
+                String vehicleName = rs.getString("vehicle_name").replace("f1mc.", "");
+                String finalVehicleName = (vehicleName.substring(0, 1).toUpperCase() + vehicleName.substring(1)).replace(".", " ").replace("_", " ");
+                DHAPI.addHologramLine(leaderBoard, curNumber + ". " + ChatColor.GRAY + finalVehicleName + " " + player.getName() + " : " + ChatColor.RESET + Utils.millisToTimeString(rs.getLong("lap_length")));
                 curNumber += 1;
             }
         } catch (SQLException ignored) {}

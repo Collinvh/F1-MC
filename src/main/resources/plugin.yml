@@ -1,62 +1,65 @@
-name: ProjectR
+name: F1MC
 version: ${project.version}
-main: collinvht.projectr.ProjectR
-api-version: 1.16
-depend: [ VehiclesPlusPro, WorldEdit, LuckPerms, JDA ]
-authors: [ Collinvht ]
+main: collinvht.f1mc.F1MC
+api-version: 1.19
+depend:
+  - VehiclesPlusPro
+  - NametagEdit
+  - WorldEdit
+  - LuckPerms
+  - JDA
+  - ItemsAdder
+  - ProtocolLib
+  - Multiverse-Core
+  - HeadDB
+  - DecentHolograms
+authors:
+  - Collinvht
+  - SBDeveloper
+
 commands:
-  warning:
-    aliases: warn
-    description: Warn people
-    permission: projectr.fia
-  race:
-    permission: projectr.fia
-    description: Starts races
-  persoonlijkrecord:
-    description: Persoonlijk Record
-  snelste:
-    description: Snelste tijden
-  stand:
-    description: Stand
-  penalty:
-    aliases: penalty
-    description: Give people a penalty
-    permission: projectr.fia
-  dsq:
-    aliases: dsq
-    description: Give people a dsq
-    permission: projectr.fia
-#  flag:
-#    aliases: vlag
-#    description: Bring out a flag
-#    permission: projectr.fia
-#  lights:
-#    aliases: lichten
-#    description: Start de lichten
-#    permission: projectr.fia
-  garage:
-    aliases: spawnkart, spawncar
-    description: Spawn a kart
-    permission: projectr.fia
-  clearchat:
-    description: ClearChat
-    permission: projectr.fia
-  muteutil:
-    description: MuteUtil
+  discord:
+    description: Discord link
   raceteam:
-    description: Team
-  golfkar:
-    description: Spawn golfkar
-    permission: projectr.spawngolf
-  testpc:
-    description: Test voor pc
-    permission: projectr.test
-  getband:
-    description: band
-    permission: projectr.band
-  fia:
-    description: FIA
-    permission: projectr.fia
-  weer:
-    description: Weer
-    permission: projectr.fia
+    description: Manage or create teams
+  race:
+    description: Start or manage races
+  slowdown:
+    permission: f1mc.fia.common
+    description: Blockslowdown
+  timetrial:
+    aliases: tt
+    description: Timetrial
+    permission: f1mc.timetrial
+  dsq:
+    permission: f1mc.fia.common
+    description: Disqualifies someone
+  flag:
+    permission: f1mc.fia.common
+    description: Sets a flag or edits the locations
+  warning:
+    permission: f1mc.fia.common
+    description: Gives a warning
+  penalty:
+    permission: f1mc.fia.common
+    description: Gives a penalty
+  announcement:
+    permission: f1mc.fia.common
+    description: Announce something
+  tyre:
+    permission: f1mc.fia.admin
+    description: Tyre
+  creplace:
+    permission: f1mc.builder
+    description: Custom replace
+  cset:
+    permission: f1mc.builder
+    description: Custom Set
+  creplacenear:
+    permission: f1mc.builder
+    description: Custom Replacenear
+  cundo:
+    permission: f1mc.builder
+    description: Custom Undo
+  country:
+    description: Sets your country

@@ -1,0 +1,6 @@
+enableBuildingModule: true
+enableDiscordModule: true
+enableCountryModule: true
+enableFIAModule: true
+enableTeamModule: true
+enableTimeTrial: false

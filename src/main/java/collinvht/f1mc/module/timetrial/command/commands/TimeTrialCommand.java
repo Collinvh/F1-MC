@@ -51,12 +51,16 @@ public class TimeTrialCommand extends CommandUtil implements TabCompleter {
         }));
         addPart("car", 1, "/timetrial car [name]", ((sender, command, label, args) -> {
             if(sender instanceof Player player) {
-                if (args[1].equals("f1car")) {
+                if (args[1].equals("f1base")) {
                     TimeTrialManager.removeF1CarPrefrence(player.getUniqueId());
                 } else {
                     Optional<BaseVehicle> vehicle = VehiclesPlusAPI.getInstance().getBaseVehicleFromString(args[1].toLowerCase());
                     if(vehicle.isPresent()) {
-                        TimeTrialManager.addF1CarPreference(((Player) sender).getUniqueId(), args[1].toLowerCase());
+                        if(sender.hasPermission(vehicle.get().getPermissions().getRidePermission())) {
+                            TimeTrialManager.addF1CarPreference(((Player) sender).getUniqueId(), args[1].toLowerCase());
+                        } else {
+                            return prefix + "No permissions for that car!";
+                        }
                     } else {
                         return prefix + "Invalid car name.";
                     }

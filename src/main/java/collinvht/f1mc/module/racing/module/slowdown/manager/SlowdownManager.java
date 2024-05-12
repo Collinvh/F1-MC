@@ -26,13 +26,15 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.io.File;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class SlowdownManager extends ModuleBase {
     private static final HashMap<Material, SlowdownObject> slowDowns = new HashMap<>();
     private static final HashMap<String, SlowdownIAObject> customslowDowns = new HashMap<>();
 
-    private static int vehicleRunnable;
+    private static final Timer timer = new Timer("SlowDownTimer");
 
 
     public static String addBlock(ItemStack stack, double slowdown, double steering, double maxSpeed) {
@@ -94,7 +96,7 @@ public class SlowdownManager extends ModuleBase {
         object.add("array2", mainObject2);
 
         Utils.saveJSON(path, "slowdown", object);
-        Bukkit.getScheduler().cancelTask(vehicleRunnable);
+        timer.cancel();
     }
 
     public void load() {
@@ -121,7 +123,7 @@ public class SlowdownManager extends ModuleBase {
             } catch (Exception ignored) {
             }
         }
-        vehicleRunnable = new BukkitRunnable() {
+        timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
                 VPListener.getRACE_DRIVERS().forEach((uuid, raceDriver) -> {
@@ -131,7 +133,7 @@ public class SlowdownManager extends ModuleBase {
                             if(raceDriver.getVehicle() != null) {
                                 if (Bukkit.getPlayer(raceDriver.getDriverUUID()) != null) {
                                     SpawnedVehicle spawnedVehicle = raceDriver.getVehicle();
-                                    Bukkit.getPlayer(raceDriver.getDriverUUID()).spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy("Speed: " + spawnedVehicle.getCurrentSpeedInKm() + " | Fuel: " + spawnedVehicle.getStorageVehicle().getVehicleStats().getCurrentFuel()));
+                                    if(!Utils.isEnableTimeTrial()) Bukkit.getPlayer(raceDriver.getDriverUUID()).spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy("Speed: " + spawnedVehicle.getCurrentSpeedInKm() + " | Fuel: " + spawnedVehicle.getStorageVehicle().getVehicleStats().getCurrentFuel()));
                                 }
                             }
                         }
@@ -139,8 +141,7 @@ public class SlowdownManager extends ModuleBase {
                 });
                 VPListener.getRACE_CARS().forEach((uuid, car) -> car.updateTyre());
             }
-        }.runTaskTimer(F1MC.getInstance(), 0, 0).getTaskId();
-
+        }, 0, 1);
     }
 
     public static void update(RaceDriver raceDriver) {

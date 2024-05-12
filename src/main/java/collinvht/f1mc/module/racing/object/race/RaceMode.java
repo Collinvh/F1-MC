@@ -5,7 +5,7 @@ import lombok.Getter;
 public enum RaceMode {
     PRACTICE(0, false),
     LAPPING(1, true),
-    TIMETRIAL(2, false);
+    NO_TIMING(2, false);
 
     @Getter
     private final int modeId;

@@ -1,13 +1,11 @@
 package collinvht.f1mc.module.racing.object.race;
 
-import collinvht.f1mc.module.discord.DiscordModule;
 import collinvht.f1mc.module.vehiclesplus.listener.listeners.VPListener;
 import collinvht.f1mc.module.vehiclesplus.objects.RaceDriver;
 import collinvht.f1mc.module.racing.manager.managers.RaceManager;
 import collinvht.f1mc.util.DefaultMessages;
 import collinvht.f1mc.util.Permissions;
-import collinvht.f1mc.util.Utils;
-import net.dv8tion.jda.api.JDA;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -16,6 +14,7 @@ import java.util.*;
 
 
 public class RaceListener {
+    @Getter
     private static final ArrayList<Race> LISTENING = new ArrayList<>();
     private static TimerTask task;
     private static Timer timer;
@@ -34,11 +33,6 @@ public class RaceListener {
                             break;
                         }
                     }
-                    VPListener.getRACE_DRIVERS().forEach((uuid, driver) -> {
-                        if(driver.isDriving() && !driver.isFinished()) {
-                            race.getRaceLapStorage().update(driver);
-                        }
-                    });
                 }
                 if(!removingRaces.isEmpty()) {
                     LISTENING.removeAll(removingRaces);
@@ -80,12 +74,12 @@ public class RaceListener {
         return LISTENING.contains(race);
     }
 
-    public static void stopListening() {
-        if(task == null) {
+    public static void stopListening(boolean b) {
+        if(timer == null) {
             return;
         }
-        task.cancel();
-        resetAll();
+        timer.cancel();
+        if(b) resetAll();
 //        DiscordManager.resetMessage();
     }
 

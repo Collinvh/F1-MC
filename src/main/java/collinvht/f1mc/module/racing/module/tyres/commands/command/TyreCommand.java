@@ -65,6 +65,7 @@ public class TyreCommand extends CommandUtil implements TabCompleter {
                 case "durability":
                     try {
                         object.setMaxDurability(Double.parseDouble(args[3]));
+                        return prefix + "Durability changed";
                     } catch (Exception ignored) {
                         return prefix + "Invalid number";
                     }
@@ -72,6 +73,7 @@ public class TyreCommand extends CommandUtil implements TabCompleter {
                 case "degradation":
                     try {
                         object.setDegradingRate(Double.parseDouble(args[3]));
+                        return prefix + "Degradation changed";
                     } catch (Exception ignored) {
                         return prefix + "Invalid number";
                     }
@@ -79,6 +81,7 @@ public class TyreCommand extends CommandUtil implements TabCompleter {
                 case "steering":
                     try {
                         object.setSteering(Double.parseDouble(args[3]));
+                        return prefix + "Steering changed";
                     } catch (Exception ignored) {
                         return prefix + "Invalid number";
                     }
@@ -86,6 +89,7 @@ public class TyreCommand extends CommandUtil implements TabCompleter {
                 case "extraspeed":
                     try {
                         object.setExtraSpeed(Double.parseDouble(args[3]));
+                        return prefix + "Extra speed changed";
                     } catch (Exception ignored) {
                         return prefix + "Invalid number";
                     }
@@ -111,6 +115,15 @@ public class TyreCommand extends CommandUtil implements TabCompleter {
                 if(args[0].equalsIgnoreCase("track")) {
                     RaceManager.getRACES().forEach((s1, race) -> list.add(s1));
                 }
+                if(args[0].equalsIgnoreCase("set")) {
+                    TyreManager.getTyres().forEach((string, tyreBaseObject) -> {
+                                list.add(string.toLowerCase());
+                            }
+                    );
+                }
+                return list;
+            }
+            if(args.length == 3) {
                 if(args[0].equalsIgnoreCase("set")) {
                     list.add("durability");
                     list.add("degradation");

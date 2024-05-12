@@ -9,7 +9,7 @@ public class MainCommands extends CommandModuleBase {
     @Override
     public void load() {
         if(Utils.isEnableCountryModule()) {
-            registerCommand("country", new CountryCommand());
+            registerCommand("country", new CountryCommand(), new CountryCommand());
         }
         registerCommand("discord", new DiscordCommand());
     }

@@ -44,6 +44,15 @@ public class DriverLaptimeStorage {
     @Getter @Setter
     private LaptimeStorage fastestLap;
 
+    @Getter @Setter
+    private int invalidCooldown = 3;
+
+    @Getter @Setter
+    private int invalidFlags = 0;
+
+    @Getter @Setter
+    private int penalty = 0;
+
     public DriverLaptimeStorage(Race race) {
         this.race = race;
     }
@@ -79,8 +88,11 @@ public class DriverLaptimeStorage {
         } else return true;
     }
 
+    @Getter @Setter
+    private long lastPassedSectorTime = -1;
     public void addSector() {
         sectors += 1;
+        lastPassedSectorTime = System.currentTimeMillis();
     }
 
     public void resetLaptimes() {
@@ -90,6 +102,7 @@ public class DriverLaptimeStorage {
         bestS1 = 0;
         bestS2 = 0;
         bestS3 = 0;
+        penalty = 0;
         invalidated = false;
     }
 }

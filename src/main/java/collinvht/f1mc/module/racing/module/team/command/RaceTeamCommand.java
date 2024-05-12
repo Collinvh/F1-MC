@@ -1,6 +1,7 @@
 package collinvht.f1mc.module.racing.module.team.command;
 
 import collinvht.f1mc.module.racing.module.team.manager.TeamManager;
+import collinvht.f1mc.module.racing.module.team.object.PCGui;
 import collinvht.f1mc.module.racing.module.tyres.commands.command.TyreCommand;
 import collinvht.f1mc.module.racing.module.tyres.listeners.TyreListeners;
 import collinvht.f1mc.module.racing.module.tyres.listeners.listener.TyreGUI;
@@ -100,6 +101,12 @@ public class RaceTeamCommand extends CommandUtil implements TabCompleter {
         addPart("tyregui", 1, "/raceteam tyregui [team]", ((sender, command, label, args) -> {
             if(sender instanceof Player) {
                 TyreGUI.open((Player) sender, TeamManager.getTEAMS().get(args[1].toLowerCase()));
+            }
+            return prefix + "Opened gui";
+        }), Permissions.FIA_ADMIN);
+        addPart("openpc", 1, "/raceteam openpc [team]", ((sender, command, label, args) -> {
+            if(sender instanceof Player) {
+                PCGui.open((Player) sender, TeamManager.getTEAMS().get(args[1].toLowerCase()));
             }
             return prefix + "Opened gui";
         }), Permissions.FIA_ADMIN);

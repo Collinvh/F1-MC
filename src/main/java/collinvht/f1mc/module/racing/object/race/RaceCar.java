@@ -11,14 +11,11 @@ import me.legofreak107.vehiclesplus.vehicles.vehicles.objects.BaseVehicle;
 import me.legofreak107.vehiclesplus.vehicles.vehicles.objects.SpawnedVehicle;
 import me.legofreak107.vehiclesplus.vehicles.vehicles.objects.VehicleStats;
 import net.md_5.bungee.api.ChatColor;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import xyz.xenondevs.invui.inventory.event.UpdateReason;
-import xyz.xenondevs.invui.window.Window;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class RaceCar {
     @Getter
@@ -46,6 +43,8 @@ public class RaceCar {
             if (tyre == null) {
                 stats.setCurrentSpeed(0.0);
                 stats.setSpeed(0);
+                stats.setHighSpeedAcceleration(0.0f);
+                stats.setLowSpeedAcceleration(0.0f);
                 stats.setLowSpeedSteering(0.0f);
                 stats.setHighSpeedSteering(0.0f);
             } else {
@@ -58,10 +57,13 @@ public class RaceCar {
                 if(!player.isInPit()) {
                     stats.setSpeed((int) (baseVehicle.getSpeedSettings().getBase() + tyre.getDouble("f1mc.extraSpeed")));
                 } else {
-                    stats.setSpeed(79);
+                    if(stats.getCurrentSpeed() > 80) {
+                        stats.setCurrentSpeed(79.99D);
+                    }
+                    stats.setSpeed(80);
                 }
-                stats.setLowSpeedSteering((float) (baseVehicle.getTurningRadiusSettings().getLowSpeed() + tyre.getDouble("f1mc.steering")));
-                stats.setHighSpeedSteering((float) (baseVehicle.getTurningRadiusSettings().getHighSpeed() + tyre.getDouble("f1mc.steering")));
+                stats.setLowSpeedSteering((float) (baseVehicle.getTurningRadiusSettings().getLowSpeed() * tyre.getDouble("f1mc.steering")));
+                stats.setHighSpeedSteering((float) (baseVehicle.getTurningRadiusSettings().getHighSpeed() * tyre.getDouble("f1mc.steering")));
 
                 tyre.setDouble("f1mc.dura", (dura-degrate * (getLinkedVehicle().getCurrentSpeedInKm())/100));
                 ArrayList<String> lore = new ArrayList<>();

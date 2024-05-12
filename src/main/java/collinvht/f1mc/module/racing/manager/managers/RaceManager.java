@@ -2,6 +2,7 @@ package collinvht.f1mc.module.racing.manager.managers;
 
 import collinvht.f1mc.F1MC;
 import collinvht.f1mc.module.discord.DiscordModule;
+import collinvht.f1mc.module.racing.object.PenaltyCuboid;
 import collinvht.f1mc.module.racing.object.race.RaceTimer;
 import collinvht.f1mc.module.vehiclesplus.listener.listeners.VPListener;
 import collinvht.f1mc.module.vehiclesplus.objects.RaceDriver;
@@ -17,7 +18,6 @@ import com.google.gson.JsonObject;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.regions.Region;
 import lombok.Getter;
-import lombok.Setter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.TextChannel;
 import org.apache.commons.collections4.map.ListOrderedMap;
@@ -25,7 +25,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.units.qual.A;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -35,10 +34,9 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class RaceManager extends ModuleBase {
     private static RaceManager instance;
@@ -83,7 +81,7 @@ public class RaceManager extends ModuleBase {
         if(!RACES.isEmpty()) {
             RACES.forEach((s, race) -> race.saveJson());
         }
-        RaceListener.stopListening();
+        RaceListener.stopListening(false);
     }
 
     private void loadRaces() {
@@ -144,8 +142,44 @@ public class RaceManager extends ModuleBase {
                     TextChannel channel = module.getJda().getTextChannelById(1217628051853021194L);
                     if (channel != null) {
                         EmbedBuilder builder = new EmbedBuilder();
-                        builder.addField("Race started at " + name, "", true);
+                        builder.addField("Race result | ", name, true);
                         builder.setColor(Color.BLUE);
+                        HashMap<UUID, RaceDriver> drivers = VPListener.getRACE_DRIVERS();
+                        if(!race.getRaceLapStorage().getRaceMode().isLapped()) {
+                            if (drivers.values().toArray().length > 0) {
+                                LinkedHashMap<RaceDriver, Long> sectors = new LinkedHashMap<>();
+                                drivers.forEach((unused, driver) -> {
+                                    if (driver.getLaptimes(race).getFastestLap() != null) {
+                                        sectors.put(driver, driver.getLaptimes(race).getFastestLap().getLapData().getSectorLength());
+                                    }
+                                });
+
+                                ListOrderedMap<RaceDriver, Long> treeMap = Utils.sortByValueDesc(sectors);
+                                if (treeMap.values().toArray().length > 0) {
+                                    AtomicInteger pos = new AtomicInteger();
+                                    treeMap.forEach((driver, aLong) -> {
+                                        OfflinePlayer player = Bukkit.getOfflinePlayer(driver.getDriverUUID());
+                                        pos.getAndIncrement();
+                                        builder.addField(pos.get() + ".", player.getName() + " " + Utils.millisToTimeString(driver.getLaptimes(race).getFastestLap().getLapData().getSectorLength()), false);
+                                    });
+                                }
+                            }
+                        } else {
+                            AtomicReference<RaceDriver> p1Finisher = new AtomicReference<>();
+                            race.getRaceLapStorage().getFinishers().forEach((integer, uuid) -> {
+                                OfflinePlayer player = Bukkit.getOfflinePlayer(uuid.getDriverUUID());
+                                if(integer > 1) {
+                                    if(p1Finisher.get() != null) {
+                                        builder.addField(integer + ". | ", player.getName() + " +" + Utils.millisToTimeString(p1Finisher.get().getFinishTime()-uuid.getFinishTime()), false);
+                                    } else {
+                                        builder.addField(integer + ". | ", player.getName(), false);
+                                    }
+                                } else {
+                                    p1Finisher.set(uuid);
+                                    builder.addField(integer + ". | ", player.getName(), false);
+                                }
+                            });
+                        }
                         channel.sendMessage(builder.build()).queue();
                     }
                 }
@@ -206,7 +240,7 @@ public class RaceManager extends ModuleBase {
                     StringBuilder builder = new StringBuilder();
                     builder.append(RacingMessages.RACE_RESULT);
                     race.getRaceLapStorage().getFinishers().forEach((integer, uuid) -> {
-                        OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
+                        OfflinePlayer player = Bukkit.getOfflinePlayer(uuid.getDriverUUID());
                         builder.append(integer).append(". | ").append(player.getName()).append("\n");
                     });
                     return builder.toString();
@@ -351,7 +385,15 @@ public class RaceManager extends ModuleBase {
                             return str.toString();
                         }
                         default: {
-                            NamedCuboid cuboid = race.getStorage().createNamedCuboidFromSelection(player.getWorld(), region, name);
+                            int flags = 0;
+                            if(extraInput[4] != null) {
+                                try {
+                                    flags = Integer.parseInt(extraInput[4]);
+                                } catch (NumberFormatException e) {
+                                    return DefaultMessages.PREFIX + "Invalid Number";
+                                }
+                            }
+                            PenaltyCuboid cuboid = race.getStorage().createPenaltyCuboidFromSelection(player.getWorld(), region, name, flags);
                             race.getStorage().getLimits().put(name, cuboid);
                             return DefaultMessages.PREFIX + "Added tracklimit";
                         }

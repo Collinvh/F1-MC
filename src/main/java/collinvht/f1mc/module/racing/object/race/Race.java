@@ -101,6 +101,7 @@ public class Race {
             deleteLeaderboard();
         }
         Location location = storage.getTimeTrialLeaderboard();
+        if(location == null) return;
         if (location.getWorld() != null) {
             leaderBoard = DHAPI.createHologram(name + "_leaderboard", location.clone().add(0, 5.5,0));
             leaderBoard.setDisplayRange(20);

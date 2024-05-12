@@ -154,7 +154,7 @@ public class TimeTrialManager {
             if (gui == null) {
                 gui = Gui.normal().setStructure("# # # # # # # # #", "# # B # A # C # #", "! # # # R # # # !")
                         .addIngredient('A', createTrack("india", 43730, "&aIndia"))
-                        .addIngredient('B', createTrack("?", 44709, "&cUnlocks on 07/05"))
+                        .addIngredient('B', createTrack("gb", 44709, "&aGB"))
                         .addIngredient('C', createTrack("mexico", 43921, "&aMexico"))
                         .addIngredient('R', new SimpleItem(Utils.emptyStack(Material.RED_STAINED_GLASS_PANE), (click -> {
                             timeTrialHolders.get(click.getPlayer().getUniqueId()).stop();
@@ -168,7 +168,7 @@ public class TimeTrialManager {
             if (gui2 == null) {
                 gui2 = Gui.normal().setStructure("# # # # # # # # #", "# # B # A # C # #", "! # # # # # # # !")
                         .addIngredient('A', createTrack("india", 43730, "&aIndia"))
-                        .addIngredient('B', createTrack("?", 44709, "&cUnlocks on 07/05"))
+                        .addIngredient('B', createTrack("gb", 44709, "&aGB"))
                         .addIngredient('C', createTrack("mexico", 43921, "&aMexico"))
                         .addIngredient('!', new SimpleItem(Utils.createSkull(1223, "DLC"), (click) -> click.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&',"&cComing soon!"))))
                         .addIngredient('#', new SimpleItem(Utils.emptyStack(Material.GRAY_STAINED_GLASS_PANE))).build();
@@ -192,7 +192,7 @@ public class TimeTrialManager {
     }
 
     private static void createTrackClick(@NotNull Click click, String track) {
-        Optional<BaseVehicle> baseVehicle = VehiclesPlusAPI.getInstance().getBaseVehicleFromString(carPreference.getOrDefault(click.getPlayer().getUniqueId(), "f1mc_prototype_1"));
+        Optional<BaseVehicle> baseVehicle = VehiclesPlusAPI.getInstance().getBaseVehicleFromString(carPreference.getOrDefault(click.getPlayer().getUniqueId(), "f1base"));
         if(baseVehicle.isPresent()) {
             Race race = RaceManager.getInstance().getRace(track);
             if(race != null) {

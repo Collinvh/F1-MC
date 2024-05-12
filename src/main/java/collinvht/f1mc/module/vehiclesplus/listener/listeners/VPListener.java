@@ -38,20 +38,20 @@ public class VPListener implements Listener {
             RaceDriver driver = RACE_DRIVERS.get(event.getDriver().getUniqueId());
             if (driver == null) {
                 driver = new RaceDriver(event.getDriver());
-                driver.setDriving(true);
-                driver.setVehicle(vehicle);
                 if(RACE_CARS.get(vehicle.getHolder().getUniqueId()) != null) {
                     RACE_CARS.get(vehicle.getHolder().getUniqueId()).setPlayer(driver);
                 }
                 spawnedVehicles.add(vehicle);
+                driver.setVehicle(vehicle);
+                driver.setDriving(true);
                 RACE_DRIVERS.put(event.getDriver().getUniqueId(), driver);
                 return;
             }
-            driver.setDriving(true);
-            driver.setVehicle(vehicle);
             if(RACE_CARS.get(vehicle.getHolder().getUniqueId()) != null) {
                 RACE_CARS.get(vehicle.getHolder().getUniqueId()).setPlayer(driver);
             }
+            driver.setVehicle(vehicle);
+            driver.setDriving(true);
             spawnedVehicles.add(vehicle);
         }
     }
@@ -64,6 +64,7 @@ public class VPListener implements Listener {
             if(driver != null) {
                 driver.setVehicle(null);
                 driver.setDriving(false);
+                driver.setInPit();
             }
             SpawnedVehicle vehicle = (SpawnedVehicle) event.getVehicle();
             if(RACE_CARS.containsKey(vehicle.getHolder().getUniqueId())) {
@@ -97,6 +98,10 @@ public class VPListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public static void vehicleDestroyEvent(@NotNull PlayerQuitEvent event) {
-        getRACE_DRIVERS().remove(event.getPlayer().getUniqueId());
+        RaceDriver raceDriver = getRACE_DRIVERS().get(event.getPlayer().getUniqueId());
+        if(raceDriver != null) {
+            raceDriver.setDriving(false);
+            raceDriver.setVehicle(null);
+        }
     }
 }

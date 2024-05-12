@@ -2,6 +2,7 @@ package collinvht.f1mc.module.racing.object.race;
 
 import collinvht.f1mc.module.racing.object.Cuboid;
 import collinvht.f1mc.module.racing.object.NamedCuboid;
+import collinvht.f1mc.module.racing.object.PenaltyCuboid;
 import collinvht.f1mc.util.Utils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -48,7 +49,7 @@ public class RaceCuboidStorage {
     Track limits
      */
     @Getter
-    private HashMap<String, NamedCuboid> limits = new HashMap<>();
+    private HashMap<String, PenaltyCuboid> limits = new HashMap<>();
 
     /*
     Time trial
@@ -101,11 +102,12 @@ public class RaceCuboidStorage {
                     String cuboidName = entries.getKey();
 
                     Map<String, String> serializableMap = new HashMap<>();
-                    for (Map.Entry<String, JsonElement> stringJsonElementEntry : object.entrySet()) {
+                    for (Map.Entry<String, JsonElement> stringJsonElementEntry : object.getAsJsonObject("cuboidHolder").entrySet()) {
                         serializableMap.put(stringJsonElementEntry.getKey(), stringJsonElementEntry.getValue().getAsString());
                     }
                     Cuboid cuboid = Cuboid.deserialize(serializableMap);
-                    storage.getLimits().put(cuboidName, new NamedCuboid(cuboid, cuboidName));
+                    int flags = object.get("extraFlags").getAsInt();
+                    storage.getLimits().put(cuboidName, new PenaltyCuboid(cuboid, cuboidName, 0));
                 }
             }
 
@@ -192,11 +194,15 @@ public class RaceCuboidStorage {
 
         JsonObject newObject = new JsonObject();
         if(!limits.isEmpty()) {
-            for (NamedCuboid namedCuboid : limits.values()) {
+            for (PenaltyCuboid namedCuboid : limits.values()) {
                 if (namedCuboid != null) {
+                    int extraFlags = namedCuboid.getExtraFlags();
                     JsonObject cuboidObj = new JsonObject();
+                    JsonObject cuboidHolder = new JsonObject();
                     Cuboid cuboid = namedCuboid.getCuboid();
-                    cuboid.serialize().forEach((s, o) -> cuboidObj.addProperty(s, String.valueOf(o)));
+                    cuboid.serialize().forEach((s, o) -> cuboidHolder.addProperty(s, String.valueOf(o)));
+                    cuboidObj.add("cuboidHolder", cuboidHolder);
+                    cuboidObj.addProperty("extraFlags", extraFlags);
                     newObject.add(namedCuboid.getName(), cuboidObj);
                 }
             }
@@ -221,6 +227,12 @@ public class RaceCuboidStorage {
         Cuboid cuboid = new Cuboid(Utils.blockVectorToLocation(world, region.getMinimumPoint()), Utils.blockVectorToLocation(world, region.getMaximumPoint()));
         Bukkit.getLogger().warning(name);
         return new NamedCuboid(cuboid, name);
+    }
+
+    public PenaltyCuboid createPenaltyCuboidFromSelection(World world, Region region, String name, int extraFlags) {
+        Cuboid cuboid = new Cuboid(Utils.blockVectorToLocation(world, region.getMinimumPoint()), Utils.blockVectorToLocation(world, region.getMaximumPoint()));
+        Bukkit.getLogger().warning(name);
+        return new PenaltyCuboid(cuboid, name, extraFlags);
     }
 
     public JsonObject ttSpawnJson() {

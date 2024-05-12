@@ -115,7 +115,11 @@ public class TimeTrialHolder {
         }
         timer.cancel();
         player.teleport(oldLocation);
-        spawnedVehicle.getStorageVehicle().removeVehicle(this.player);
+        if(spawnedVehicle.getStorageVehicle() != null) {
+            if(VehiclesPlusAPI.getVehicleManager().getPlayerVehicleHashMap().containsKey(player.getUniqueId())) {
+                spawnedVehicle.getStorageVehicle().removeVehicle(this.player);
+            }
+        }
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
             onlinePlayer.showPlayer(F1MC.getInstance(), this.player);
         }

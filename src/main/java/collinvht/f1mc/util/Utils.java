@@ -237,4 +237,16 @@ public class Utils {
             return stack;
         } else return new ItemStack(Material.AIR);
     }
+
+    public static ListOrderedMap<Long, Integer> sortPositions(LinkedHashMap<Long, Integer> map) {
+        List<Map.Entry<Long, Integer>> list = new LinkedList<>(map.entrySet());
+        list.sort((o1, o2) -> o2.getValue().compareTo(o1.getValue()));
+        Collections.reverse(list);
+
+        ListOrderedMap<Long, Integer> result = new ListOrderedMap<>();
+        for (Map.Entry<Long, Integer> entry : list) {
+            result.put(entry.getKey(), entry.getValue());
+        }
+        return result;
+    }
 }

@@ -21,17 +21,16 @@ import java.io.File;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class CountryManager extends ModuleBase {
+    @Getter
     private static final HashMap<String, CountryObject> countries = new HashMap<>();
     @Getter
     private static final HashMap<UUID, CountryObject> playerPerCountry = new HashMap<>();
-    public static List<Item> getItems() {
-        ArrayList<Item> items = new ArrayList<>();
+
+    public static LinkedList<Item> getItems() {
+        LinkedList<Item> items = new LinkedList<>();
         if(!countries.isEmpty()) {
             countries.forEach((s, countryObject) -> items.add(new SimpleItem(countryObject.getStack(), (click) -> {
                 CountryManager.updateCountry(click.getPlayer(), countryObject.getCountryName());
@@ -39,6 +38,7 @@ public class CountryManager extends ModuleBase {
                 click.getPlayer().sendMessage(DefaultMessages.PREFIX + "Changed your country!");
             })));
         }
+        items.sort(Comparator.comparing(o -> Objects.requireNonNull(o.getItemProvider().get().getItemMeta()).getDisplayName()));
         return items;
     }
 
@@ -123,11 +123,11 @@ public class CountryManager extends ModuleBase {
             countryObject.updateTag(player);
         } else {
             updateCountry(player, "none");
-            Window.single().setTitle(org.bukkit.ChatColor.GRAY + "Select your country!").setGui(CountryGUIs.getCountryGUI()).build(player).open();
+            CountryGUIs.getCountryGUI(player);
         }
     }
 
-    public static void updateCountry(Player player, String country) {
+    public static String updateCountry(Player player, String country) {
         country = country.toLowerCase();
         if(countries.get(country) != null) {
             if(playerPerCountry.get(player.getUniqueId()) != null) {
@@ -135,6 +135,7 @@ public class CountryManager extends ModuleBase {
                 playerPerCountry.remove(player.getUniqueId());
             }
             countries.get(country).addPlayer(player);
+            return "Country updated";
         } else {
             for (CountryObject value : countries.values()) {
                 if(value.getCountryShort().equals(country)) {
@@ -143,9 +144,10 @@ public class CountryManager extends ModuleBase {
                         playerPerCountry.remove(player.getUniqueId());
                     }
                     value.addPlayer(player);
-                    return;
+                    return "Country updated";
                 }
             }
         }
+        return "Country not found.";
     }
 }

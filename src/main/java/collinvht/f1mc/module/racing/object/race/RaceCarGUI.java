@@ -1,6 +1,9 @@
 package collinvht.f1mc.module.racing.object.race;
 
 import collinvht.f1mc.F1MC;
+import collinvht.f1mc.module.discord.DiscordModule;
+import collinvht.f1mc.module.racing.module.team.manager.TeamManager;
+import collinvht.f1mc.module.racing.module.team.object.TeamObj;
 import collinvht.f1mc.module.racing.module.tyres.manager.TyreManager;
 import collinvht.f1mc.module.racing.module.tyres.obj.TyreBaseObject;
 import collinvht.f1mc.module.racing.module.tyres.obj.TyreClickItem;
@@ -8,6 +11,9 @@ import collinvht.f1mc.util.Utils;
 import com.sk89q.worldedit.blocks.BaseItem;
 import de.tr7zw.changeme.nbtapi.NBTItem;
 import lombok.Getter;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -24,6 +30,7 @@ import xyz.xenondevs.invui.item.ItemProvider;
 import xyz.xenondevs.invui.item.impl.SimpleItem;
 import xyz.xenondevs.invui.window.Window;
 
+import java.awt.*;
 import java.util.Set;
 import java.util.UUID;
 
@@ -107,34 +114,22 @@ public class RaceCarGUI {
             event.setCancelled(true);
             return;
         }
-        if(!car.getPlayer().isInPit() || car.getLinkedVehicle().getCurrentSpeedInKm() > 0) {
-            event.setCancelled(true);
-        }
-        if(TyreManager.isTyre(event.getNewItem()) && event.getPreviousItem() == null) {
+        if(TyreManager.isTyre(event.getNewItem())) {
             isWaitingOnTask = true;
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    startMinigame(false, event.getNewItem());
+                    startMinigame(event.getPreviousItem() != null, event.getNewItem());
                     isWaitingOnTask = false;
                 }
             }.runTaskLater(F1MC.getInstance(), 1);
             event.setCancelled(false);
         } else if(event.getPreviousItem() != null) {
-            if(event.getNewItem() == null) {
-                isWaitingOnTask = true;
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        startMinigame(true, event.getNewItem());
-                        isWaitingOnTask = false;
-                    }
-                }.runTaskLater(F1MC.getInstance(), 1);
-                event.setCancelled(true);
-            } else {
-                event.setCancelled(true);
-            }
+            Bukkit.getLogger().warning("previtem not null");
+            startMinigame(true, event.getNewItem());
+            event.setCancelled(true);
         } else {
+            Bukkit.getLogger().warning("just cancel it mf");
             event.setCancelled(true);
         }
     }
@@ -202,8 +197,52 @@ public class RaceCarGUI {
                 if (!players.isEmpty()) {
                     Player randomPlayer = players.stream().findAny().get();
                     randomPlayer.getInventory().addItem(bandInventory.getItem(0));
+                    if(Utils.isEnableDiscordModule()) {
+                        DiscordModule discordModule = DiscordModule.getInstance();
+                        if (discordModule.isInitialized()) {
+                            TeamObj teamObj = TeamManager.getTeamForPlayer(randomPlayer);
+                            if(teamObj != null) {
+                                JDA jda = discordModule.getJda();
+                                TextChannel channel = jda.getTextChannelById(1217628051853021194L);
+                                if (channel != null) {
+                                    EmbedBuilder builder = new EmbedBuilder();
+                                    builder.setColor(teamObj.getTeamColor().getColor());
+                                    builder.setTitle("Tyre change | " + teamObj.getTeamName());
+                                    builder.addField("Previous Tyre", TyreManager.getTyreName(bandInventory.getItem(0)), true);
+                                    builder.addField("New Tyre", TyreManager.getTyreName(newItem), true);
+                                    builder.addBlankField(true);
+                                    builder.addField("Player", car.getPlayer().getDriverName(), true);
+                                    channel.sendMessage(builder.build()).queue();
+                                }
+                            }
+                        }
+                    }
                 }
                 bandInventory.forceSetItem(UpdateReason.SUPPRESSED,0, newItem);
+            } else {
+                if(Utils.isEnableDiscordModule()) {
+                    if (!players.isEmpty()) {
+                        Player randomPlayer = players.stream().findAny().get();
+                        randomPlayer.getInventory().addItem(bandInventory.getItem(0));
+                        DiscordModule discordModule = DiscordModule.getInstance();
+                        if (discordModule.isInitialized()) {
+                            TeamObj teamObj = TeamManager.getTeamForPlayer(randomPlayer);
+                            if (teamObj != null) {
+                                JDA jda = discordModule.getJda();
+                                TextChannel channel = jda.getTextChannelById(1217628051853021194L);
+                                if (channel != null) {
+                                    EmbedBuilder builder = new EmbedBuilder();
+                                    builder.setColor(teamObj.getTeamColor().getColor());
+                                    builder.setTitle("Tyre change | " + teamObj.getTeamName());
+                                    builder.addField("New Tyre", TyreManager.getTyreName(newItem), true);
+                                    builder.addBlankField(true);
+                                    builder.addField("Player", car.getPlayer().getDriverName(), true);
+                                    channel.sendMessage(builder.build()).queue();
+                                }
+                            }
+                        }
+                    }
+                }
             }
             players.forEach(p -> {
                 Window window = Window.single()

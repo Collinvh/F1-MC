@@ -4,6 +4,7 @@ import collinvht.f1mc.module.racing.manager.managers.RaceManager;
 import collinvht.f1mc.module.racing.object.laptime.DriverLaptimeStorage;
 import collinvht.f1mc.module.racing.object.laptime.LaptimeStorage;
 import collinvht.f1mc.module.racing.object.race.Race;
+import collinvht.f1mc.module.racing.object.race.RaceListener;
 import collinvht.f1mc.module.racing.object.race.RaceMode;
 import collinvht.f1mc.module.vehiclesplus.listener.listeners.VPListener;
 import collinvht.f1mc.util.Utils;
@@ -32,6 +33,7 @@ public class RaceDriver {
     @Getter
     private boolean isDriving = true;
 
+    private RaceDriver instace;
     @Getter
     private final HashMap<Race, DriverLaptimeStorage> laptimes = new HashMap<>();
 
@@ -43,6 +45,9 @@ public class RaceDriver {
 
     @Getter @Setter
     private boolean finished;
+
+    @Getter @Setter
+    private long finishTime;
 
     @Getter @Setter
     private int currentLap;
@@ -62,8 +67,10 @@ public class RaceDriver {
     private Sidebar sidebar;
 
     public RaceDriver(Player player) {
+        Bukkit.getLogger().warning(String.valueOf(player.getUniqueId()));
         this.driverUUID = player.getUniqueId();
         this.driverName = player.getName();
+        initialize();
         SidebarComponent component = SidebarComponent.builder()
                 .addBlankLine()
                 .addDynamicLine(() -> {
@@ -162,10 +169,29 @@ public class RaceDriver {
         SidebarComponent title = SidebarComponent.staticLine(Component.text(ChatColor.RED + "F1" + ChatColor.GRAY + "-MC"));
         this.sidebarComponent = new ComponentSidebarLayout(title, component);
 //        this.sidebar = Utils.getScoreboardLibrary().createSidebar();
+        this.instace = this;
     }
 
     public void tick() {
 //        sidebarComponent.apply(sidebar);
+    }
+
+    private static TimerTask task;
+    private static Timer timer;
+
+    private void initialize() {
+        task = new TimerTask() {
+            @Override
+            public void run() {
+                if(isDriving) {
+                    for (Race race : RaceListener.getLISTENING()) {
+                        race.getRaceLapStorage().update(instace);
+                    }
+                }
+            }
+        };
+        if(timer == null) timer = new Timer("F1MC RaceListener Player | " + driverName);
+        timer.schedule(task, 0, 1);
     }
 
     private RaceDriver p1Driver;
@@ -236,7 +262,6 @@ public class RaceDriver {
 
     public void setDriving(boolean driving) {
         isDriving = driving;
-        isInPit = true;
         isPassedPitExit = false;
         Player player = Bukkit.getPlayer(driverUUID);
         if(player != null) {
@@ -258,8 +283,18 @@ public class RaceDriver {
     public void setPassedPitExit(Race race) {
         isInPit = false;
         isPassedPitExit = true;
-        if(laptimes.get(race).getCurrentLap() != null) {
-            laptimes.get(race).getCurrentLap().getS1().setSectorStart(System.currentTimeMillis()-100);
+        if(laptimes.get(race) != null) {
+            if (laptimes.get(race).getCurrentLap() != null) {
+                laptimes.get(race).getCurrentLap().getS1().setSectorStart(System.currentTimeMillis() - 100);
+            }
         }
+    }
+
+    public void reset() {
+        currentLap = 0;
+    }
+
+    public void delete() {
+        task.cancel();
     }
 }

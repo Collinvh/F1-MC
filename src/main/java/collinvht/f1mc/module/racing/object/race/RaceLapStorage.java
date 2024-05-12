@@ -1,40 +1,29 @@
 package collinvht.f1mc.module.racing.object.race;
 
-import collinvht.f1mc.module.discord.DiscordModule;
+import collinvht.f1mc.F1MC;
 import collinvht.f1mc.module.racing.manager.managers.RaceManager;
-import collinvht.f1mc.module.racing.module.fia.command.commands.DSQCommand;
 import collinvht.f1mc.module.racing.object.Cuboid;
 import collinvht.f1mc.module.racing.object.NamedCuboid;
+import collinvht.f1mc.module.racing.object.PenaltyCuboid;
 import collinvht.f1mc.module.racing.object.laptime.DriverLaptimeStorage;
+import collinvht.f1mc.module.racing.object.laptime.LaptimeStorage;
 import collinvht.f1mc.module.racing.object.laptime.SectorData;
 import collinvht.f1mc.module.vehiclesplus.listener.listeners.VPListener;
 import collinvht.f1mc.module.vehiclesplus.objects.RaceDriver;
-import collinvht.f1mc.module.racing.object.laptime.LaptimeStorage;
 import collinvht.f1mc.util.DefaultMessages;
 import collinvht.f1mc.util.Permissions;
 import collinvht.f1mc.util.Utils;
-import de.tr7zw.changeme.nbtapi.NBTItem;
 import lombok.Getter;
 import lombok.Setter;
 import me.legofreak107.vehiclesplus.vehicles.vehicles.objects.SpawnedVehicle;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.TextChannel;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.units.qual.N;
-import scala.concurrent.impl.FutureConvertersImpl;
+import org.bukkit.scheduler.BukkitRunnable;
 
-import java.awt.*;
-import java.sql.Time;
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
 import java.util.LinkedHashMap;
 import java.util.UUID;
-
-import static collinvht.f1mc.module.racing.object.race.RaceListener.drivingBackwards;
 
 public class RaceLapStorage {
     @Getter
@@ -47,7 +36,7 @@ public class RaceLapStorage {
     private final LinkedHashMap<UUID, LaptimeStorage> laptimeHash = new LinkedHashMap<>();
 
     @Getter
-    private final LinkedHashMap<Integer, UUID> finishers = new LinkedHashMap<>();
+    private final LinkedHashMap<Integer, RaceDriver> finishers = new LinkedHashMap<>();
 
     @Getter @Setter
     private LaptimeStorage bestLapTime;
@@ -67,25 +56,21 @@ public class RaceLapStorage {
     }
 
     public void update(RaceDriver raceDriver) {
-        if(raceDriver.isFinished()) return;
         Player player = Bukkit.getPlayer(raceDriver.getDriverUUID());
         if(player == null) return;
-        if(!player.isOnline()) return;
-        if(raceDriver.getVehicle() == null) return;
-        if(raceDriver.isDisqualified())  {
-            if(raceDriver.isInPit()) {
-                if(raceDriver.getVehicle().getCurrentSpeedInKm() > 140) {
-                    if(raceDriver.getSpeedingFlags() >= 30) {
-                        //TODO:
-                        //player.ban(prefix + "Speeding in the pits and continuing to do so", Duration.of(200, ChronoUnit.MINUTES), "F1-MC Plugin", true);
-                        raceDriver.setSpeedingFlags(0);
-                    } else {
-                        raceDriver.setSpeedingFlags(raceDriver.getSpeedingFlags()+1);
-                    }
-                }
-            } else {
-                raceDriver.setSpeedingFlags(raceDriver.getSpeedingFlags()-1);
-            }
+        if(!player.isOnline()) {
+            Bukkit.getLogger().warning("PLAYER OFFLINE + " + player.getName());
+        }
+        if(raceDriver.getVehicle() == null) {
+            player.sendMessage("vehicle null");
+            return;
+        }
+        if(raceDriver.isFinished()) {
+            player.sendMessage("finished");
+            return;
+        }
+        if(raceDriver.isDisqualified()) {
+            player.sendMessage("dsq");
             return;
         }
         if(RaceManager.getDrivingPlayers().get(player) != null) {
@@ -108,68 +93,55 @@ public class RaceLapStorage {
 
         SpawnedVehicle spawnedVehicle = raceDriver.getVehicle();
         Location location = spawnedVehicle.getHolder().getLocation();
-
-        if(!raceMode.isLapped()) {
-            if(raceDriver.isInPit()) {
-                Cuboid pitExit = race.getStorage().getPitExit().getCuboid();
-                if(pitExit.containsLocation(location)) {
-                    raceDriver.setPassedPitExit(race);
-                    Bukkit.getLogger().warning("pitout");
-                } else {
-                    if(spawnedVehicle.getCurrentSpeedInKm() > 80) {
-                        if(spawnedVehicle.getCurrentSpeedInKm() > 130) {
-                            raceDriver.setDisqualified(true);
-                            player.sendMessage(prefix + "You've been disqualified.");
-                            player.sendTitle(ChatColor.GRAY + "DSQ", "Speeding in the pits", 2, 50, 2);
-                            if(Utils.isEnableDiscordModule()) {
-                                DiscordModule discordModule = DiscordModule.getInstance();
-                                if (discordModule.isInitialized()) {
-                                    JDA jda = discordModule.getJda();
-                                    TextChannel channel = jda.getTextChannelById(1217628051853021194L);
-                                    if (channel != null) {
-                                        EmbedBuilder embedBuilder = new EmbedBuilder();
-                                        embedBuilder.setColor(Color.YELLOW);
-                                        embedBuilder.setTitle("DSQ | " + player.getName());
-                                        embedBuilder.addField("Reason", "Speeding in the pits by more than 40km/h", true);
-                                        channel.sendMessage(embedBuilder.build()).queue();
-                                    }
-                                }
-                            }
-                            raceDriver.setInPit();
-                            raceDriver.setSpeedingFlags(0);
-                        } else {
-                            if(raceDriver.getSpeedingFlags() >= 10) {
-                                for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-                                    if(Permissions.FIA_ADMIN.hasPermission(onlinePlayer)) {
-                                        onlinePlayer.sendMessage(prefix + player.getDisplayName() + " | Is speeding in the pits\nCircuit: " + race.getName() + "\nSpeed: " + spawnedVehicle.getCurrentSpeedInKm() + "/80km/h");
-                                    }
-                                }
-                                raceDriver.setSpeedingFlags(0);
-                            } else {
-                                raceDriver.setSpeedingFlags(raceDriver.getSpeedingFlags()+1);
-                            }
-                        }
-                    } else {
-                        raceDriver.setSpeedingFlags(raceDriver.getSpeedingFlags()-1);
-                    }
-                    return;
-                }
+        if(raceDriver.isInPit()) {
+            Cuboid pitExit = race.getStorage().getPitExit().getCuboid();
+            if (pitExit.containsLocation(location)) {
+                raceDriver.setPassedPitExit(race);
+                Bukkit.getLogger().warning("pit out");
             }
-            if(raceDriver.getSpeedingFlags() > 0) raceDriver.setSpeedingFlags(raceDriver.getSpeedingFlags()-1);
+        } else {
             Cuboid pitEntry = race.getStorage().getPitEntry().getCuboid();
             if(pitEntry.containsLocation(location)) {
                 raceDriver.setInPit();
+                Bukkit.getLogger().warning("pit in");
                 return;
             }
         }
-        if(!driverLaptimeStorage.isInvalidated()) {
-            for (NamedCuboid cuboid : race.getStorage().getLimits().values()) {
-                if (cuboid.getCuboid().containsLocation(location)) {
+        if(raceMode == RaceMode.NO_TIMING) return;
+        boolean hadFlag = false;
+        for (PenaltyCuboid cuboid : race.getStorage().getLimits().values()) {
+            if (cuboid.getCuboid().containsLocation(location)) {
+                if (!driverLaptimeStorage.isInvalidated()) {
                     driverLaptimeStorage.setInvalidated(true);
+                    driverLaptimeStorage.setInvalidFlags(driverLaptimeStorage.getInvalidFlags() + 5);
                     player.sendMessage(prefix + ChatColor.RED + "You've invalidated your lap.");
+                }
+                if(raceMode.isLapped()) {
+                    if(!hadFlag) {
+                        hadFlag = true;
+                        int curSpeed = spawnedVehicle.getCurrentSpeedInKm();
+                        if(curSpeed >= 90) {
+                            if(curSpeed >= 140) {
+                                driverLaptimeStorage.setInvalidFlags(driverLaptimeStorage.getInvalidFlags() + 4 + cuboid.getExtraFlags());
+                            } else {
+                                driverLaptimeStorage.setInvalidFlags(driverLaptimeStorage.getInvalidFlags() + 2 + cuboid.getExtraFlags());
+                            }
+                        } else if(curSpeed >= 25) {
+                            driverLaptimeStorage.setInvalidFlags(driverLaptimeStorage.getInvalidFlags() + 1 + cuboid.getExtraFlags());
+                        }
+                    }
+                    if (driverLaptimeStorage.getInvalidFlags() > 2000) {
+                        driverLaptimeStorage.setInvalidFlags(0);
+                        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+                            onlinePlayer.sendMessage(prefix + player.getName() + " +" + ChatColor.RED + "3s penalty\nREASON: Corner cutting");
+                        }
+                        player.sendMessage(prefix + ChatColor.RED + "You've gotten a 3s penalty for corner cutting.");
+                        driverLaptimeStorage.setPenalty(driverLaptimeStorage.getPenalty() + 3);
+                    }
                 }
             }
         }
+
         if(!laptimeStorage.isPassedS1()) {
             Cuboid s1 = race.getStorage().getS1().getCuboid();
             race.getStorage().getS1_mini().forEach((s, namedCuboid) -> {
@@ -200,6 +172,12 @@ public class RaceLapStorage {
                     laptimeStorage.setCurrentMini("");
                 }
                 if (!laptimeStorage.isPassedS1()) {
+                    if(driverLaptimeStorage.getInvalidFlags() > 250) {
+                        driverLaptimeStorage.setInvalidFlags(driverLaptimeStorage.getInvalidFlags() / 2);
+                    } else {
+                        driverLaptimeStorage.setInvalidFlags(0);
+                    }
+                    driverLaptimeStorage.addSector();
                     laptimeStorage.setPassedS1(true);
                     laptimeStorage.setPassedS3(false);
                     laptimeStorage.setS1L(current);
@@ -241,6 +219,12 @@ public class RaceLapStorage {
                     laptimeStorage.setCurrentMini("");
                 }
                 if (laptimeStorage.isPassedS1() && !laptimeStorage.isPassedS2()) {
+                    if(driverLaptimeStorage.getInvalidFlags() > 25) {
+                        driverLaptimeStorage.setInvalidFlags(driverLaptimeStorage.getInvalidFlags() / 2);
+                    } else {
+                        driverLaptimeStorage.setInvalidFlags(0);
+                    }
+                    driverLaptimeStorage.addSector();
                     laptimeStorage.setPassedS2(true);
                     laptimeStorage.setS2L(current);
                     if (!driverLaptimeStorage.isInvalidated()) {
@@ -281,6 +265,12 @@ public class RaceLapStorage {
                     laptimeStorage.setCurrentMini("");
                 }
                 if (laptimeStorage.isPassedS1() && laptimeStorage.isPassedS2() && !laptimeStorage.isPassedS3()) {
+                    driverLaptimeStorage.addSector();
+                    if(driverLaptimeStorage.getInvalidFlags() > 25) {
+                        driverLaptimeStorage.setInvalidFlags(driverLaptimeStorage.getInvalidFlags() / 2);
+                    } else {
+                        driverLaptimeStorage.setInvalidFlags(0);
+                    }
                     laptimeStorage.setPassedS3(true);
                     laptimeStorage.setS3L(current);
                     laptimeStorage.setLapL(laptimeStorage.getS1().getSectorLength() + laptimeStorage.getS2().getSectorLength() + laptimeStorage.getS3().getSectorLength());
@@ -296,16 +286,38 @@ public class RaceLapStorage {
                     raceDriver.setCurrentLap(raceDriver.getCurrentLap() + 1);
                     if (raceMode.isLapped()) {
                         if (raceDriver.getCurrentLap() >= race.getLaps()) {
-                            raceDriver.setFinished(true);
-                            final int position = finishers.size() + 1;
-                            finishers.put(position, raceDriver.getDriverUUID());
+                            if (driverLaptimeStorage.getPenalty() > 0) {
+                                player.sendMessage(prefix + ChatColor.RED + "You've finished but you got a penalty\n It'll show up soon!");
+                                raceDriver.setFinished(true);
+                                new BukkitRunnable() {
+                                    @Override
+                                    public void run() {
+                                        final int position = finishers.size() + 1;
+                                        finishers.put(position, raceDriver);
 
-                            player.sendMessage(ChatColor.GRAY + "You finished on position " + position);
+                                        player.sendMessage(prefix + ChatColor.GRAY + "You finished on position " + position);
 
-                            for (Player p : Bukkit.getOnlinePlayers()) {
-                                if (Permissions.FIA_ADMIN.hasPermission(p) || Permissions.FIA_RACE.hasPermission(p)) {
-                                    p.sendMessage(player.getDisplayName() + " finished on position " + position);
+                                        for (Player p : Bukkit.getOnlinePlayers()) {
+                                            if (Permissions.FIA_ADMIN.hasPermission(p) || Permissions.FIA_RACE.hasPermission(p)) {
+                                                p.sendMessage(player.getDisplayName() + " finished on position " + position);
+                                            }
+                                        }
+                                        raceDriver.setFinishTime(System.currentTimeMillis());
+                                    }
+                                }.runTaskLater(F1MC.getInstance(), 20L * driverLaptimeStorage.getPenalty());
+                            } else {
+                                raceDriver.setFinished(true);
+                                final int position = finishers.size() + 1;
+                                finishers.put(position, raceDriver);
+
+                                player.sendMessage(ChatColor.GRAY + "You finished on position " + position);
+
+                                for (Player p : Bukkit.getOnlinePlayers()) {
+                                    if (Permissions.FIA_ADMIN.hasPermission(p) || Permissions.FIA_RACE.hasPermission(p)) {
+                                        p.sendMessage(player.getDisplayName() + " finished on position " + position);
+                                    }
                                 }
+                                raceDriver.setFinishTime(System.currentTimeMillis());
                             }
                         }
                     }
@@ -327,6 +339,13 @@ public class RaceLapStorage {
         bestS1 = -1;
         bestS2 = -1;
         bestS3 = -1;
-        VPListener.getRACE_DRIVERS().forEach((uuid, raceDriver) -> raceDriver.getLaptimes(race).resetLaptimes());
+        finishers.clear();
+        VPListener.getRACE_DRIVERS().forEach((uuid, raceDriver) -> {
+            raceDriver.setCurrentLap(0);
+            raceDriver.setDisqualified(false);
+            raceDriver.setSpeedingFlags(0);
+            raceDriver.setFinished(false);
+            raceDriver.getLaptimes(race).resetLaptimes();
+        });
     }
 }

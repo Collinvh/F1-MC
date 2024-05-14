@@ -106,7 +106,7 @@ public class TimeTrialHolder {
             return;
         }
         if(spawnedVehicle != null) {
-            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy("Speed: " + spawnedVehicle.getCurrentSpeedInKm()));
+            //player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy("Speed: " + spawnedVehicle.getCurrentSpeedInKm()));
         }
     }
     public void stop() {

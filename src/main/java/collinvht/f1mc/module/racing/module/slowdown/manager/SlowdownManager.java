@@ -3,6 +3,7 @@ package collinvht.f1mc.module.racing.module.slowdown.manager;
 import collinvht.f1mc.F1MC;
 import collinvht.f1mc.module.racing.module.slowdown.obj.SlowdownIAObject;
 import collinvht.f1mc.module.racing.module.slowdown.obj.SlowdownObject;
+import collinvht.f1mc.module.racing.object.race.RaceCar;
 import collinvht.f1mc.module.vehiclesplus.listener.listeners.VPListener;
 import collinvht.f1mc.module.vehiclesplus.objects.RaceDriver;
 import collinvht.f1mc.util.Utils;
@@ -11,6 +12,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import dev.lone.itemsadder.api.CustomBlock;
+import me.legofreak107.vehiclesplus.VehiclesPlus;
 import me.legofreak107.vehiclesplus.vehicles.vehicles.objects.SpawnedVehicle;
 import me.legofreak107.vehiclesplus.vehicles.vehicles.objects.VehicleStats;
 import net.md_5.bungee.api.ChatMessageType;
@@ -28,6 +30,7 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class SlowdownManager extends ModuleBase {
@@ -126,20 +129,32 @@ public class SlowdownManager extends ModuleBase {
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                VPListener.getRACE_DRIVERS().forEach((uuid, raceDriver) -> {
-                    if(raceDriver.getVehicle() != null) {
-                        if(raceDriver.isDriving()) {
-                            update(raceDriver);
+                HashMap<UUID, RaceDriver> cloned = (HashMap<UUID, RaceDriver>) VPListener.getRACE_DRIVERS().clone();
+                HashMap<UUID, RaceCar> cloned2 = (HashMap<UUID, RaceCar>) VPListener.getRACE_CARS().clone();
+                cloned.forEach((uuid, raceDriver) -> {
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
                             if(raceDriver.getVehicle() != null) {
-                                if (Bukkit.getPlayer(raceDriver.getDriverUUID()) != null) {
-                                    SpawnedVehicle spawnedVehicle = raceDriver.getVehicle();
-                                    if(!Utils.isEnableTimeTrial()) Bukkit.getPlayer(raceDriver.getDriverUUID()).spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy("Speed: " + spawnedVehicle.getCurrentSpeedInKm() + " | Fuel: " + spawnedVehicle.getStorageVehicle().getVehicleStats().getCurrentFuel()));
+                                if(raceDriver.isDriving()) {
+                                    update(raceDriver);
+                                    if(raceDriver.getVehicle() != null) {
+                                        if (Bukkit.getPlayer(raceDriver.getDriverUUID()) != null) {
+                                            SpawnedVehicle spawnedVehicle = raceDriver.getVehicle();
+                                            Bukkit.getPlayer(raceDriver.getDriverUUID()).spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy("Speed: " + spawnedVehicle.getCurrentSpeedInKm() + " | Fuel: " + spawnedVehicle.getStorageVehicle().getVehicleStats().getCurrentFuel()));
+                                        }
+                                    }
                                 }
                             }
                         }
-                    }
+                    }.run();
                 });
-                VPListener.getRACE_CARS().forEach((uuid, car) -> car.updateTyre());
+                cloned2.forEach((uuid, car) -> new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        car.updateTyre();
+                    }
+                }.run());
             }
         }, 0, 1);
     }
@@ -149,7 +164,6 @@ public class SlowdownManager extends ModuleBase {
         if(player != null && player.isOnline()) {
             SpawnedVehicle vehicle = raceDriver.getVehicle();
             VehicleStats stats = vehicle.getStorageVehicle().getVehicleStats();
-            double curSpeed = stats.getCurrentSpeed();
             Block block = player.getLocation().clone().add(0, -0.2, 0).getBlock();
             if(block.getBlockData() instanceof Slab) {
                 block = player.getLocation().clone().add(0, -1.2, 0).getBlock();

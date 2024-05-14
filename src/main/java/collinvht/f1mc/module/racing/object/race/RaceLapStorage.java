@@ -29,7 +29,8 @@ public class RaceLapStorage {
     @Getter
     private final Race race;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private RaceMode raceMode;
 
     @Getter
@@ -38,43 +39,50 @@ public class RaceLapStorage {
     @Getter
     private final LinkedHashMap<Integer, RaceDriver> finishers = new LinkedHashMap<>();
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private LaptimeStorage bestLapTime;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private long bestS1 = -1;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private long bestS2 = -1;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private long bestS3 = -1;
 
     private static final String prefix = DefaultMessages.PREFIX;
+
     public RaceLapStorage(Race race) {
         this.race = race;
     }
 
     public void update(RaceDriver raceDriver) {
+        if (raceDriver == null) return;
+        if (raceDriver.getDriverUUID() == null) return;
         Player player = Bukkit.getPlayer(raceDriver.getDriverUUID());
-        if(player == null) return;
-        if(!player.isOnline()) {
+        if (player == null) return;
+        if (!player.isOnline()) {
             Bukkit.getLogger().warning("PLAYER OFFLINE + " + player.getName());
         }
-        if(raceDriver.getVehicle() == null) {
+        if (raceDriver.getVehicle() == null) {
             player.sendMessage("vehicle null");
             return;
         }
-        if(raceDriver.isFinished()) {
+        if (raceDriver.isFinished()) {
             player.sendMessage("finished");
             return;
         }
-        if(raceDriver.isDisqualified()) {
+        if (raceDriver.isDisqualified()) {
             player.sendMessage("dsq");
             return;
         }
-        if(RaceManager.getDrivingPlayers().get(player) != null) {
-            if(RaceManager.getDrivingPlayers().get(player) != race) {
+        if (RaceManager.getDrivingPlayers().get(player) != null) {
+            if (RaceManager.getDrivingPlayers().get(player) != race) {
                 RaceManager.getDrivingPlayers().put(player, race);
             }
         } else {
@@ -84,16 +92,16 @@ public class RaceLapStorage {
 
         DriverLaptimeStorage driverLaptimeStorage = raceDriver.getLaptimes(race);
         LaptimeStorage storage = driverLaptimeStorage.getCurrentLap();
-        if(storage == null) {
+        if (storage == null) {
             storage = new LaptimeStorage(raceDriver.getDriverUUID());
-            storage.getS1().setSectorStart(System.currentTimeMillis()-100);
+            storage.getS1().setSectorStart(System.currentTimeMillis() - 100);
             driverLaptimeStorage.setCurrentLap(storage);
         }
         final LaptimeStorage laptimeStorage = storage;
 
         SpawnedVehicle spawnedVehicle = raceDriver.getVehicle();
         Location location = spawnedVehicle.getHolder().getLocation();
-        if(raceDriver.isInPit()) {
+        if (raceDriver.isInPit()) {
             Cuboid pitExit = race.getStorage().getPitExit().getCuboid();
             if (pitExit.containsLocation(location)) {
                 raceDriver.setPassedPitExit(race);
@@ -101,13 +109,13 @@ public class RaceLapStorage {
             }
         } else {
             Cuboid pitEntry = race.getStorage().getPitEntry().getCuboid();
-            if(pitEntry.containsLocation(location)) {
+            if (pitEntry.containsLocation(location)) {
                 raceDriver.setInPit();
                 Bukkit.getLogger().warning("pit in");
                 return;
             }
         }
-        if(raceMode == RaceMode.NO_TIMING) return;
+        if (raceMode == RaceMode.NO_TIMING) return;
         boolean hadFlag = false;
         for (PenaltyCuboid cuboid : race.getStorage().getLimits().values()) {
             if (cuboid.getCuboid().containsLocation(location)) {
@@ -116,17 +124,17 @@ public class RaceLapStorage {
                     driverLaptimeStorage.setInvalidFlags(driverLaptimeStorage.getInvalidFlags() + 5);
                     player.sendMessage(prefix + ChatColor.RED + "You've invalidated your lap.");
                 }
-                if(raceMode.isLapped()) {
-                    if(!hadFlag) {
+                if (raceMode.isLapped()) {
+                    if (!hadFlag) {
                         hadFlag = true;
                         int curSpeed = spawnedVehicle.getCurrentSpeedInKm();
-                        if(curSpeed >= 90) {
-                            if(curSpeed >= 140) {
+                        if (curSpeed >= 90) {
+                            if (curSpeed >= 140) {
                                 driverLaptimeStorage.setInvalidFlags(driverLaptimeStorage.getInvalidFlags() + 4 + cuboid.getExtraFlags());
                             } else {
                                 driverLaptimeStorage.setInvalidFlags(driverLaptimeStorage.getInvalidFlags() + 2 + cuboid.getExtraFlags());
                             }
-                        } else if(curSpeed >= 25) {
+                        } else if (curSpeed >= 25) {
                             driverLaptimeStorage.setInvalidFlags(driverLaptimeStorage.getInvalidFlags() + 1 + cuboid.getExtraFlags());
                         }
                     }
@@ -142,16 +150,16 @@ public class RaceLapStorage {
             }
         }
 
-        if(!laptimeStorage.isPassedS1()) {
+        if (!laptimeStorage.isPassedS1()) {
             Cuboid s1 = race.getStorage().getS1().getCuboid();
             race.getStorage().getS1_mini().forEach((s, namedCuboid) -> {
-                if(!laptimeStorage.getCuboids().contains(namedCuboid)) {
-                    if(namedCuboid.getCuboid().containsLocation(location)) {
+                if (!laptimeStorage.getCuboids().contains(namedCuboid)) {
+                    if (namedCuboid.getCuboid().containsLocation(location)) {
                         SectorData data = new SectorData(raceDriver.getDriverUUID());
-                        if(!laptimeStorage.getCurrentMini().isEmpty()) {
+                        if (!laptimeStorage.getCurrentMini().isEmpty()) {
                             final long current = System.currentTimeMillis();
                             laptimeStorage.getS1_minis().get(laptimeStorage.getCurrentMini()).setSectorLengthL(current);
-                            player.sendMessage(prefix + "Mini " + laptimeStorage.getS1_minis().get(laptimeStorage.getCurrentMini()).getSectorName()  + " | " + Utils.millisToTimeString(laptimeStorage.getS1_minis().get(laptimeStorage.getCurrentMini()).getSectorLength()));
+                            player.sendMessage(prefix + "Mini " + laptimeStorage.getS1_minis().get(laptimeStorage.getCurrentMini()).getSectorName() + " | " + Utils.millisToTimeString(laptimeStorage.getS1_minis().get(laptimeStorage.getCurrentMini()).getSectorLength()));
                             data.setSectorStart(current);
                         } else {
                             data.setSectorStart(laptimeStorage.getS1().getSectorStart());
@@ -166,13 +174,13 @@ public class RaceLapStorage {
 
             if (s1.containsLocation(location)) {
                 final long current = System.currentTimeMillis();
-                if(!laptimeStorage.getCurrentMini().isEmpty()) {
+                if (!laptimeStorage.getCurrentMini().isEmpty()) {
                     laptimeStorage.getS1_minis().get(laptimeStorage.getCurrentMini()).setSectorLengthL(current);
-                    player.sendMessage(prefix + "Mini " + laptimeStorage.getS1_minis().get(laptimeStorage.getCurrentMini()).getSectorName()  + " | " + Utils.millisToTimeString(laptimeStorage.getS1_minis().get(laptimeStorage.getCurrentMini()).getSectorLength()));
+                    player.sendMessage(prefix + "Mini " + laptimeStorage.getS1_minis().get(laptimeStorage.getCurrentMini()).getSectorName() + " | " + Utils.millisToTimeString(laptimeStorage.getS1_minis().get(laptimeStorage.getCurrentMini()).getSectorLength()));
                     laptimeStorage.setCurrentMini("");
                 }
                 if (!laptimeStorage.isPassedS1()) {
-                    if(driverLaptimeStorage.getInvalidFlags() > 250) {
+                    if (driverLaptimeStorage.getInvalidFlags() > 250) {
                         driverLaptimeStorage.setInvalidFlags(driverLaptimeStorage.getInvalidFlags() / 2);
                     } else {
                         driverLaptimeStorage.setInvalidFlags(0);
@@ -189,10 +197,10 @@ public class RaceLapStorage {
                     }
                 }
             }
-        } else if(!laptimeStorage.isPassedS2()) {
+        } else if (!laptimeStorage.isPassedS2()) {
             Cuboid s2 = race.getStorage().getS2().getCuboid();
             race.getStorage().getS2_mini().forEach((s, namedCuboid) -> {
-                if(!laptimeStorage.getCuboids().contains(namedCuboid)) {
+                if (!laptimeStorage.getCuboids().contains(namedCuboid)) {
                     if (namedCuboid.getCuboid().containsLocation(location)) {
                         SectorData data = new SectorData(raceDriver.getDriverUUID());
                         if (!laptimeStorage.getCurrentMini().isEmpty()) {
@@ -213,13 +221,13 @@ public class RaceLapStorage {
 
             if (s2.containsLocation(location)) {
                 final long current = System.currentTimeMillis();
-                if(!laptimeStorage.getS2_minis().isEmpty()) {
+                if (!laptimeStorage.getS2_minis().isEmpty()) {
                     laptimeStorage.getS2_minis().get(laptimeStorage.getCurrentMini()).setSectorLengthL(current);
                     player.sendMessage(prefix + "Mini " + (laptimeStorage.getS2_minis().size()) + " | " + Utils.millisToTimeString(laptimeStorage.getS2_minis().get(laptimeStorage.getCurrentMini()).getSectorLength()));
                     laptimeStorage.setCurrentMini("");
                 }
                 if (laptimeStorage.isPassedS1() && !laptimeStorage.isPassedS2()) {
-                    if(driverLaptimeStorage.getInvalidFlags() > 25) {
+                    if (driverLaptimeStorage.getInvalidFlags() > 25) {
                         driverLaptimeStorage.setInvalidFlags(driverLaptimeStorage.getInvalidFlags() / 2);
                     } else {
                         driverLaptimeStorage.setInvalidFlags(0);
@@ -238,7 +246,7 @@ public class RaceLapStorage {
         } else {
             Cuboid s3 = race.getStorage().getS3().getCuboid();
             race.getStorage().getS3_mini().forEach((s, namedCuboid) -> {
-                if(!laptimeStorage.getCuboids().contains(namedCuboid)) {
+                if (!laptimeStorage.getCuboids().contains(namedCuboid)) {
                     if (namedCuboid.getCuboid().containsLocation(location)) {
                         SectorData data = new SectorData(raceDriver.getDriverUUID());
                         if (!laptimeStorage.getCurrentMini().isEmpty()) {
@@ -259,14 +267,14 @@ public class RaceLapStorage {
 
             if (s3.containsLocation(location)) {
                 final long current = System.currentTimeMillis();
-                if(!laptimeStorage.getS3_minis().isEmpty()) {
+                if (!laptimeStorage.getS3_minis().isEmpty()) {
                     laptimeStorage.getS3_minis().get(laptimeStorage.getCurrentMini()).setSectorLengthL(current);
                     player.sendMessage(prefix + "Mini " + (laptimeStorage.getS3_minis().size()) + " | " + Utils.millisToTimeString(laptimeStorage.getS3_minis().get(laptimeStorage.getCurrentMini()).getSectorLength()));
                     laptimeStorage.setCurrentMini("");
                 }
                 if (laptimeStorage.isPassedS1() && laptimeStorage.isPassedS2() && !laptimeStorage.isPassedS3()) {
                     driverLaptimeStorage.addSector();
-                    if(driverLaptimeStorage.getInvalidFlags() > 25) {
+                    if (driverLaptimeStorage.getInvalidFlags() > 25) {
                         driverLaptimeStorage.setInvalidFlags(driverLaptimeStorage.getInvalidFlags() / 2);
                     } else {
                         driverLaptimeStorage.setInvalidFlags(0);
@@ -333,6 +341,7 @@ public class RaceLapStorage {
             }
         }
     }
+
     public void reset() {
         laptimeHash.clear();
         bestLapTime = null;

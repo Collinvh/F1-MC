@@ -33,7 +33,7 @@ public class RaceDriver {
     @Getter
     private boolean isDriving = true;
 
-    private RaceDriver instace;
+    private final RaceDriver instace;
     @Getter
     private final HashMap<Race, DriverLaptimeStorage> laptimes = new HashMap<>();
 

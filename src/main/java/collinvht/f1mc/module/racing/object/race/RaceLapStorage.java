@@ -23,6 +23,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.LinkedHashMap;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.UUID;
 
 public class RaceLapStorage {
@@ -42,6 +44,8 @@ public class RaceLapStorage {
     @Getter
     @Setter
     private LaptimeStorage bestLapTime;
+
+    private final Timer timer = new Timer("f1mc.finishTimer");
 
     @Getter
     @Setter
@@ -70,15 +74,12 @@ public class RaceLapStorage {
             Bukkit.getLogger().warning("PLAYER OFFLINE + " + player.getName());
         }
         if (raceDriver.getVehicle() == null) {
-            player.sendMessage("vehicle null");
             return;
         }
         if (raceDriver.isFinished()) {
-            player.sendMessage("finished");
             return;
         }
         if (raceDriver.isDisqualified()) {
-            player.sendMessage("dsq");
             return;
         }
         if (RaceManager.getDrivingPlayers().get(player) != null) {
@@ -94,7 +95,7 @@ public class RaceLapStorage {
         LaptimeStorage storage = driverLaptimeStorage.getCurrentLap();
         if (storage == null) {
             storage = new LaptimeStorage(raceDriver.getDriverUUID());
-            storage.getS1().setSectorStart(System.currentTimeMillis() - 100);
+            storage.getS1().setSectorStart((System.currentTimeMillis() - 5000L));
             driverLaptimeStorage.setCurrentLap(storage);
         }
         final LaptimeStorage laptimeStorage = storage;
@@ -138,8 +139,8 @@ public class RaceLapStorage {
                             driverLaptimeStorage.setInvalidFlags(driverLaptimeStorage.getInvalidFlags() + 1 + cuboid.getExtraFlags());
                         }
                     }
-                    if (driverLaptimeStorage.getInvalidFlags() > 2000) {
-                        driverLaptimeStorage.setInvalidFlags(0);
+                    if (driverLaptimeStorage.getInvalidFlags() > 2500) {
+                        driverLaptimeStorage.setInvalidFlags(-500);
                         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
                             onlinePlayer.sendMessage(prefix + player.getName() + " +" + ChatColor.RED + "3s penalty\nREASON: Corner cutting");
                         }
@@ -297,7 +298,7 @@ public class RaceLapStorage {
                             if (driverLaptimeStorage.getPenalty() > 0) {
                                 player.sendMessage(prefix + ChatColor.RED + "You've finished but you got a penalty\n It'll show up soon!");
                                 raceDriver.setFinished(true);
-                                new BukkitRunnable() {
+                                timer.schedule(new TimerTask() {
                                     @Override
                                     public void run() {
                                         final int position = finishers.size() + 1;
@@ -312,7 +313,8 @@ public class RaceLapStorage {
                                         }
                                         raceDriver.setFinishTime(System.currentTimeMillis());
                                     }
-                                }.runTaskLater(F1MC.getInstance(), 20L * driverLaptimeStorage.getPenalty());
+                                }, (1000L * ((long)driverLaptimeStorage.getPenalty())));
+                                return;
                             } else {
                                 raceDriver.setFinished(true);
                                 final int position = finishers.size() + 1;

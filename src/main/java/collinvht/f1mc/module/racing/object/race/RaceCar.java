@@ -58,13 +58,15 @@ public class RaceCar {
                 if(!player.isInPit()) {
                     stats.setSpeed((int) (baseVehicle.getSpeedSettings().getBase() + tyre.getDouble("f1mc.extraSpeed")));
                 } else {
-                    if(stats.getCurrentSpeed() > 80) {
-                        stats.setCurrentSpeed(79.99D);
+                    if(stats.getCurrentSpeed() > 60.5D) {
+                        stats.setCurrentSpeed(60.00D);
                     }
-                    stats.setSpeed(80);
+                    stats.setSpeed(60);
                 }
                 stats.setLowSpeedSteering((float) (baseVehicle.getTurningRadiusSettings().getLowSpeed() * tyre.getDouble("f1mc.steering")));
                 stats.setHighSpeedSteering((float) (baseVehicle.getTurningRadiusSettings().getHighSpeed() * tyre.getDouble("f1mc.steering")));
+                stats.setLowSpeedAcceleration((float) (baseVehicle.getAccelerationSettings().getLowSpeed() * tyre.getDouble("f1mc.steering")));
+                stats.setHighSpeedAcceleration((float) (baseVehicle.getAccelerationSettings().getHighSpeed() * tyre.getDouble("f1mc.steering")));
 
                 tyre.setDouble("f1mc.dura", (dura-degrate * (getLinkedVehicle().getCurrentSpeedInKm())/5000));
                 ArrayList<String> lore = new ArrayList<>();

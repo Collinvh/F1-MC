@@ -285,7 +285,7 @@ public class RaceDriver {
         isPassedPitExit = true;
         if(laptimes.get(race) != null) {
             if (laptimes.get(race).getCurrentLap() != null) {
-                laptimes.get(race).getCurrentLap().getS1().setSectorStart(System.currentTimeMillis() - 100);
+                laptimes.get(race).getCurrentLap().getS1().setSectorStart(System.currentTimeMillis() - 1000);
             }
         }
     }

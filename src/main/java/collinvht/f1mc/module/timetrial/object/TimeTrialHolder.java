@@ -91,22 +91,12 @@ public class TimeTrialHolder {
             @Override
             public void run() {
                 checkSectors();
-                sendHotbar();
             }
         }, 0, 1);
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
             if(onlinePlayer != this.player) {
                 hide(onlinePlayer);
             }
-        }
-    }
-
-    public void sendHotbar() {
-        if(!isRunning) {
-            return;
-        }
-        if(spawnedVehicle != null) {
-            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy("Speed: " + spawnedVehicle.getCurrentSpeedInKm()));
         }
     }
     public void stop() {
@@ -200,7 +190,7 @@ public class TimeTrialHolder {
         MysqlDataSource dataSource = Utils.getDatabase();
         try {
             Connection connection = dataSource.getConnection();
-            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM timetrial_laps WHERE `player_uuid` = \""+ player.getUniqueId() +"\" AND `vehicle_name` = \""+ vehicle.getPermissions().getRidePermission() + "\" AND `track_name` = \"" + race.getName() + "\";");
+            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM timetrial_laps WHERE `player_uuid` = \""+ player.getUniqueId() +"\" AND `vehicle_name` = \""+ (vehicle.getPermissions().getRidePermission().contains("team.") ? "f1car" : vehicle.getPermissions().getRidePermission()) + "\" AND `track_name` = \"" + race.getName() + "\";");
             ResultSet rs = stmt.executeQuery();
             String id = null;
             long length = 0;
@@ -235,7 +225,7 @@ public class TimeTrialHolder {
                     }
                 }
             } else {
-                PreparedStatement nextStmt = connection.prepareStatement("INSERT INTO timetrial_laps (`player_uuid`, `lap_length`, `s1_length`, `s2_length`, `s3_length`, `track_name`, `vehicle_name`) VALUES ('"+ player.getUniqueId() +"', "+ timeTrialLap.getLapData().getSectorLength() + ","+ timeTrialLap.getS1().getSectorLength() + ","+ timeTrialLap.getS2().getSectorLength() + ","+ timeTrialLap.getS3().getSectorLength() +",'" + race.getName() + "', '"+ vehicle.getPermissions().getRidePermission() + "');");
+                PreparedStatement nextStmt = connection.prepareStatement("INSERT INTO timetrial_laps (`player_uuid`, `lap_length`, `s1_length`, `s2_length`, `s3_length`, `track_name`, `vehicle_name`) VALUES ('"+ player.getUniqueId() +"', "+ timeTrialLap.getLapData().getSectorLength() + ","+ timeTrialLap.getS1().getSectorLength() + ","+ timeTrialLap.getS2().getSectorLength() + ","+ timeTrialLap.getS3().getSectorLength() +",'" + race.getName() + "', '"+ (vehicle.getPermissions().getRidePermission().contains("team.") ? "f1car" : vehicle.getPermissions().getRidePermission()) + "');");
                 nextStmt.execute();
                 race.updateLeaderboard();
                 player.sendMessage(prefix + "New personal best!");

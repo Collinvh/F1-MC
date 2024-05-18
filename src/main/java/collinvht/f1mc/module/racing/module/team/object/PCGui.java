@@ -111,7 +111,13 @@ public class PCGui implements Listener {
                 ).addIngredient('#', new SimpleItem(new ItemBuilder(Utils.emptyStack(Material.GRAY_STAINED_GLASS_PANE))))
                 .addIngredient('P', new AutoUpdateItem(20, () -> new ItemBuilder(createPlayer(skullPlayer.getUniqueId()))))
                 .addIngredient('A', new AutoUpdateItem(20, () -> new ItemBuilder(currentLap(skullCar, skullPlayer))))
-                .addIngredient('T', skullCar.getRaceCarGUI().getBandInventory())
+                .addIngredient('T', new AutoUpdateItem(10, () -> {
+                    if(skullCar.getRaceCarGUI().getTyre() != null) {
+                        return new ItemBuilder(skullCar.getRaceCarGUI().getTyre().getItem());
+                    } else {
+                        return new ItemBuilder(Utils.emptyStack(Material.GRAY_STAINED_GLASS_PANE));
+                    }
+                }))
                 .addIngredient('C', new AutoUpdateItem(20, () -> new ItemBuilder(fastestLap(skullCar, skullPlayer))))
                 .addIngredient('B', new SimpleItem(new ItemStack(Material.BIRCH_SIGN))).build();
         Window window = Window.single()

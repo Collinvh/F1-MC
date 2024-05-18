@@ -114,12 +114,12 @@ public class RaceCarGUI {
             event.setCancelled(true);
             return;
         }
-        if(TyreManager.isTyre(event.getNewItem())) {
+        if(TyreManager.isTyre(event.getNewItem()) && event.getPreviousItem() == null) {
             isWaitingOnTask = true;
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    startMinigame(event.getPreviousItem() != null, event.getNewItem());
+                    startMinigame(false, event.getNewItem());
                     isWaitingOnTask = false;
                 }
             }.runTaskLater(F1MC.getInstance(), 1);
@@ -223,7 +223,6 @@ public class RaceCarGUI {
                 if(Utils.isEnableDiscordModule()) {
                     if (!players.isEmpty()) {
                         Player randomPlayer = players.stream().findAny().get();
-                        randomPlayer.getInventory().addItem(bandInventory.getItem(0));
                         DiscordModule discordModule = DiscordModule.getInstance();
                         if (discordModule.isInitialized()) {
                             TeamObj teamObj = TeamManager.getTeamForPlayer(randomPlayer);

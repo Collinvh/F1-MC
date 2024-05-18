@@ -11,7 +11,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mysql.cj.jdbc.MysqlDataSource;
-import ia.m.U;
 import me.legofreak107.vehiclesplus.vehicles.api.VehiclesPlusAPI;
 import me.legofreak107.vehiclesplus.vehicles.vehicles.objects.BaseVehicle;
 import org.bukkit.Bukkit;
@@ -155,7 +154,7 @@ public class TimeTrialManager {
                 gui = Gui.normal().setStructure("# # # # # # # # #", "# # B # A # C # #", "! # # # R # # # !")
                         .addIngredient('A', createTrack("india", 43730, "&aIndia"))
                         .addIngredient('B', createTrack("gb", 44709, "&aGB"))
-                        .addIngredient('C', createTrack("mexico", 43921, "&aMexico"))
+                        .addIngredient('C', createTrack("hockenheim", 43579, "&aGermany"))
                         .addIngredient('R', new SimpleItem(Utils.emptyStack(Material.RED_STAINED_GLASS_PANE), (click -> {
                             timeTrialHolders.get(click.getPlayer().getUniqueId()).stop();
                             timeTrialHolders.remove(click.getPlayer().getUniqueId());
@@ -169,7 +168,7 @@ public class TimeTrialManager {
                 gui2 = Gui.normal().setStructure("# # # # # # # # #", "# # B # A # C # #", "! # # # # # # # !")
                         .addIngredient('A', createTrack("india", 43730, "&aIndia"))
                         .addIngredient('B', createTrack("gb", 44709, "&aGB"))
-                        .addIngredient('C', createTrack("mexico", 43921, "&aMexico"))
+                        .addIngredient('C', createTrack("hockenheim", 43579, "&aGermany"))
                         .addIngredient('!', new SimpleItem(Utils.createSkull(1223, "DLC"), (click) -> click.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&',"&cComing soon!"))))
                         .addIngredient('#', new SimpleItem(Utils.emptyStack(Material.GRAY_STAINED_GLASS_PANE))).build();
             }
@@ -196,11 +195,13 @@ public class TimeTrialManager {
         if(baseVehicle.isPresent()) {
             Race race = RaceManager.getInstance().getRace(track);
             if(race != null) {
-                Player player = click.getPlayer();
-                if(timeTrialHolders.containsKey(player.getUniqueId())) {
-                    timeTrialHolders.get(player.getUniqueId()).stop();
+                if (race.isTimeTrialStatus()) {
+                    Player player = click.getPlayer();
+                    if (timeTrialHolders.containsKey(player.getUniqueId())) {
+                        timeTrialHolders.get(player.getUniqueId()).stop();
+                    }
+                    timeTrialHolders.put(player.getUniqueId(), new TimeTrialHolder(player, race, baseVehicle.get()));
                 }
-                timeTrialHolders.put(player.getUniqueId(), new TimeTrialHolder(player, race, baseVehicle.get()));
             }
         } else {
             click.getPlayer().sendMessage(DefaultMessages.PREFIX + "Error loading vehicle.");

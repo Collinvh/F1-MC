@@ -9,6 +9,7 @@ import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.math.BlockVector3;
 import lombok.Getter;
+import lombok.Setter;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import net.megavex.scoreboardlibrary.api.ScoreboardLibrary;
@@ -45,7 +46,7 @@ public class Utils {
     @Getter
     private static boolean enableBuildingModule = true;
 
-    @Getter
+    @Getter @Setter
     private static boolean enableDiscordModule = true;
 
     @Getter

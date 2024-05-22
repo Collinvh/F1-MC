@@ -2,6 +2,7 @@ package collinvht.f1mc.module.racing.object.race;
 
 import collinvht.f1mc.F1MC;
 import collinvht.f1mc.module.racing.manager.managers.RaceManager;
+import collinvht.f1mc.module.racing.module.weather.obj.WeatherTypes;
 import collinvht.f1mc.module.racing.object.Cuboid;
 import collinvht.f1mc.module.racing.object.NamedCuboid;
 import collinvht.f1mc.module.racing.object.PenaltyCuboid;
@@ -34,6 +35,14 @@ public class RaceLapStorage {
     @Getter
     @Setter
     private RaceMode raceMode;
+
+    @Getter
+    @Setter
+    private WeatherTypes weatherType = WeatherTypes.DRY;
+
+    @Getter
+    @Setter
+    private int waterPercentage = WeatherTypes.DRY.getWaterPercentage();
 
     @Getter
     private final LinkedHashMap<UUID, LaptimeStorage> laptimeHash = new LinkedHashMap<>();

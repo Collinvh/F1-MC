@@ -37,9 +37,6 @@ public class SlowdownManager extends ModuleBase {
     private static final HashMap<Material, SlowdownObject> slowDowns = new HashMap<>();
     private static final HashMap<String, SlowdownIAObject> customslowDowns = new HashMap<>();
 
-    private static final Timer timer = new Timer("SlowDownTimer");
-
-
     public static String addBlock(ItemStack stack, double slowdown, double steering, double maxSpeed) {
         Material material = stack.getType();
         if(slowDowns.containsKey(material)) {
@@ -99,7 +96,6 @@ public class SlowdownManager extends ModuleBase {
         object.add("array2", mainObject2);
 
         Utils.saveJSON(path, "slowdown", object);
-        timer.cancel();
     }
 
     public void load() {
@@ -126,37 +122,6 @@ public class SlowdownManager extends ModuleBase {
             } catch (Exception ignored) {
             }
         }
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                HashMap<UUID, RaceDriver> cloned = (HashMap<UUID, RaceDriver>) VPListener.getRACE_DRIVERS().clone();
-                HashMap<UUID, RaceCar> cloned2 = (HashMap<UUID, RaceCar>) VPListener.getRACE_CARS().clone();
-                cloned.forEach((uuid, raceDriver) -> {
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            if(raceDriver.getVehicle() != null) {
-                                if(raceDriver.isDriving()) {
-                                    update(raceDriver);
-                                    if(raceDriver.getVehicle() != null) {
-                                        if (Bukkit.getPlayer(raceDriver.getDriverUUID()) != null) {
-                                            SpawnedVehicle spawnedVehicle = raceDriver.getVehicle();
-                                            Bukkit.getPlayer(raceDriver.getDriverUUID()).spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy("Speed: " + spawnedVehicle.getCurrentSpeedInKm() + " | Fuel: " + spawnedVehicle.getStorageVehicle().getVehicleStats().getCurrentFuel()));
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }.run();
-                });
-                cloned2.forEach((uuid, car) -> new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        car.updateTyre();
-                    }
-                }.run());
-            }
-        }, 0, 1);
     }
 
     public static void update(RaceDriver raceDriver) {

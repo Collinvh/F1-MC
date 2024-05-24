@@ -40,6 +40,11 @@ public class RaceLapStorage {
     @Setter
     private WeatherTypes weatherType = WeatherTypes.DRY;
 
+
+    @Getter
+    @Setter
+    private WeatherTypes nextWeatherType = WeatherTypes.DRY;
+
     @Getter
     @Setter
     private int waterPercentage = WeatherTypes.DRY.getWaterPercentage();

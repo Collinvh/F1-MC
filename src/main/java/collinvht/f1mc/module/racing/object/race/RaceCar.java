@@ -1,7 +1,10 @@
 package collinvht.f1mc.module.racing.object.race;
 
+import collinvht.f1mc.module.racing.manager.managers.RaceManager;
 import collinvht.f1mc.module.racing.module.slowdown.manager.SlowdownManager;
 import collinvht.f1mc.module.racing.module.team.object.TeamObj;
+import collinvht.f1mc.module.racing.module.weather.manager.WeatherManager;
+import collinvht.f1mc.module.racing.module.weather.obj.WeatherTypes;
 import collinvht.f1mc.module.vehiclesplus.listener.listeners.VPListener;
 import collinvht.f1mc.module.vehiclesplus.objects.RaceDriver;
 import collinvht.f1mc.util.Utils;
@@ -71,23 +74,39 @@ public class RaceCar {
             } else {
                 double dura = tyre.getDouble("f1mc.dura");
                 double degrate = tyre.getDouble("f1mc.degradationRate")/20;
+                double[] tyreSpeedArray = new double[3];
+                if(RaceManager.getDrivingPlayers().get(player.getPlayer()) != null) {
+                    tyreSpeedArray = WeatherManager.currentRotation(RaceManager.getDrivingPlayers().get(player.getPlayer()));
+                } else {
+                    tyreSpeedArray[0] = WeatherTypes.DRY.getInterSpeedMultiplier();;
+                    tyreSpeedArray[1] = WeatherTypes.DRY.getWetSpeedMultiplier();;
+                    tyreSpeedArray[2] = WeatherTypes.DRY.getSlickSpeedMultiplier();;
+                }
+                String tyreName = tyre.getString("f1mc.name");
+                double speedMultiplier;
+                switch (tyreName.toLowerCase()) {
+                    case "intermediate" -> speedMultiplier = tyreSpeedArray[0];
+                    case "wet" -> speedMultiplier = tyreSpeedArray[1];
+                    default -> speedMultiplier = tyreSpeedArray[2];
+                }
+
                 if(dura <= 0) {
                     if(stats.getCurrentSpeed() > 10) stats.setCurrentSpeed(10.0);
                     stats.setSpeed(10);
                     return;
                 }
                 if(!player.isInPit()) {
-                    stats.setSpeed((int) (baseVehicle.getSpeedSettings().getBase() + tyre.getDouble("f1mc.extraSpeed")));
+                    stats.setSpeed((int) (baseVehicle.getSpeedSettings().getBase() + tyre.getDouble("f1mc.extraSpeed") * speedMultiplier));
                 } else {
                     if(stats.getCurrentSpeed() > 60.5D) {
                         stats.setCurrentSpeed(60.00D);
                     }
                     stats.setSpeed(60);
                 }
-                stats.setLowSpeedSteering((float) (baseVehicle.getTurningRadiusSettings().getLowSpeed() * tyre.getDouble("f1mc.steering")));
-                stats.setHighSpeedSteering((float) (baseVehicle.getTurningRadiusSettings().getHighSpeed() * tyre.getDouble("f1mc.steering")));
-                stats.setLowSpeedAcceleration((float) (baseVehicle.getAccelerationSettings().getLowSpeed() * tyre.getDouble("f1mc.steering")));
-                stats.setHighSpeedAcceleration((float) (baseVehicle.getAccelerationSettings().getHighSpeed() * tyre.getDouble("f1mc.steering")));
+                stats.setLowSpeedSteering((float) (baseVehicle.getTurningRadiusSettings().getLowSpeed() * tyre.getDouble("f1mc.steering")) * speedMultiplier);
+                stats.setHighSpeedSteering((float) (baseVehicle.getTurningRadiusSettings().getHighSpeed() * tyre.getDouble("f1mc.steering")) * speedMultiplier);
+                stats.setLowSpeedAcceleration((float) (baseVehicle.getAccelerationSettings().getLowSpeed() * tyre.getDouble("f1mc.steering")) * speedMultiplier);
+                stats.setHighSpeedAcceleration((float) (baseVehicle.getAccelerationSettings().getHighSpeed() * tyre.getDouble("f1mc.steering")) * speedMultiplier);
 
                 tyre.setDouble("f1mc.dura", (dura-degrate * (getLinkedVehicle().getCurrentSpeedInKm())/5000));
                 ArrayList<String> lore = new ArrayList<>();

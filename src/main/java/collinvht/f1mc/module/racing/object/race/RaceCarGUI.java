@@ -35,7 +35,7 @@ import java.util.Set;
 import java.util.UUID;
 
 public class RaceCarGUI {
-    private final RaceCar car;
+    private final RaceCar holder;
     private final Gui bandGui;
     @Getter
     private final VirtualInventory bandInventory;
@@ -52,7 +52,7 @@ public class RaceCarGUI {
     private Player intialOpenedPlayer;
 
     public RaceCarGUI(RaceCar car) {
-        this.car = car;
+        this.holder = car;
         int[] sizes = new int[]{1};
         this.bandInventory = new VirtualInventory(UUID.randomUUID(), 1, null, sizes);
         bandInventory.setPreUpdateHandler(this::ItemPreUpdate);
@@ -211,7 +211,7 @@ public class RaceCarGUI {
                                     builder.addField("Previous Tyre", TyreManager.getTyreName(bandInventory.getItem(0)), true);
                                     builder.addField("New Tyre", TyreManager.getTyreName(newItem), true);
                                     builder.addBlankField(true);
-                                    builder.addField("Player", car.getPlayer().getDriverName(), true);
+                                    builder.addField("Player", holder.getPlayer().getDriverName(), true);
                                     channel.sendMessage(builder.build()).queue();
                                 }
                             }
@@ -235,7 +235,7 @@ public class RaceCarGUI {
                                     builder.setTitle("Tyre change | " + teamObj.getTeamName());
                                     builder.addField("New Tyre", TyreManager.getTyreName(newItem), true);
                                     builder.addBlankField(true);
-                                    builder.addField("Player", car.getPlayer().getDriverName(), true);
+                                    builder.addField("Player", holder.getPlayer().getDriverName(), true);
                                     channel.sendMessage(builder.build()).queue();
                                 }
                             }
@@ -266,7 +266,7 @@ public class RaceCarGUI {
     }
 
     public boolean canContinue() {
-        if(car.getLinkedVehicle() == null) {
+        if(holder.getLinkedVehicle() == null) {
             for (Player allCurrentViewer : bandGui.findAllCurrentViewers()) {
                 allCurrentViewer.closeInventory();
             }

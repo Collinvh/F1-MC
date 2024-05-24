@@ -5,6 +5,8 @@ import collinvht.f1mc.module.racing.module.weather.obj.WeatherTransitionSpeed;
 import collinvht.f1mc.module.racing.module.weather.obj.WeatherTypes;
 import collinvht.f1mc.module.racing.object.race.Race;
 import collinvht.f1mc.util.DefaultMessages;
+import org.bukkit.Bukkit;
+import org.joml.Math;
 
 import java.util.Random;
 import java.util.Timer;
@@ -20,7 +22,7 @@ public class WeatherManager {
         if(race == null) return prefix + "That race doesn't exist";
         if(race.getRaceLapStorage() == null) return prefix + "The race has not been started";
         int percentage = race.getRaceLapStorage().getWaterPercentage();
-        return prefix + "We expect it to be " + WeatherTypes.fromPercentageAprox(percentage) + " currently.";
+        return prefix + "We expect it to be " + WeatherTypes.fromPercentageAprox(percentage) + " for now.";
     }
     public static String getWeather(String raceName) {
         Race race = RaceManager.getRACES().get(raceName);
@@ -46,7 +48,7 @@ public class WeatherManager {
         if(transitionSpeed == null) return prefix + "That transition type doesn't exist";
         if(race.getRaceLapStorage() == null) return prefix + "Theirs no race storage";
         if(race.getRaceLapStorage().getWeatherType().equals(type)) return prefix + "This weather type is already the current weather type";
-        race.getRaceLapStorage().setWeatherType(type);
+        race.getRaceLapStorage().setNextWeatherType(type);
         if(transitionSpeed == WeatherTransitionSpeed.INSTANT) {
             race.getRaceLapStorage().setWaterPercentage(type.getWaterPercentage());
         } else {
@@ -54,6 +56,39 @@ public class WeatherManager {
             weatherTimer.schedule(timerTask, delay, 10);
         }
         return prefix + "Weather is being adjusted";
+    }
+
+    public static double[] currentRotation(Race race) {
+        WeatherTypes current = race.getRaceLapStorage().getWeatherType();
+        WeatherTypes next = race.getRaceLapStorage().getNextWeatherType();
+        int idDifference = current.getId() - next.getId();
+        if(idDifference != 1 && idDifference != -1) {
+            if(idDifference < 0) {
+                next = WeatherTypes.fromID(current.getId()-1);
+            } else {
+                next = WeatherTypes.fromID(current.getId()+1);
+            }
+        }
+        double[] doubles = new double[3];
+        if(next != null) {
+            if(idDifference > 0) {
+                double calculation = ((double) next.getWaterPercentage()) / ((double) current.getWaterPercentage());
+                doubles[0] = Math.lerp(current.getInterSpeedMultiplier(), next.getInterSpeedMultiplier(), calculation);
+                doubles[1] = Math.lerp(current.getWetSpeedMultiplier(), next.getWetSpeedMultiplier(), calculation);
+                doubles[2] = Math.lerp(current.getSlickSpeedMultiplier(), next.getSlickSpeedMultiplier(), calculation);
+            } else {
+                double calculation = ((double) current.getWaterPercentage()) / ((double) next.getWaterPercentage());
+                doubles[0] = Math.lerp(current.getInterSpeedMultiplier(), next.getInterSpeedMultiplier(), calculation);
+                doubles[1] = Math.lerp(current.getWetSpeedMultiplier(), next.getWetSpeedMultiplier(), calculation);
+                doubles[2] = Math.lerp(current.getSlickSpeedMultiplier(), next.getSlickSpeedMultiplier(), calculation);
+            }
+        } else {
+            Bukkit.getLogger().severe("Theirs been an issue getting the currentRotation for the tyres");
+            doubles[0] = WeatherTypes.DRY.getInterSpeedMultiplier();;
+            doubles[1] = WeatherTypes.DRY.getWetSpeedMultiplier();;
+            doubles[2] = WeatherTypes.DRY.getSlickSpeedMultiplier();;
+        }
+        return doubles;
     }
 
     private static TimerTask getWeatherTask(Race race, WeatherTransitionSpeed transitionSpeed, WeatherTypes type) {
@@ -69,6 +104,7 @@ public class WeatherManager {
                     race.getRaceLapStorage().setWaterPercentage(Math.max(waterPercentage - addedAmount, goal));
                 }
                 if(race.getRaceLapStorage().getWaterPercentage() == goal) {
+                    race.getRaceLapStorage().setWeatherType(type);
                     cancel();
                 }
             }

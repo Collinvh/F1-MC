@@ -59,4 +59,11 @@ public enum WeatherTypes {
         }
         return name;
     }
+
+    public static WeatherTypes fromID(int id) {
+        for (WeatherTypes value : WeatherTypes.values()) {
+            if(value.id == id) return value;
+        }
+        return null;
+    }
 }

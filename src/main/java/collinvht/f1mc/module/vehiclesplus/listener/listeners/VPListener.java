@@ -64,7 +64,6 @@ public class VPListener implements Listener {
             if(driver != null) {
                 driver.setVehicle(null);
                 driver.setDriving(false);
-                driver.setInPit();
             }
             SpawnedVehicle vehicle = (SpawnedVehicle) event.getVehicle();
             if(RACE_CARS.containsKey(vehicle.getHolder().getUniqueId())) {

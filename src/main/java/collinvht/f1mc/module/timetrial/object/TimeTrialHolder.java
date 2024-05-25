@@ -63,7 +63,7 @@ public class TimeTrialHolder {
         this.timeTrialLap.setPassedS1(true);
         this.timeTrialLap.setPassedS2(true);
         this.oldLocation = player.getLocation();
-        this.spawnedVehicle = VehiclesPlusAPI.getInstance().createVehicle(vehicle, player).spawnVehicle(storage.getTimeTrialSpawn(), SpawnMode.FORCE);
+        this.spawnedVehicle = VehiclesPlusAPI.getInstance().createVehicle(vehicle, player).spawnVehicle(storage.getTimeTrialSpawn(), SpawnMode.GARAGE);
         this.rival = TimeTrialManager.getRivalObject(this.race.getName(), this.player.getUniqueId());
         if (this.rival != null) {
             if(this.rival.getRival() != null) {

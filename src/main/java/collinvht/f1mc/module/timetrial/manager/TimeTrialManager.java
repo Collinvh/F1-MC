@@ -151,8 +151,8 @@ public class TimeTrialManager {
     public static Gui getGui(Player player) {
         if(timeTrialHolders.containsKey(player.getUniqueId())) {
             if (gui == null) {
-                gui = Gui.normal().setStructure("# # # # # # # # #", "# # B # A # C # #", "! # # # R # # # !")
-                        .addIngredient('A', createTrack("india", 43730, "&aIndia"))
+                gui = Gui.normal().setStructure("# # # # # # # # #", "# # B # C # A # #", "! # # # R # # # !")
+                        .addIngredient('A', createTrack("misano", 43759, "&aMisano"))
                         .addIngredient('B', createTrack("gb", 44709, "&aGB"))
                         .addIngredient('C', createTrack("hockenheim", 43579, "&aGermany"))
                         .addIngredient('R', new SimpleItem(Utils.emptyStack(Material.RED_STAINED_GLASS_PANE), (click -> {
@@ -165,8 +165,8 @@ public class TimeTrialManager {
             return gui;
         } else {
             if (gui2 == null) {
-                gui2 = Gui.normal().setStructure("# # # # # # # # #", "# # B # A # C # #", "! # # # # # # # !")
-                        .addIngredient('A', createTrack("india", 43730, "&aIndia"))
+                gui2 = Gui.normal().setStructure("# # # # # # # # #", "# # B # C # A # #", "! # # # # # # # !")
+                        .addIngredient('A', createTrack("misano", 43759, "&aMisano"))
                         .addIngredient('B', createTrack("gb", 44709, "&aGB"))
                         .addIngredient('C', createTrack("hockenheim", 43579, "&aGermany"))
                         .addIngredient('!', new SimpleItem(Utils.createSkull(1223, "DLC"), (click) -> click.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&',"&cComing soon!"))))
@@ -201,7 +201,11 @@ public class TimeTrialManager {
                         timeTrialHolders.get(player.getUniqueId()).stop();
                     }
                     timeTrialHolders.put(player.getUniqueId(), new TimeTrialHolder(player, race, baseVehicle.get()));
+                } else {
+                    click.getPlayer().sendMessage(DefaultMessages.PREFIX + "This track has been disabled.");
                 }
+            } else {
+                click.getPlayer().sendMessage(DefaultMessages.PREFIX + "Theirs been an issue loading this track\nReport it to staff please.");
             }
         } else {
             click.getPlayer().sendMessage(DefaultMessages.PREFIX + "Error loading vehicle.");

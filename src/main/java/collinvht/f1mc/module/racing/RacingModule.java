@@ -37,5 +37,6 @@ public class RacingModule extends ModuleBase {
         for (RaceCar value : VPListener.getRACE_CARS().values()) {
             value.getLinkedVehicle().despawn(true);
         }
+        RaceCar.getCarTimers().cancel();
     }
 }

@@ -154,9 +154,9 @@ public class SlowdownManager extends ModuleBase {
                 SlowdownObject obj = slowDowns.get(block.getType());
                 steering *= (float) obj.getSteeringPercent();
                 steeringHigh *= (float) obj.getSteeringPercent();
-                acceleration *= (float) (obj.getSteeringPercent()*2);
-                accelerationHigh *= (float) (obj.getSteeringPercent()*2);
-                braking *= (float) (obj.getSteeringPercent()*2);
+                acceleration *= (float) (obj.getSteeringPercent());
+                accelerationHigh *= (float) (obj.getSteeringPercent());
+                braking *= (float) (obj.getSteeringPercent());
             }
             stats.setLowSpeedSteering(steering);
             stats.setHighSpeedSteering(steeringHigh);

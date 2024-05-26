@@ -91,6 +91,7 @@ public class TimeTrialHolder {
             @Override
             public void run() {
                 checkSectors();
+//                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy("Speed: " + spawnedVehicle.getCurrentSpeedInKm()));
             }
         }, 0, 1);
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {

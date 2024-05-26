@@ -1,6 +1,7 @@
 package collinvht.f1mc.module.vehiclesplus.objects;
 
 import collinvht.f1mc.module.racing.manager.managers.RaceManager;
+import collinvht.f1mc.module.racing.module.slowdown.manager.SlowdownManager;
 import collinvht.f1mc.module.racing.object.laptime.DriverLaptimeStorage;
 import collinvht.f1mc.module.racing.object.laptime.LaptimeStorage;
 import collinvht.f1mc.module.racing.object.race.Race;
@@ -13,6 +14,8 @@ import lombok.Getter;
 import lombok.Setter;
 import me.legofreak107.vehiclesplus.vehicles.vehicles.objects.SpawnedVehicle;
 import net.kyori.adventure.text.Component;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.megavex.scoreboardlibrary.api.sidebar.Sidebar;
 import net.megavex.scoreboardlibrary.api.sidebar.component.ComponentSidebarLayout;
 import net.megavex.scoreboardlibrary.api.sidebar.component.SidebarComponent;
@@ -187,6 +190,9 @@ public class RaceDriver {
                     for (Race race : RaceListener.getLISTENING()) {
                         race.getRaceLapStorage().update(instace);
                     }
+                    try {
+                        Bukkit.getPlayer(getDriverUUID()).spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy("Speed: " + vehicle.getCurrentSpeedInKm() + " | Fuel: " + vehicle.getStorageVehicle().getVehicleStats().getCurrentFuel()));
+                    } catch (Exception ignored) {}
                 }
             }
         };

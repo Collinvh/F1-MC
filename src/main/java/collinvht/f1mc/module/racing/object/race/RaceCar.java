@@ -15,6 +15,7 @@ import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import xyz.xenondevs.invui.inventory.event.UpdateReason;
@@ -22,6 +23,7 @@ import xyz.xenondevs.invui.inventory.event.UpdateReason;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.UUID;
 
 public class RaceCar {
     @Getter
@@ -45,13 +47,6 @@ public class RaceCar {
             @Override
             public void run() {
                 updateTyre();
-                if(player != null) {
-                    if(player.isDriving()) {
-                        SlowdownManager.update(player);
-                        Bukkit.getPlayer(player.getDriverUUID()).spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy("Speed: " + spawnedVehicle.getCurrentSpeedInKm() + " | Fuel: " + spawnedVehicle.getStorageVehicle().getVehicleStats().getCurrentFuel()));
-                    }
-                }
-
             }
         }, 0, 1);
     }

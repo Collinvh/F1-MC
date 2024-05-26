@@ -63,3 +63,8 @@ commands:
     description: Custom Undo
   country:
     description: Sets your country
+  forecast:
+    description: Predicts the upcomming weather
+  weather:
+    description: Sets the weather
+    permission: f1mc.fia.common

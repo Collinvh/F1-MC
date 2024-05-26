@@ -48,6 +48,8 @@ public class RaceDriver {
     @Getter
     private final UUID driverUUID;
     @Getter
+    private final Player player;
+    @Getter
     private final String driverName;
 
     @Getter @Setter
@@ -62,6 +64,7 @@ public class RaceDriver {
     public RaceDriver(Player player) {
         Bukkit.getLogger().warning(String.valueOf(player.getUniqueId()));
         this.driverUUID = player.getUniqueId();
+        this.player = player;
         this.driverName = player.getName();
         initialize();
         this.instace = this;

@@ -106,10 +106,21 @@ public class TyreManager extends ModuleBase {
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-        } else {
+        }
+        if(!tyres.containsKey("soft")) {
             tyres.put("soft", new TyreBaseObject("soft", 10012, 1500, 1.15, 1.1, 15));
+        }
+        if(!tyres.containsKey("medium")) {
             tyres.put("medium", new TyreBaseObject("medium", 10013, 1650, 1.10, 1.05, 7.5));
+        }
+        if(!tyres.containsKey("hard")) {
             tyres.put("hard", new TyreBaseObject("soft", 10014, 1800, 1.05, 1, 0));
+        }
+        if(!tyres.containsKey("wet")) {
+            tyres.put("wet", new TyreBaseObject("wet", 10014, 1800, 1.05, 1, 0));
+        }
+        if(!tyres.containsKey("intermediate")) {
+            tyres.put("intermediate", new TyreBaseObject("wet", 10014, 1800, 1.05, 1, 0));
         }
         attachModule(new TyreListeners());
     }

@@ -1,7 +1,6 @@
 package collinvht.f1mc.module.buildingtools.manager;
 
 import collinvht.f1mc.module.buildingtools.obj.MemorizedEdit;
-import collinvht.f1mc.util.modules.ModuleBase;
 
 import java.util.ArrayList;
 import java.util.HashMap;

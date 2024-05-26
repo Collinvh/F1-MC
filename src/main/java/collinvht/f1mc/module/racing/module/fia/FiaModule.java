@@ -1,7 +1,6 @@
 package collinvht.f1mc.module.racing.module.fia;
 
 import collinvht.f1mc.module.racing.module.fia.command.FiaCommands;
-import collinvht.f1mc.module.racing.util.RacingMessages;
 import collinvht.f1mc.util.modules.ModuleBase;
 import org.bukkit.Bukkit;
 

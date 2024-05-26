@@ -7,8 +7,6 @@ import com.google.gson.JsonObject;
 import com.mysql.cj.jdbc.MysqlDataSource;
 import eu.decentsoftware.holograms.api.DHAPI;
 import eu.decentsoftware.holograms.api.holograms.Hologram;
-import eu.decentsoftware.holograms.api.holograms.HologramLine;
-import eu.decentsoftware.holograms.api.holograms.HologramPage;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
@@ -89,9 +87,7 @@ public class Race {
                 race.setStorage(raceStorage);
                 return race;
             }
-        } catch (Exception ignored) {
-            ignored.printStackTrace();
-        }
+        } catch (Exception ignored) {}
         return null;
     }
 

@@ -559,7 +559,7 @@ public class RaceManager extends ModuleBase {
                     });
                 } else {
                     race.getRaceLapStorage().getFinishers().forEach((integer, uuid) -> {
-                        RaceDriver driver = VPListener.getRACE_DRIVERS().get(uuid);
+                        RaceDriver driver = VPListener.getRACE_DRIVERS().get(uuid.getDriverUUID());
                         if (driver.getLaptimes(race).getFastestLap() != null) {
                             sectors.put(driver, integer.longValue());
                         }
@@ -588,8 +588,7 @@ public class RaceManager extends ModuleBase {
                                     font = new Font("Calibri", Font.PLAIN, 15);
                                     imageGraphics.setFont(font);
                                     imageGraphics.drawString(team, 32, 390);
-                                } catch (IOException e) {
-                                    e.printStackTrace();
+                                } catch (IOException ignored) {
                                 }
                             }
 
@@ -640,11 +639,6 @@ public class RaceManager extends ModuleBase {
         isRunningTimer = bool;
     }
 
-    public void startTimerForNewPlayer(Player player) {
-        if(isRunningTimer && timingRace != null) {
-            timingRace.getRaceTimer().addPlayer(player);
-        }
-    }
     public String createTimer(String race, String arg) {
         if(isRunningTimer) return "There is already a timer running!";
         if(!raceExists(race)) return RacingMessages.RACE_DOES_NOT_EXIST;

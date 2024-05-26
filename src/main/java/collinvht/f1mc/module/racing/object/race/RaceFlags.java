@@ -14,19 +14,17 @@ import java.util.Map;
 
 
 
+@Getter
 public class RaceFlags {
-    @Getter @Setter
+    @Setter
     private ArrayList<Location> s1loc = new ArrayList<>();
-    @Getter @Setter
+    @Setter
     private ArrayList<Location> s2loc = new ArrayList<>();
-    @Getter @Setter
+    @Setter
     private ArrayList<Location> s3loc = new ArrayList<>();
 
-    @Getter
     private FlagType S1;
-    @Getter
     private FlagType S2;
-    @Getter
     private FlagType S3;
 
 

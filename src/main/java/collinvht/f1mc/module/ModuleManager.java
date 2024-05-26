@@ -1,14 +1,13 @@
 package collinvht.f1mc.module;
 
-import collinvht.f1mc.module.discord.DiscordModule;
 import collinvht.f1mc.module.buildingtools.BuildingToolsModule;
-import collinvht.f1mc.module.racing.util.RacingMessages;
+import collinvht.f1mc.module.discord.DiscordModule;
+import collinvht.f1mc.module.main.MainModule;
+import collinvht.f1mc.module.racing.RacingModule;
 import collinvht.f1mc.module.timetrial.TimeTrialModule;
 import collinvht.f1mc.module.vehiclesplus.VehiclePlusModule;
 import collinvht.f1mc.util.Utils;
 import collinvht.f1mc.util.modules.ModuleBase;
-import collinvht.f1mc.module.main.MainModule;
-import collinvht.f1mc.module.racing.RacingModule;
 import org.bukkit.Bukkit;
 
 import java.util.ArrayList;

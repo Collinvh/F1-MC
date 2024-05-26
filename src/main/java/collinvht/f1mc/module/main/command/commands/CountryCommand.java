@@ -2,18 +2,17 @@ package collinvht.f1mc.module.main.command.commands;
 
 import collinvht.f1mc.module.main.command.managers.CountryManager;
 import collinvht.f1mc.module.main.gui.CountryGUIs;
-import collinvht.f1mc.util.Permissions;
 import collinvht.f1mc.util.commands.CommandUtil;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import xyz.xenondevs.invui.window.Window;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
 
 public class CountryCommand extends CommandUtil implements TabCompleter {
     @Override

@@ -16,25 +16,24 @@ import java.util.*;
 public class RaceListener {
     @Getter
     private static final ArrayList<Race> LISTENING = new ArrayList<>();
-    private static TimerTask task;
     private static Timer timer;
 
     public static void initialize() {
-        task = new TimerTask() {
+        TimerTask task = new TimerTask() {
             @Override
             public void run() {
                 ArrayList<Race> removingRaces = new ArrayList<>();
                 for (Race race : LISTENING) {
-                    if(race.getRaceTimer() != null) {
+                    if (race.getRaceTimer() != null) {
                         race.getRaceTimer().update();
-                        if(race.getRaceTimer().isFinished()) {
+                        if (race.getRaceTimer().isFinished()) {
                             removingRaces.add(race);
                             Bukkit.getLogger().warning(RaceManager.getInstance().getRaceResult(race.getName(), "fastest", null));
                             break;
                         }
                     }
                 }
-                if(!removingRaces.isEmpty()) {
+                if (!removingRaces.isEmpty()) {
                     LISTENING.removeAll(removingRaces);
                 }
             }
@@ -59,17 +58,6 @@ public class RaceListener {
         return DefaultMessages.PREFIX + "Race started.";
     }
 
-    static void drivingBackwards(RaceDriver raceDriver, Race race, Player player) {
-        if(raceDriver.getLaptimes(race).isInvalidated()) return;
-        raceDriver.getLaptimes(race).setInvalidated(true);
-        player.sendMessage(DefaultMessages.PREFIX + ChatColor.RED + " Your time got invalidated because your driving backwards!");
-        for (Player p : Bukkit.getOnlinePlayers()) {
-            if (Permissions.FIA_ADMIN.hasPermission(p) || Permissions.FIA_RACE.hasPermission(p)) {
-                p.sendMessage(player.getDisplayName() + " is most likely driving the circuit backwards.");
-            }
-        }
-    }
-
     public static boolean isListeningToRace(Race race) {
         return LISTENING.contains(race);
     }
@@ -80,7 +68,6 @@ public class RaceListener {
         }
         timer.cancel();
         if(b) resetAll();
-//        DiscordManager.resetMessage();
     }
 
     public static String stopListeningTo(Race race) {
@@ -106,9 +93,5 @@ public class RaceListener {
             race.getRaceLapStorage().reset();
         }
         return "Race has been reset.";
-    }
-
-    public static boolean isListeningToAnyRace() {
-        return !LISTENING.isEmpty();
     }
 }

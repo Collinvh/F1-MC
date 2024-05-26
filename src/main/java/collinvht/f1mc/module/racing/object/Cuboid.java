@@ -7,6 +7,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 public class Cuboid implements Cloneable, ConfigurationSerializable, Iterable<Block> {
@@ -21,14 +22,11 @@ public class Cuboid implements Cloneable, ConfigurationSerializable, Iterable<Bl
     @Getter
     private boolean disabled;
 
+    @Getter
     private Location loc1, loc2;
 
     public Cuboid(Cuboid cuboid) {
         this(cuboid.worldName, cuboid.minimumPoint.getX(), cuboid.minimumPoint.getY(), cuboid.minimumPoint.getZ(), cuboid.maximumPoint.getX(), cuboid.maximumPoint.getY(), cuboid.maximumPoint.getZ());
-    }
-
-    public Cuboid(Location loc) {
-        this(loc, loc);
     }
 
     public Cuboid(Location loc1, Location loc2) {
@@ -73,14 +71,6 @@ public class Cuboid implements Cloneable, ConfigurationSerializable, Iterable<Bl
         this.maximumPoint = new Vector(xPos2, yPos2, zPos2);
     }
 
-    public Location getLoc1() {
-        return loc1;
-    }
-
-    public Location getLoc2() {
-        return loc2;
-    }
-
     public boolean containsLocation(Location location) {
         return location != null && location.getWorld().getName().equals(this.worldName) && location.toVector().isInAABB(this.minimumPoint, this.maximumPoint);
     }
@@ -104,51 +94,10 @@ public class Cuboid implements Cloneable, ConfigurationSerializable, Iterable<Bl
         return blockList;
     }
 
-    public Location getLowerLocation() {
-        return this.minimumPoint.toLocation(this.getWorld());
-    }
-
-    public double getLowerX() {
-        return this.minimumPoint.getX();
-    }
-
-    public double getLowerY() {
-        return this.minimumPoint.getY();
-    }
-
-    public double getLowerZ() {
-        return this.minimumPoint.getZ();
-    }
-
-    public Location getUpperLocation() {
-        return this.maximumPoint.toLocation(this.getWorld());
-    }
-
-    public double getUpperX() {
-        return this.maximumPoint.getX();
-    }
-
-    public double getUpperY() {
-        return this.maximumPoint.getY();
-    }
-
-    public double getUpperZ() {
-        return this.maximumPoint.getZ();
-    }
-
-    public double getVolume() {
-        return (this.getUpperX() - this.getLowerX() + 1) * (this.getUpperY() - this.getLowerY() + 1) * (this.getUpperZ() - this.getLowerZ() + 1);
-    }
-
     public World getWorld() {
         World world = Bukkit.getServer().getWorld(this.worldName);
         if (world == null) throw new NullPointerException("World '" + this.worldName + "' is not loaded.");
         return world;
-    }
-
-    public void setWorld(World world) {
-        if (world != null) this.worldName = world.getName();
-        else throw new NullPointerException("The world cannot be null.");
     }
 
     @Override
@@ -157,12 +106,12 @@ public class Cuboid implements Cloneable, ConfigurationSerializable, Iterable<Bl
     }
 
     @Override
-    public ListIterator<Block> iterator() {
+    public @NotNull ListIterator<Block> iterator() {
         return this.getBlocks().listIterator();
     }
 
     @Override
-    public Map<String, Object> serialize() {
+    public @NotNull Map<String, Object> serialize() {
         Map<String, Object> serializedCuboid = new HashMap<>();
         serializedCuboid.put("worldName", this.worldName);
         serializedCuboid.put("x1", this.minimumPoint.getX());

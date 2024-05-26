@@ -1,7 +1,6 @@
 package collinvht.f1mc.module.discord;
 
 import collinvht.f1mc.F1MC;
-import collinvht.f1mc.module.racing.util.RacingMessages;
 import collinvht.f1mc.util.modules.ModuleBase;
 import lombok.Getter;
 import net.dv8tion.jda.api.JDA;

@@ -6,23 +6,23 @@ import org.bukkit.ChatColor;
 
 import java.util.UUID;
 
+@Getter
 public class SectorData {
-    @Getter
     private final UUID driver;
 
-    @Getter @Setter
+    @Setter
     private ChatColor sectorColor = ChatColor.RESET;
 
-    @Getter @Setter
+    @Setter
     private long sectorLength;
 
-    @Getter @Setter
+    @Setter
     private long sectorDifference;
 
-    @Setter @Getter
+    @Setter
     private long sectorStart;
 
-    @Getter @Setter
+    @Setter
     private String sectorName;
 
     public SectorData(UUID driver) {

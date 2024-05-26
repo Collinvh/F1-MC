@@ -5,8 +5,9 @@ import lombok.Setter;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
+@Setter
+@Getter
 public class PenaltyCuboid extends NamedCuboid {
-    @Getter @Setter
     private int extraFlags;
 
     public PenaltyCuboid(Cuboid cuboid, String name, int extraFlags) {

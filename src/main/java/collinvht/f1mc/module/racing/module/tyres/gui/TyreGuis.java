@@ -1,7 +1,6 @@
 package collinvht.f1mc.module.racing.module.tyres.gui;
 
 import collinvht.f1mc.module.racing.module.tyres.manager.TyreManager;
-import collinvht.f1mc.module.racing.module.tyres.obj.TyreClickItem;
 import xyz.xenondevs.invui.gui.Gui;
 import xyz.xenondevs.invui.item.impl.SimpleItem;
 

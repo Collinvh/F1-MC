@@ -2,19 +2,10 @@ package collinvht.f1mc.module.racing.object.laptime;
 
 import collinvht.f1mc.module.racing.object.race.Race;
 import collinvht.f1mc.module.racing.object.race.RaceMode;
-import collinvht.f1mc.module.vehiclesplus.objects.RaceDriver;
-import collinvht.f1mc.util.Utils;
-import com.mysql.cj.jdbc.MysqlDataSource;
 import lombok.Getter;
 import lombok.Setter;
-import org.bukkit.Bukkit;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.LinkedList;
-import java.util.UUID;
 
 public class DriverLaptimeStorage {
 

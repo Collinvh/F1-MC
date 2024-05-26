@@ -1,7 +1,10 @@
 package collinvht.f1mc.module.racing.module.tyres.listeners.listener;
 
+import collinvht.f1mc.module.racing.manager.managers.RaceManager;
 import collinvht.f1mc.module.racing.module.team.object.TeamObj;
+import collinvht.f1mc.module.racing.object.race.Race;
 import collinvht.f1mc.module.racing.object.race.RaceCar;
+import collinvht.f1mc.module.racing.object.race.RaceMode;
 import collinvht.f1mc.module.vehiclesplus.listener.listeners.VPListener;
 import collinvht.f1mc.module.vehiclesplus.objects.RaceDriver;
 import collinvht.f1mc.util.DefaultMessages;
@@ -64,17 +67,30 @@ public class TyreGUI implements Listener {
                                                 Player skullPlayer = Bukkit.getPlayer(name);
                                                 if (skullPlayer != null) {
                                                     RaceDriver object = VPListener.getRACE_DRIVERS().get(name);
+                                                    Race race = RaceManager.getInstance().getRaceForPlayer(skullPlayer);
                                                     if (object != null) {
                                                         if (object.getVehicle() != null) {
                                                             RaceCar skullCar = VPListener.getRACE_CARS().get(object.getVehicle().getHolder().getUniqueId());
                                                             if (skullCar != null) {
                                                                 if (!object.isInPit()) {
-                                                                    event.getWhoClicked().sendMessage(prefix + "Car is not in the pit lane");
-                                                                    event.setCancelled(true);
-                                                                    return;
+                                                                    if(race == null) {
+                                                                        event.getWhoClicked().sendMessage(prefix + "Car is not in the pit lane");
+                                                                        event.setCancelled(true);
+                                                                        return;
+                                                                    } else {
+                                                                        if(race.getRaceLapStorage() != null) {
+                                                                            if(race.getRaceLapStorage().getRaceMode() != null) {
+                                                                                if(race.getRaceLapStorage().getRaceMode() != RaceMode.NO_TIMING) {
+                                                                                    event.getWhoClicked().sendMessage(prefix + "Car is not in the pit lane");
+                                                                                    event.setCancelled(true);
+                                                                                    return;
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
                                                                 }
 
-                                                                if(skullCar.getLinkedVehicle().getHolder().getLocation().distance(click.getPlayer().getLocation()) > 10) {
+                                                                if(skullCar.getLinkedVehicle().getHolder().getLocation().distance(click.getPlayer().getLocation()) > 12) {
                                                                     event.getWhoClicked().sendMessage(prefix + "Car is not close enough");
                                                                     event.setCancelled(true);
                                                                     return;

@@ -58,12 +58,14 @@ public class FlagCommand extends CommandUtil {
                         if (type == FlagType.SC || type == FlagType.VSC) {
                             FlagManager.setAll(race, type);
                             onlinePlayer.sendMessage(prefix + type.getChatColor() + type.getName() + " deployed, reduce speed to " + type.getMaxSpeed() + "km/h.");
+                            onlinePlayer.sendTitle(type.getChatColor() + type.getName() + " Deployed", "reduce speed to " + type.getMaxSpeed() + "km/h.", 2, 15, 2);
                             if(RaceManager.getTimingRace() != null) {
                                 RaceManager.getTimingRace().getRaceTimer().setPaused(false);
                             }
                         } else if (type == FlagType.GREEN) {
                             FlagManager.set(race, type, sector);
                             onlinePlayer.sendMessage(prefix + type.getChatColor() + type.getName() + " flag in sector "+ sector +". You can continue to race!");
+                            onlinePlayer.sendTitle(type.getChatColor() + type.getName(), " flag in sector " + sector + ". Continue to race.", 2, 15, 2);
                             if(RaceManager.getTimingRace() != null) {
                                 RaceManager.getTimingRace().getRaceTimer().setPaused(false);
                             }
@@ -86,6 +88,7 @@ public class FlagCommand extends CommandUtil {
                                     RaceManager.getTimingRace().getRaceTimer().setPaused(true);
                                 }
                             }
+                            onlinePlayer.sendTitle(type.getChatColor() + type.getName(), " flag in sector " + sector + ", Reduce speed to " + type.getMaxSpeed() + "km/h", 2, 15, 2);
                             onlinePlayer.sendMessage(builder.toString());
                         }
                     }
@@ -102,10 +105,13 @@ public class FlagCommand extends CommandUtil {
                     for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
                         if (type == FlagType.SC || type == FlagType.VSC) {
                             onlinePlayer.sendMessage(prefix + type.getChatColor() + type.getName() + " deployed, reduce speed to " + type.getMaxSpeed() + "km/h.");
+                            onlinePlayer.sendTitle(type.getChatColor() + type.getName() + " Deployed", "reduce speed to " + type.getMaxSpeed() + "km/h.", 2, 15, 2);
                         } else if (type == FlagType.GREEN) {
                             onlinePlayer.sendMessage(prefix + type.getChatColor() + type.getName() + " flag. You can continue to race!");
+                            onlinePlayer.sendTitle(type.getChatColor() + type.getName(), "in all sectors!", 2, 15, 2);
                         } else {
                             onlinePlayer.sendMessage(prefix + type.getChatColor() + type.getName() + " flag, reduce speed to " + type.getMaxSpeed() + "km/h.");
+                            onlinePlayer.sendTitle(type.getChatColor() + type.getName(), " in all sectors! Reduce speed to " + type.getMaxSpeed() + "km/h", 2, 15, 2);
                             if (type.isStopsSession()) {
                                 onlinePlayer.sendMessage(type.getChatColor() + "After that return into the pit-lane.");
                             }

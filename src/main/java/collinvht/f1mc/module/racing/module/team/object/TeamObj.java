@@ -16,8 +16,6 @@ import net.luckperms.api.model.user.User;
 import net.luckperms.api.node.types.InheritanceNode;
 import net.luckperms.api.node.types.PermissionNode;
 import net.luckperms.api.node.types.PrefixNode;
-import net.luckperms.api.query.QueryMode;
-import net.luckperms.api.query.QueryOptions;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
 

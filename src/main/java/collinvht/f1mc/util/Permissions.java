@@ -1,7 +1,6 @@
 package collinvht.f1mc.util;
 
 import lombok.Getter;
-import lombok.Setter;
 import org.bukkit.command.CommandSender;
 
 @Getter

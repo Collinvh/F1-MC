@@ -5,29 +5,20 @@ import collinvht.f1mc.module.racing.object.Cuboid;
 import collinvht.f1mc.module.racing.object.NamedCuboid;
 import collinvht.f1mc.module.racing.object.race.Race;
 import collinvht.f1mc.module.racing.object.race.RaceCuboidStorage;
-import collinvht.f1mc.module.racing.object.race.RaceMode;
 import collinvht.f1mc.module.timetrial.manager.TimeTrialManager;
 import collinvht.f1mc.util.DefaultMessages;
 import collinvht.f1mc.util.Utils;
 import com.mysql.cj.jdbc.MysqlDataSource;
-import dev.lone.itemsadder.api.FontImages.FontImageWrapper;
-import dev.lone.itemsadder.api.FontImages.PlayerCustomHudWrapper;
-import dev.lone.itemsadder.api.FontImages.PlayerHudsHolderWrapper;
-import dev.lone.itemsadder.api.FontImages.PlayerQuantityHudWrapper;
-import me.legofreak107.vehiclesplus.VehiclesPlus;
 import me.legofreak107.vehiclesplus.vehicles.api.VehiclesPlusAPI;
 import me.legofreak107.vehiclesplus.vehicles.api.objects.spawn.SpawnMode;
 import me.legofreak107.vehiclesplus.vehicles.vehicles.objects.BaseVehicle;
 import me.legofreak107.vehiclesplus.vehicles.vehicles.objects.SpawnedVehicle;
 import me.legofreak107.vehiclesplus.vehicles.vehicles.objects.addons.Part;
 import me.legofreak107.vehiclesplus.vehicles.vehicles.objects.addons.seats.Seat;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -63,7 +54,7 @@ public class TimeTrialHolder {
         this.timeTrialLap.setPassedS1(true);
         this.timeTrialLap.setPassedS2(true);
         this.oldLocation = player.getLocation();
-        this.spawnedVehicle = VehiclesPlusAPI.getInstance().createVehicle(vehicle, player).spawnVehicle(storage.getTimeTrialSpawn(), SpawnMode.FORCE);
+        this.spawnedVehicle = VehiclesPlusAPI.getInstance().createVehicle(vehicle, player).spawnVehicle(storage.getTimeTrialSpawn(), SpawnMode.GARAGE);
         this.rival = TimeTrialManager.getRivalObject(this.race.getName(), this.player.getUniqueId());
         if (this.rival != null) {
             if(this.rival.getRival() != null) {
@@ -91,6 +82,7 @@ public class TimeTrialHolder {
             @Override
             public void run() {
                 checkSectors();
+//                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy("Speed: " + spawnedVehicle.getCurrentSpeedInKm()));
             }
         }, 0, 1);
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {

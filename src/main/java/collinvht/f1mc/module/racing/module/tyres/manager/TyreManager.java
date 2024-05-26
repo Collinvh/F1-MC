@@ -21,7 +21,6 @@ import java.io.File;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class TyreManager extends ModuleBase {
     @Getter

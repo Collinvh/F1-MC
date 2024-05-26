@@ -8,7 +8,6 @@ import collinvht.f1mc.util.commands.CommandUtil;
 import com.mysql.cj.jdbc.MysqlDataSource;
 import me.legofreak107.vehiclesplus.vehicles.api.VehiclesPlusAPI;
 import me.legofreak107.vehiclesplus.vehicles.vehicles.objects.BaseVehicle;
-import me.legofreak107.vehiclesplus.vehicles.vehicles.objects.addons.seats.Seat;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;

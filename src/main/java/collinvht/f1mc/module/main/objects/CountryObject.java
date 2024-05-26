@@ -3,20 +3,16 @@ package collinvht.f1mc.module.main.objects;
 import collinvht.f1mc.module.main.command.managers.CountryManager;
 import collinvht.f1mc.util.Utils;
 import com.nametagedit.plugin.NametagEdit;
-import com.nametagedit.plugin.api.NametagAPI;
 import lombok.Getter;
 import lombok.Setter;
 import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.checkerframework.checker.units.qual.A;
 import tsp.headdb.core.api.HeadAPI;
 import tsp.headdb.implementation.head.Head;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 

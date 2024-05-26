@@ -3,7 +3,6 @@ package collinvht.f1mc.module.buildingtools.obj;
 import collinvht.f1mc.F1MC;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.block.Block;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;

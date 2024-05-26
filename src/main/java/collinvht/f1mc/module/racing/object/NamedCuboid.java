@@ -5,10 +5,10 @@ import lombok.Setter;
 import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
+@Setter
+@Getter
 public class NamedCuboid {
-    @Getter @Setter
     private Cuboid cuboid;
-    @Getter @Setter
     private String name;
 
     public NamedCuboid(Cuboid cuboid, String name) {

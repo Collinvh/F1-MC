@@ -15,7 +15,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -64,7 +63,6 @@ public class VPListener implements Listener {
             if(driver != null) {
                 driver.setVehicle(null);
                 driver.setDriving(false);
-                driver.setInPit();
             }
             SpawnedVehicle vehicle = (SpawnedVehicle) event.getVehicle();
             if(RACE_CARS.containsKey(vehicle.getHolder().getUniqueId())) {

@@ -3,7 +3,6 @@ package collinvht.f1mc.module.racing.module.team;
 import collinvht.f1mc.module.racing.module.team.command.RaceTeamCommand;
 import collinvht.f1mc.module.racing.module.team.listeners.TeamListeners;
 import collinvht.f1mc.module.racing.module.team.manager.TeamManager;
-import collinvht.f1mc.module.racing.util.RacingMessages;
 import collinvht.f1mc.util.modules.CommandModuleBase;
 import org.bukkit.Bukkit;
 

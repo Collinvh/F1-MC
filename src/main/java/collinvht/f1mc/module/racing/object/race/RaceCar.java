@@ -1,7 +1,5 @@
 package collinvht.f1mc.module.racing.object.race;
 
-import collinvht.f1mc.module.racing.manager.managers.RaceManager;
-import collinvht.f1mc.module.racing.module.slowdown.manager.SlowdownManager;
 import collinvht.f1mc.module.racing.module.team.object.TeamObj;
 import collinvht.f1mc.module.racing.module.weather.manager.WeatherManager;
 import collinvht.f1mc.module.racing.module.weather.obj.WeatherTypes;
@@ -15,9 +13,6 @@ import me.legofreak107.vehiclesplus.vehicles.vehicles.objects.BaseVehicle;
 import me.legofreak107.vehiclesplus.vehicles.vehicles.objects.SpawnedVehicle;
 import me.legofreak107.vehiclesplus.vehicles.vehicles.objects.VehicleStats;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import xyz.xenondevs.invui.inventory.event.UpdateReason;
@@ -48,13 +43,6 @@ public class RaceCar {
             @Override
             public void run() {
                 updateTyre();
-                if(player != null) {
-                    if(player.isDriving()) {
-                        SlowdownManager.update(player);
-                        Bukkit.getPlayer(player.getDriverUUID()).spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy("Speed: " + spawnedVehicle.getCurrentSpeedInKm() + " | Fuel: " + spawnedVehicle.getStorageVehicle().getVehicleStats().getCurrentFuel()));
-                    }
-                }
-
             }
         }, 0, 1);
     }

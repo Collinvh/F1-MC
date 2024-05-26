@@ -2,8 +2,6 @@ package collinvht.f1mc.module.racing.module.team.command;
 
 import collinvht.f1mc.module.racing.module.team.manager.TeamManager;
 import collinvht.f1mc.module.racing.module.team.object.PCGui;
-import collinvht.f1mc.module.racing.module.tyres.commands.command.TyreCommand;
-import collinvht.f1mc.module.racing.module.tyres.listeners.TyreListeners;
 import collinvht.f1mc.module.racing.module.tyres.listeners.listener.TyreGUI;
 import collinvht.f1mc.util.Permissions;
 import collinvht.f1mc.util.commands.CommandUtil;

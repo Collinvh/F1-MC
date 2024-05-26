@@ -4,7 +4,6 @@ import collinvht.f1mc.module.racing.module.slowdown.manager.SlowdownManager;
 import collinvht.f1mc.util.Permissions;
 import collinvht.f1mc.util.commands.CommandUtil;
 import dev.lone.itemsadder.api.CustomBlock;
-import me.legofreak107.vehiclesplus.custom.CustomItemStack;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;

@@ -1,21 +1,16 @@
 package collinvht.f1mc.module.racing.module.tyres.obj;
 
-import collinvht.f1mc.module.racing.object.race.RaceCar;
 import collinvht.f1mc.module.racing.object.race.RaceCarGUI;
 import collinvht.f1mc.util.Utils;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import xyz.xenondevs.invui.gui.Gui;
 import xyz.xenondevs.invui.inventory.Inventory;
 import xyz.xenondevs.invui.inventory.event.UpdateReason;
 import xyz.xenondevs.invui.item.impl.SimpleItem;
-
-import java.util.function.Consumer;
 
 public class TyreClickItem extends SimpleItem {
     private final RaceCarGUI car;

@@ -5,6 +5,7 @@ import lombok.Getter;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 
+@Getter
 public enum FlagType {
     GREEN("Green",999, false, ChatColor.GREEN, Material.BLACK_WOOL),
     YELLOW("Yellow",100, false, ChatColor.YELLOW, Material.YELLOW_WOOL),
@@ -12,17 +13,11 @@ public enum FlagType {
     VSC("VSC",60.0, true, ChatColor.GOLD, Material.YELLOW_TERRACOTTA),
     SC("SC",60.0, true, ChatColor.GOLD, Material.ORANGE_TERRACOTTA);
 
-    @Getter
     private final String name;
-    @Getter
     private final double maxSpeed;
-    @Getter
     private final boolean fullCourse;
-    @Getter
     private final Material colorMaterial;
-    @Getter
     private final ChatColor chatColor;
-    @Getter
     private final boolean stopsSession;
     FlagType(String name, double maxSpeed, boolean fullCourse, ChatColor color, Material colorMaterial) {
         this.name = name;

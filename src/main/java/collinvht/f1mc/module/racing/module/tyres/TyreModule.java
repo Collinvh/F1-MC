@@ -2,7 +2,6 @@ package collinvht.f1mc.module.racing.module.tyres;
 
 import collinvht.f1mc.module.racing.module.tyres.commands.TyreCommands;
 import collinvht.f1mc.module.racing.module.tyres.manager.TyreManager;
-import collinvht.f1mc.module.racing.util.RacingMessages;
 import collinvht.f1mc.util.modules.ModuleBase;
 import org.bukkit.Bukkit;
 

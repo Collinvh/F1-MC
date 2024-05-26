@@ -2,9 +2,7 @@ package collinvht.f1mc.module.racing.module.slowdown;
 
 import collinvht.f1mc.module.racing.module.slowdown.command.SlowdownCommand;
 import collinvht.f1mc.module.racing.module.slowdown.manager.SlowdownManager;
-import collinvht.f1mc.module.racing.util.RacingMessages;
 import collinvht.f1mc.util.modules.CommandModuleBase;
-import net.luckperms.api.messenger.message.Message;
 import org.bukkit.Bukkit;
 
 public class SlowdownModule extends CommandModuleBase {

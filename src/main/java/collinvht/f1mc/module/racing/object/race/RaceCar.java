@@ -1,5 +1,6 @@
 package collinvht.f1mc.module.racing.object.race;
 
+import collinvht.f1mc.module.racing.manager.managers.RaceManager;
 import collinvht.f1mc.module.racing.module.team.object.TeamObj;
 import collinvht.f1mc.module.racing.module.weather.manager.WeatherManager;
 import collinvht.f1mc.module.racing.module.weather.obj.WeatherTypes;
@@ -66,16 +67,16 @@ public class RaceCar {
                 if(RaceManager.getDrivingPlayers().get(player.getPlayer()) != null) {
                     tyreSpeedArray = WeatherManager.currentRotation(RaceManager.getDrivingPlayers().get(player.getPlayer()));
                 } else {
-                    tyreSpeedArray[0] = WeatherTypes.DRY.getInterSpeedMultiplier();;
-                    tyreSpeedArray[1] = WeatherTypes.DRY.getWetSpeedMultiplier();;
-                    tyreSpeedArray[2] = WeatherTypes.DRY.getSlickSpeedMultiplier();;
+                    tyreSpeedArray[0] = WeatherTypes.DRY.getInterSpeedMultiplier();
+                    tyreSpeedArray[1] = WeatherTypes.DRY.getWetSpeedMultiplier();
+                    tyreSpeedArray[2] = WeatherTypes.DRY.getSlickSpeedMultiplier();
                 }
                 String tyreName = tyre.getString("f1mc.name");
-                double speedMultiplier;
+                float speedMultiplier;
                 switch (tyreName.toLowerCase()) {
-                    case "intermediate" -> speedMultiplier = tyreSpeedArray[0];
-                    case "wet" -> speedMultiplier = tyreSpeedArray[1];
-                    default -> speedMultiplier = tyreSpeedArray[2];
+                    case "intermediate" -> speedMultiplier = (float) tyreSpeedArray[0];
+                    case "wet" -> speedMultiplier = (float) tyreSpeedArray[1];
+                    default -> speedMultiplier = (float) tyreSpeedArray[2];
                 }
 
                 if(dura <= 0) {

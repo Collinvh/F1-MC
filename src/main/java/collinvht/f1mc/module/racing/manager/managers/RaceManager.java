@@ -2,6 +2,10 @@ package collinvht.f1mc.module.racing.manager.managers;
 
 import collinvht.f1mc.F1MC;
 import collinvht.f1mc.module.discord.DiscordModule;
+import collinvht.f1mc.module.main.command.managers.CountryManager;
+import collinvht.f1mc.module.main.objects.CountryObject;
+import collinvht.f1mc.module.racing.module.team.manager.TeamManager;
+import collinvht.f1mc.module.racing.module.team.object.TeamObj;
 import collinvht.f1mc.module.racing.object.PenaltyCuboid;
 import collinvht.f1mc.module.racing.object.race.RaceTimer;
 import collinvht.f1mc.module.vehiclesplus.listener.listeners.VPListener;
@@ -142,8 +146,8 @@ public class RaceManager extends ModuleBase {
                     TextChannel channel = module.getJda().getTextChannelById(1217628051853021194L);
                     if (channel != null) {
                         EmbedBuilder builder = new EmbedBuilder();
-                        builder.addField("Race result | ", name, true);
-                        builder.setColor(Color.BLUE);
+                        builder.addField("Race result | " + name, race.getLaps() + " laps driven.", true);
+                        builder.setColor(Color.GREEN);
                         HashMap<UUID, RaceDriver> drivers = VPListener.getRACE_DRIVERS();
                         if(!race.getRaceLapStorage().getRaceMode().isLapped()) {
                             if (drivers.values().toArray().length > 0) {
@@ -168,15 +172,17 @@ public class RaceManager extends ModuleBase {
                             AtomicReference<RaceDriver> p1Finisher = new AtomicReference<>();
                             race.getRaceLapStorage().getFinishers().forEach((integer, uuid) -> {
                                 OfflinePlayer player = Bukkit.getOfflinePlayer(uuid.getDriverUUID());
+                                CountryObject countryObject = CountryManager.getPlayerPerCountry().get(uuid.getDriverUUID());
+                                TeamObj obj = TeamManager.getTeamForUUID(uuid.getDriverUUID());
                                 if(integer > 1) {
                                     if(p1Finisher.get() != null) {
-                                        builder.addField(integer + ". | ", player.getName() + " +" + Utils.millisToTimeString(p1Finisher.get().getFinishTime()-uuid.getFinishTime()), false);
+                                        builder.addField(integer + ". | " + player.getName() + Utils.millisToTimeString(p1Finisher.get().getFinishTime()-uuid.getFinishTime()), (obj == null ? "Team: ???" : "Team: " + obj.getTeamName()) + " Country: " + (countryObject == null ? "???" : countryObject.getCountryName()), false);
                                     } else {
-                                        builder.addField(integer + ". | ", player.getName(), false);
+                                        builder.addField(integer + ". | " + player.getName(), (obj == null ? "Team: ???" : "Team: " + obj.getTeamName()) + " Country: " + (countryObject == null ? "???" : countryObject.getCountryName()), false);
                                     }
                                 } else {
                                     p1Finisher.set(uuid);
-                                    builder.addField(integer + ". | ", player.getName(), false);
+                                    builder.addField(integer + ". | " + player.getName(), (obj == null ? "Team: ???" : "Team: " + obj.getTeamName()) + " Country: " + (countryObject == null ? "???" : countryObject.getCountryName()) , false);
                                 }
                             });
                         }

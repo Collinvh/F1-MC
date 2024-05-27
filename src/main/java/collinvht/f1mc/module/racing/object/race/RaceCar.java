@@ -100,7 +100,7 @@ public class RaceCar {
                 stats.setLowSpeedAcceleration((float) (baseVehicle.getAccelerationSettings().getLowSpeed() * tyre.getDouble("f1mc.steering")) * speedMultiplier);
                 stats.setHighSpeedAcceleration((float) (baseVehicle.getAccelerationSettings().getHighSpeed() * tyre.getDouble("f1mc.steering")) * speedMultiplier);
 
-                tyre.setDouble("f1mc.dura", (dura-degrate * (getLinkedVehicle().getCurrentSpeedInKm())/5000));
+                tyre.setDouble("f1mc.dura", (dura-(degrate * (getLinkedVehicle().getCurrentSpeedInKm()/100))));
                 ArrayList<String> lore = new ArrayList<>();
                 lore.add(ChatColor.GRAY + "Durability left = " + Utils.round(dura - degrate, 1) + "/" + tyre.getDouble("f1mc.maxdura"));
                 lore.add(ChatColor.GRAY + "Extra Speed = " + tyre.getDouble("f1mc.extraSpeed") + "km/h");

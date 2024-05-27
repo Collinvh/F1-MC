@@ -88,6 +88,20 @@ public class TeamManager extends ModuleBase {
         return null;
     }
 
+    public static TeamObj getTeamForUUID(UUID player) {
+        for (TeamObj teamObj : TEAMS.values()) {
+            if(teamObj.getMembers().contains(player)) {
+                return teamObj;
+            }
+            else if(teamObj.getOwner() != null) {
+                if(teamObj.getOwner().equals(player)) {
+                    return teamObj;
+                }
+            }
+        }
+        return null;
+    }
+
     public static String createTeam(TeamObj team) {
         if(TEAMS.containsKey(team.getGroupName())) return "A team with that name already exists.";
         Group group = luckPerms.getGroupManager().getGroup(team.getGroupName().toLowerCase());

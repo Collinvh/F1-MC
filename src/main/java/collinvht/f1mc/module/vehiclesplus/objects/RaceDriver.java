@@ -3,8 +3,10 @@ package collinvht.f1mc.module.vehiclesplus.objects;
 import collinvht.f1mc.module.racing.object.laptime.DriverLaptimeStorage;
 import collinvht.f1mc.module.racing.object.laptime.LaptimeStorage;
 import collinvht.f1mc.module.racing.object.race.Race;
+import collinvht.f1mc.module.racing.object.race.RaceCar;
 import collinvht.f1mc.module.racing.object.race.RaceListener;
 import collinvht.f1mc.module.racing.object.race.RaceMode;
+import collinvht.f1mc.util.Utils;
 import lombok.Getter;
 import lombok.Setter;
 import me.legofreak107.vehiclesplus.vehicles.vehicles.objects.SpawnedVehicle;
@@ -12,6 +14,7 @@ import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.megavex.scoreboardlibrary.api.sidebar.Sidebar;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -23,6 +26,8 @@ public class RaceDriver {
 
     @Setter @Getter
     private SpawnedVehicle vehicle;
+    @Getter @Setter
+    private RaceCar raceCar;
     @Getter
     private boolean isDriving = true;
 
@@ -82,7 +87,13 @@ public class RaceDriver {
                         race.getRaceLapStorage().update(instace);
                     }
                     try {
-                        Bukkit.getPlayer(getDriverUUID()).spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy("Speed: " + vehicle.getCurrentSpeedInKm() + " | Fuel: " + vehicle.getStorageVehicle().getVehicleStats().getCurrentFuel()));
+                        if(raceCar != null) {
+                            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy(ChatColor.GRAY + "| " + vehicle.getCurrentSpeedInKm() + "km/h | " + (raceCar.getCurrentERS()/200*100) + "% | " + vehicle.getStorageVehicle().getVehicleStats().getCurrentFuel() + "/" + vehicle.getStorageVehicle().getVehicleStats().getFuelTank() + "L"));
+                        } else if(!Utils.isEnableTimeTrial()) {
+                            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy(ChatColor.GRAY + "| " + vehicle.getCurrentSpeedInKm() + "km/h | " + vehicle.getStorageVehicle().getVehicleStats().getCurrentFuel() + "/" + vehicle.getStorageVehicle().getVehicleStats().getFuelTank() + "L"));
+                        } else {
+                            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy(ChatColor.GRAY + "| " + vehicle.getCurrentSpeedInKm() + "km/h | "));
+                        }
                     } catch (Exception ignored) {}
                 }
             }

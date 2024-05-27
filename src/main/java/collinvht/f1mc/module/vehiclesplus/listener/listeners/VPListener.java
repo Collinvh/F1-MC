@@ -39,6 +39,7 @@ public class VPListener implements Listener {
                 driver = new RaceDriver(event.getDriver());
                 if(RACE_CARS.get(vehicle.getHolder().getUniqueId()) != null) {
                     RACE_CARS.get(vehicle.getHolder().getUniqueId()).setPlayer(driver);
+                    driver.setRaceCar(RACE_CARS.get(vehicle.getHolder().getUniqueId()));
                 }
                 spawnedVehicles.add(vehicle);
                 driver.setVehicle(vehicle);
@@ -63,6 +64,7 @@ public class VPListener implements Listener {
             if(driver != null) {
                 driver.setVehicle(null);
                 driver.setDriving(false);
+                driver.setRaceCar(null);
             }
             SpawnedVehicle vehicle = (SpawnedVehicle) event.getVehicle();
             if(RACE_CARS.containsKey(vehicle.getHolder().getUniqueId())) {
@@ -88,6 +90,7 @@ public class VPListener implements Listener {
                         itemEntity.setItemStack(item.getItem());
                     }
                 }
+                car.getPlayer().setRaceCar(null);
                 RACE_CARS.remove(vehicle.getHolder().getUniqueId());
                 spawnedVehicles.remove(vehicle);
             }
@@ -100,6 +103,7 @@ public class VPListener implements Listener {
         if(raceDriver != null) {
             raceDriver.setDriving(false);
             raceDriver.setVehicle(null);
+            raceDriver.setRaceCar(null);
         }
     }
 }

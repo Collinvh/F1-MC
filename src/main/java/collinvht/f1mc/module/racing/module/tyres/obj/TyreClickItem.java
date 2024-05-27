@@ -27,7 +27,10 @@ public class TyreClickItem extends SimpleItem {
         if(event.isShiftClick()) return;
         if(clickType.isRightClick() || clickType.isLeftClick()) {
             if (count == 2) {
-                if (next.getItem(0).getType() == Material.RED_STAINED_GLASS_PANE) {
+                ItemStack nextItem = next.getItem(0);
+                if(nextItem == null) {
+                    count = 0;
+                } else if (nextItem.getType() == Material.RED_STAINED_GLASS_PANE) {
                     count = 0;
                 }
             }

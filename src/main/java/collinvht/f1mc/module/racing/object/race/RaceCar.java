@@ -16,6 +16,7 @@ import me.legofreak107.vehiclesplus.vehicles.vehicles.objects.VehicleStats;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.joml.Math;
 import xyz.xenondevs.invui.inventory.event.UpdateReason;
 
 import java.util.ArrayList;
@@ -63,6 +64,8 @@ public class RaceCar {
             } else {
                 double dura = tyre.getDouble("f1mc.dura");
                 double degrate = tyre.getDouble("f1mc.degradationRate")/20;
+                double maxDura = tyre.getDouble("f1mc.maxdura");
+                double currentWear = dura/maxDura;
                 double[] tyreSpeedArray = new double[3];
                 if(RaceManager.getDrivingPlayers().get(player.getPlayer()) != null) {
                     tyreSpeedArray = WeatherManager.currentRotation(RaceManager.getDrivingPlayers().get(player.getPlayer()));
@@ -85,7 +88,7 @@ public class RaceCar {
                     return;
                 }
                 if(!player.isInPit()) {
-                    stats.setSpeed((int) (baseVehicle.getSpeedSettings().getBase() + tyre.getDouble("f1mc.extraSpeed") * speedMultiplier));
+                    stats.setSpeed((int) (baseVehicle.getSpeedSettings().getBase() + Math.lerp(0, tyre.getDouble("f1mc.extraSpeed"), currentWear) * speedMultiplier));
                 } else {
                     if(stats.getCurrentSpeed() > 60.5D) {
                         stats.setCurrentSpeed(60.00D);

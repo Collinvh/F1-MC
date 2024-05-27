@@ -136,6 +136,7 @@ public class RaceCommand extends CommandUtil implements TabCompleter {
                             list.add("enable");
                             list.add("setspawn");
                             list.add("leaderboard");
+                            list.add("skull");
                             yield list;
                         }
                         case "offtrack" -> {

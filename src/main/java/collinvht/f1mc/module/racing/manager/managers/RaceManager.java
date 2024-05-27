@@ -260,11 +260,25 @@ public class RaceManager extends ModuleBase {
                 if(!drivers.isEmpty()) {
                     builder.append(RacingMessages.RACE_POSITION);
 
-                    LinkedHashMap<RaceDriver, Long> sectors = new LinkedHashMap<>();
+                    LinkedHashMap<RaceDriver, Integer> sectors = new LinkedHashMap<>();
 
-                    drivers.forEach((unused, driver) -> sectors.put(driver, (long) driver.getLaptimes(race).getSectors()));
+                    drivers.forEach((unused, driver) -> sectors.put(driver, driver.getLaptimes(race).getSectors()));
 
-                    ListOrderedMap<RaceDriver, Long> treeMap = Utils.sortByValueDesc(sectors);
+                    ListOrderedMap<RaceDriver, Integer> treeMap = Utils.sortByValueDescInt(sectors);
+
+                    LinkedHashMap<RaceDriver, Long> gap = new LinkedHashMap<>();
+
+                    drivers.forEach((uuid, raceDriver) -> {
+                        LaptimeStorage curLap = raceDriver.getLaptimes(race).getCurrentLap();
+                        if(curLap.isPassedS1() && !curLap.isPassedS2()) {
+                            gap.put(raceDriver, curLap.getS1().getSectorStart());
+                        } else if(curLap.isPassedS2() && !curLap.isPassedS3()) {
+                            gap.put(raceDriver, curLap.getS2().getSectorStart());
+                        } else if(curLap.isPassedS3()) {
+                            gap.put(raceDriver, curLap.getS3().getSectorStart());
+                        }
+                    });
+                    ListOrderedMap<RaceDriver, Long> gapOrdered = Utils.sortByValueDesc(gap);
 
 
                     if (!treeMap.isEmpty()) {
@@ -274,7 +288,13 @@ public class RaceManager extends ModuleBase {
                         treeMap.forEach((driver, integer) -> {
                             if (integer > 0) {
                                 OfflinePlayer player = Bukkit.getOfflinePlayer(driver.getDriverUUID());
-                                builder.append(pos.incrementAndGet()).append(". ").append(player.getName()).append(" : ").append(integer).append("\n");
+                                if (pos.get() == 0) {
+                                    builder.append(pos.incrementAndGet()).append(". ").append(player.getName()).append(" : ").append(integer).append("\n");
+                                } else {
+                                    builder.append(pos.incrementAndGet()).append(". ").append(player.getName()).append(" : ").append(integer).append("\n");
+                                    long gapToNext = gapOrdered.get(driver);
+                                    builder.append(pos.incrementAndGet()).append(". ").append(player.getName()).append(" : ").append(Utils.millisToTimeString(gapToNext)).append("\n");
+                                }
                             }
                         });
                         return builder.toString();
@@ -359,7 +379,7 @@ public class RaceManager extends ModuleBase {
                     case "head":
                     case "skull":
                         if(extraInput[4] != null) {
-                            int number = 0;
+                            int number;
                             try {
                                 number = Integer.parseInt(extraInput[4]);
                             } catch (NumberFormatException e) {

@@ -193,6 +193,19 @@ public class Utils {
         }
         return result;
     }
+
+    public static ListOrderedMap<RaceDriver, Integer> sortByValueDescInt(Map<RaceDriver, Integer> map) {
+        List<Map.Entry<RaceDriver, Integer>> list = new LinkedList<>(map.entrySet());
+        list.sort((o1, o2) -> o2.getValue().compareTo(o1.getValue()));
+        Collections.reverse(list);
+
+        ListOrderedMap<RaceDriver, Integer> result = new ListOrderedMap<>();
+        for (Map.Entry<RaceDriver, Integer> entry : list) {
+            result.put(entry.getKey(), entry.getValue());
+        }
+        return result;
+    }
+
     /*
     Reads a json file and returns it as a JsonElement
      */

@@ -1,6 +1,8 @@
 package collinvht.f1mc.module.racing.module.team.object;
 
 import collinvht.f1mc.module.racing.manager.managers.RaceManager;
+import collinvht.f1mc.module.racing.object.race.ERSMode;
+import collinvht.f1mc.module.racing.object.race.FMMode;
 import collinvht.f1mc.module.racing.object.race.Race;
 import collinvht.f1mc.module.racing.object.race.RaceCar;
 import collinvht.f1mc.module.vehiclesplus.listener.listeners.VPListener;
@@ -105,9 +107,10 @@ public class PCGui implements Listener {
         Gui gui = Gui.normal()
                 .setStructure(
                         "# # # # # # # # #",
-                        "# P # # # # # T #",
-                        "# A # # # # # C #",
-                        "# # # # B # # # #"
+                        "# P # # # # # C #",
+                        "# l m h H ! # T #",
+                        "# o M D Q @ # A #",
+                        "# # # # # # # # #"
                 ).addIngredient('#', new SimpleItem(new ItemBuilder(Utils.emptyStack(Material.GRAY_STAINED_GLASS_PANE))))
                 .addIngredient('P', new AutoUpdateItem(20, () -> new ItemBuilder(createPlayer(skullPlayer.getUniqueId()))))
                 .addIngredient('A', new AutoUpdateItem(20, () -> new ItemBuilder(currentLap(skullCar, skullPlayer))))
@@ -115,17 +118,66 @@ public class PCGui implements Listener {
                     if(skullCar.getRaceCarGUI().getTyre() != null) {
                         return new ItemBuilder(skullCar.getRaceCarGUI().getTyre().getItem());
                     } else {
-                        return new ItemBuilder(Utils.emptyStack(Material.GRAY_STAINED_GLASS_PANE));
+                        return new ItemBuilder(Utils.emptyStack(Material.YELLOW_WOOL));
                     }
                 }))
-                .addIngredient('C', new AutoUpdateItem(20, () -> new ItemBuilder(fastestLap(skullCar, skullPlayer))))
-                .addIngredient('B', new SimpleItem(new ItemStack(Material.BIRCH_SIGN))).build();
+                .addIngredient('l', new SimpleItem(namedItemStack(Material.RED_CONCRETE_POWDER, ChatColor.RED + "FM | Low"), (click) -> skullCar.updateFM(FMMode.LOW)))
+                .addIngredient('m', new SimpleItem(namedItemStack(Material.YELLOW_CONCRETE_POWDER, ChatColor.YELLOW + "FM | Medium"), (click) -> skullCar.updateFM(FMMode.MEDIUM)))
+                .addIngredient('h', new SimpleItem(namedItemStack(Material.GREEN_CONCRETE_POWDER, ChatColor.GREEN + "FM | High"), (click) -> skullCar.updateFM(FMMode.HIGH)))
+                .addIngredient('H', new SimpleItem(namedItemStack(Material.PURPLE_CONCRETE_POWDER, ChatColor.DARK_PURPLE + "FM | Hotlap"), (click) -> skullCar.updateFM(FMMode.HOTLAP)))
+                .addIngredient('o', new SimpleItem(namedItemStack(Material.RED_CONCRETE, ChatColor.RED + "ERS | Off"), (click) -> skullCar.updateERS(ERSMode.OFF)))
+                .addIngredient('M', new SimpleItem(namedItemStack(Material.YELLOW_CONCRETE, ChatColor.YELLOW + "ERS | Balanced"), (click) -> skullCar.updateERS(ERSMode.BALANCED)))
+                .addIngredient('D', new SimpleItem(namedItemStack(Material.GREEN_CONCRETE, ChatColor.GREEN + "ERS | Hotlap"), (click) -> skullCar.updateERS(ERSMode.HOTLAP)))
+                .addIngredient('Q', new SimpleItem(namedItemStack(Material.PURPLE_CONCRETE, ChatColor.DARK_PURPLE + "ERS | Overtake"), (click) -> skullCar.updateERS(ERSMode.OVERTAKE)))
+                .addIngredient('@', new AutoUpdateItem(10, () -> new ItemBuilder(ers(skullCar))))
+                .addIngredient('!', new AutoUpdateItem(10, () -> new ItemBuilder(fuel(skullCar))))
+                .addIngredient('C', new AutoUpdateItem(20, () -> new ItemBuilder(fastestLap(skullCar, skullPlayer)))).build();
         Window window = Window.single()
                 .setViewer(player)
                 .setTitle(ChatColor.of("#767676") + "Tyre Tool")
                 .setGui(gui)
                 .build();
         window.open();
+    }
+
+    private static ItemStack ers(RaceCar skullCar) {
+        ItemStack stack = new ItemStack(Material.PAPER);
+        ItemMeta meta = stack.getItemMeta();
+        if (meta != null) {
+            meta.setDisplayName(ChatColor.GRAY + "ERS Left");
+            ArrayList<String> strings = new ArrayList<>();
+            strings.add(skullCar.getCurrentERS() + "/200");
+            meta.setLore(strings);
+            stack.setItemMeta(meta);
+            return stack;
+        }
+        return Utils.emptyStack(Material.PAPER);
+    }
+
+    private static ItemStack fuel(RaceCar skullCar) {
+        ItemStack stack = new ItemStack(Material.PAPER);
+        ItemMeta meta = stack.getItemMeta();
+        if(skullCar.getLinkedVehicle() != null) {
+            if (meta != null) {
+                meta.setDisplayName(ChatColor.GRAY + "ERS Left");
+                ArrayList<String> strings = new ArrayList<>();
+                strings.add(skullCar.getLinkedVehicle().getStorageVehicle().getVehicleStats().getCurrentFuel() + "/" + skullCar.getLinkedVehicle().getStorageVehicle().getVehicleStats().getFuelTank());
+                meta.setLore(strings);
+                stack.setItemMeta(meta);
+                return stack;
+            }
+        }
+        return Utils.emptyStack(Material.PAPER);
+    }
+
+    private static ItemStack namedItemStack(Material material, String name) {
+        ItemStack stack = new ItemStack(material);
+        if(stack.getItemMeta() != null) {
+            ItemMeta meta = stack.getItemMeta();
+            meta.setDisplayName(name);
+            stack.setItemMeta(meta);
+        }
+        return stack;
     }
 
     private static ItemStack fastestLap(RaceCar skullCar, Player skullPlayer) {
@@ -161,7 +213,7 @@ public class PCGui implements Listener {
                 }
             }
         }
-        return Utils.emptyStack(Material.GRAY_STAINED_GLASS_PANE);
+        return Utils.emptyStack(Material.PAPER);
     }
 
     private static ItemStack currentLap(RaceCar skullCar, Player skullPlayer) {
@@ -191,7 +243,7 @@ public class PCGui implements Listener {
                 }
             }
         }
-        return Utils.emptyStack(Material.GRAY_STAINED_GLASS_PANE);
+        return Utils.emptyStack(Material.PAPER);
     }
 
     public static ItemStack createPlayer(UUID uuid) {

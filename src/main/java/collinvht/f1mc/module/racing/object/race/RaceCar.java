@@ -36,15 +36,37 @@ public class RaceCar {
     @Getter
     private static final Timer carTimers = new Timer("RaceCar Timers");
 
+    @Getter
+    private FMMode currentMode;
+    @Getter
+    private ERSMode currentERSMode;
+
+    @Getter
+    private double currentERS = 200;
+
     public RaceCar(SpawnedVehicle spawnedVehicle, TeamObj linkedTeam) {
         this.linkedVehicle = spawnedVehicle;
         this.linkedTeam = linkedTeam;
         this.raceCarGUI = new RaceCarGUI(this);
         VPListener.getRACE_CARS().put(spawnedVehicle.getHolder().getUniqueId(), this);
         carTimers.schedule(new TimerTask() {
+            int curTick = 0;
             @Override
             public void run() {
                 updateTyre();
+
+                if(curTick == 0) {
+                    if(spawnedVehicle.getCurrentSpeedInKm() > 0) {
+                        currentERS -= currentERSMode.getUsage();
+                        currentERS += currentERSMode.getRegain();
+                        curTick++;
+                    }
+                } else {
+                    curTick++;
+                    if(curTick >= 20) {
+                        curTick = 0;
+                    }
+                }
             }
         }, 0, 1);
     }
@@ -88,7 +110,7 @@ public class RaceCar {
                     return;
                 }
                 if(!player.isInPit()) {
-                    stats.setSpeed((int) (baseVehicle.getSpeedSettings().getBase() + Math.lerp(0, tyre.getDouble("f1mc.extraSpeed"), currentWear) * speedMultiplier));
+                    stats.setSpeed((int) (baseVehicle.getSpeedSettings().getBase() + currentERSMode.getExtraSpeed() + currentMode.getExtraSpeed() + Math.lerp(0, tyre.getDouble("f1mc.extraSpeed"), currentWear) * speedMultiplier));
                 } else {
                     if(stats.getCurrentSpeed() > 60.5D) {
                         stats.setCurrentSpeed(60.00D);
@@ -112,6 +134,18 @@ public class RaceCar {
                 }
                 raceCarGUI.getBandInventory().forceSetItem(UpdateReason.SUPPRESSED, 0, stack);
             }
+        }
+    }
+
+    public void updateFM(FMMode fmMode) {
+        if(currentMode != fmMode) {
+            currentMode = fmMode;
+        }
+    }
+
+    public void updateERS(ERSMode fmMode) {
+        if(currentERSMode != fmMode) {
+            currentERSMode = fmMode;
         }
     }
 }

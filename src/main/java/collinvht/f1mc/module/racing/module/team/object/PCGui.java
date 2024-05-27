@@ -88,7 +88,7 @@ public class PCGui implements Listener {
                     });
                     Window window = Window.single()
                             .setViewer(player)
-                            .setTitle(ChatColor.of("#767676") + "Tyre Tool")
+                            .setTitle(ChatColor.of("#767676") + "Computer")
                             .setGui(gui)
                             .build();
                     window.open();
@@ -134,7 +134,7 @@ public class PCGui implements Listener {
                 .addIngredient('C', new AutoUpdateItem(20, () -> new ItemBuilder(fastestLap(skullCar, skullPlayer)))).build();
         Window window = Window.single()
                 .setViewer(player)
-                .setTitle(ChatColor.of("#767676") + "Tyre Tool")
+                .setTitle(ChatColor.of("#767676") + "Computer")
                 .setGui(gui)
                 .build();
         window.open();

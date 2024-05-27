@@ -117,10 +117,10 @@ public class TyreManager extends ModuleBase {
             tyres.put("hard", new TyreBaseObject("soft", 10014, 1800, 1.05, 1, 0));
         }
         if(!tyres.containsKey("wet")) {
-            tyres.put("wet", new TyreBaseObject("wet", 10014, 1800, 1.05, 1, 0));
+            tyres.put("wet", new TyreBaseObject("wet", 10016, 1800, 1.05, 1, 0));
         }
         if(!tyres.containsKey("intermediate")) {
-            tyres.put("intermediate", new TyreBaseObject("wet", 10014, 1800, 1.05, 1, 0));
+            tyres.put("intermediate", new TyreBaseObject("intermediate", 10017, 1800, 1.05, 1, 0));
         }
         attachModule(new TyreListeners());
     }

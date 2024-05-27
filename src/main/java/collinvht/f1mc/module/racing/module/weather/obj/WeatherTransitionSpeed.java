@@ -6,15 +6,15 @@ import java.util.Arrays;
 
 @Getter
 public enum WeatherTransitionSpeed {
-    SLOW(0, "slow", 1),
-    NORMAL(1, "normal", 3),
-    FAST(2, "fast", 6),
+    SLOW(0, "slow", 0.05),
+    NORMAL(1, "normal", 0.2),
+    FAST(2, "fast", 0.6),
     INSTANT(3, "instant",100);
 
     private final int id;
     private final String name;
-    private final int extraTransitionTicks;
-    WeatherTransitionSpeed(int id, String name, int extraTransitionTicks) {
+    private final double extraTransitionTicks;
+    WeatherTransitionSpeed(int id, String name, double extraTransitionTicks) {
         this.id = id;
         this.name = name;
         this.extraTransitionTicks = extraTransitionTicks;

@@ -44,7 +44,7 @@ public class RaceLapStorage {
 
     @Getter
     @Setter
-    private int waterPercentage = WeatherTypes.DRY.getWaterPercentage();
+    private double waterPercentage = WeatherTypes.DRY.getWaterPercentage();
 
     @Getter
     private final LinkedHashMap<UUID, LaptimeStorage> laptimeHash = new LinkedHashMap<>();

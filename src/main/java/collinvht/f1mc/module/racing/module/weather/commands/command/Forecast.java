@@ -15,13 +15,7 @@ import java.util.List;
 public class Forecast extends CommandUtil implements TabCompleter {
     @Override
     protected void initializeCommand(@NotNull CommandSender commandSender) {
-        addPart("%", 0, "/forecast [race]", (sender, command, label, args) -> {
-            if(args.length == 1) {
-                return WeatherManager.getForecast(args[0]);
-            } else {
-                return command.getUsage();
-            }
-        });
+        addPart("%", 0, "/forecast [race]", (sender, command, label, args) -> WeatherManager.getForecast(args[0]));
     }
 
     @Nullable

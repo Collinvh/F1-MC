@@ -21,7 +21,7 @@ public class WeatherManager {
         Race race = RaceManager.getRACES().get(raceName);
         if(race == null) return prefix + "That race doesn't exist";
         if(race.getRaceLapStorage() == null) return prefix + "The race has not been started";
-        int percentage = race.getRaceLapStorage().getWaterPercentage();
+        double percentage = race.getRaceLapStorage().getWaterPercentage();
         return prefix + "We expect it to be " + WeatherTypes.fromPercentageAprox(percentage) + " for now.";
     }
     public static String getWeather(String raceName) {
@@ -53,7 +53,7 @@ public class WeatherManager {
             race.getRaceLapStorage().setWaterPercentage(type.getWaterPercentage());
         } else {
             TimerTask timerTask = getWeatherTask(race, transitionSpeed, type);
-            weatherTimer.schedule(timerTask, delay, 10);
+            weatherTimer.schedule(timerTask, delay, 100);
         }
         return prefix + "Weather is being adjusted";
     }
@@ -92,18 +92,22 @@ public class WeatherManager {
     }
 
     private static TimerTask getWeatherTask(Race race, WeatherTransitionSpeed transitionSpeed, WeatherTypes type) {
-        int waterPercentage = race.getRaceLapStorage().getWaterPercentage();
-        int addedAmount = transitionSpeed.getExtraTransitionTicks();
+        double addedAmount = transitionSpeed.getExtraTransitionTicks();
         int goal = type.getWaterPercentage();
         return new TimerTask() {
             @Override
             public void run() {
+                double waterPercentage = race.getRaceLapStorage().getWaterPercentage();
                 if(waterPercentage > type.getWaterPercentage()) {
-                    race.getRaceLapStorage().setWaterPercentage(Math.min(waterPercentage + addedAmount, goal));
+                    double value = Math.max(waterPercentage - addedAmount, 0);
+                    race.getRaceLapStorage().setWaterPercentage(Math.max(value, goal));
+                    Bukkit.getLogger().warning(String.valueOf(waterPercentage - addedAmount));
                 } else {
-                    race.getRaceLapStorage().setWaterPercentage(Math.max(waterPercentage - addedAmount, goal));
+                    double value = Math.min(waterPercentage + addedAmount, 100);
+                    race.getRaceLapStorage().setWaterPercentage(Math.min(value, goal));
+                    Bukkit.getLogger().warning(String.valueOf(waterPercentage + addedAmount));
                 }
-                if(race.getRaceLapStorage().getWaterPercentage() == goal) {
+                if(race.getRaceLapStorage().getWaterPercentage() == type.getWaterPercentage()) {
                     race.getRaceLapStorage().setWeatherType(type);
                     cancel();
                 }

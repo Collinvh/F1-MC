@@ -76,6 +76,7 @@ public class RaceDriver {
     }
 
     private static TimerTask task;
+    @Getter
     private static Timer timer;
 
     private void initialize() {

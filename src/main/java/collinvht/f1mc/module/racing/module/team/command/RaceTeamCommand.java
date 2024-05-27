@@ -151,11 +151,12 @@ public class RaceTeamCommand extends CommandUtil implements TabCompleter {
                 list.add("tyregui");
                 list.add("delete");
                 list.add("list");
+                list.add("openpc");
                 return list;
             }
             if(args.length == 2) {
                 return switch (args[0]) {
-                    case "spawn", "set", "add", "remove", "delete", "tyregui" -> {
+                    case "spawn", "set", "add", "remove", "delete", "tyregui", "openpc" -> {
                         TeamManager.getTEAMS().forEach((s1, teamObj) -> list.add(s1));
                         yield list;
                     }

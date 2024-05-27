@@ -7,6 +7,7 @@ import collinvht.f1mc.module.racing.module.fia.FiaModule;
 import collinvht.f1mc.module.racing.module.slowdown.SlowdownModule;
 import collinvht.f1mc.module.racing.module.team.TeamModule;
 import collinvht.f1mc.module.racing.module.tyres.TyreModule;
+import collinvht.f1mc.module.racing.module.weather.WeatherModule;
 import collinvht.f1mc.module.racing.object.race.RaceCar;
 import collinvht.f1mc.module.racing.util.RacingMessages;
 import collinvht.f1mc.module.vehiclesplus.listener.listeners.VPListener;
@@ -28,6 +29,7 @@ public class RacingModule extends ModuleBase {
         if(Utils.isEnableFIAModule()) {
             attachModule(new TeamModule());
             attachModule(new TyreModule());
+            attachModule(new WeatherModule());
         }
         Bukkit.getLogger().info("[F1MC] [Racing] Enabled Racing Modules");
     }

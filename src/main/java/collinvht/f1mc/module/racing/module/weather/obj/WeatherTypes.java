@@ -1,8 +1,11 @@
 package collinvht.f1mc.module.racing.module.weather.obj;
 
 import lombok.Getter;
+import org.bukkit.Bukkit;
 
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.NoSuchElementException;
 
 @Getter
 public enum WeatherTypes {
@@ -40,24 +43,13 @@ public enum WeatherTypes {
         return Arrays.stream(values()).findAny().get().name;
     }
 
-    public static String fromPercentageAprox(int percentage) {
-        int currentClosest = 50000;
-        String name = "dry";
-        for (WeatherTypes value : values()) {
-            if (value.waterPercentage > percentage) {
-                if (value.waterPercentage - percentage < currentClosest) {
-                    currentClosest = value.waterPercentage;
-                    name = value.name;
-                }
-            } else {
-                if (value.waterPercentage + percentage < currentClosest) {
-                    currentClosest = value.waterPercentage;
-                    name = value.name;
-                }
-            }
-
+    public static String fromPercentageAprox(double percentage) {
+        try {
+            WeatherTypes type = Arrays.stream(values()).min(Comparator.comparingDouble(i -> Math.abs(i.getWaterPercentage() - percentage))).orElseThrow(() -> new NoSuchElementException("No value present"));
+            return type.getName();
+        } catch (NoSuchElementException e) {
+            return "dry";
         }
-        return name;
     }
 
     public static WeatherTypes fromID(int id) {

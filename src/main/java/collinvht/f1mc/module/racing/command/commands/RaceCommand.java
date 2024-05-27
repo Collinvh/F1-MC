@@ -67,7 +67,6 @@ public class RaceCommand extends CommandUtil implements TabCompleter {
         addPart("create", 2, "/race create [name] [laps]", (sender, command, label, args) -> racing.createRace(args[1], args[2]), Permissions.FIA_RACE, Permissions.FIA_ADMIN);
         addPart("list", 0, "/race list", (sender, command, label, args) -> racing.listRaces(), Permissions.FIA_RACE, Permissions.FIA_ADMIN);
         addPart("update", 3, "/race update [name] [type] [input]", (sender, command, label, args) -> racing.updateRace((Player) sender, args[1].toLowerCase(), args[2], args[3], args), Permissions.FIA_RACE, Permissions.FIA_ADMIN);
-        //addPart("tyres", 1, "/race tyres get", (sender, command, label, args) -> TyreInventory.openList((Player) sender), Permissions.FIA_RACE, Permissions.FIA_ADMIN);
     }
 
     @Nullable

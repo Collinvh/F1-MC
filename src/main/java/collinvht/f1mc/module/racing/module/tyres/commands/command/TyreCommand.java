@@ -31,8 +31,7 @@ public class TyreCommand extends CommandUtil implements TabCompleter {
             }
         }, Permissions.FIA_ADMIN);
         addPart("debug", 0, "/tyre debug [Hold tyre in hand]", (sender, command, label, args) -> {
-            if(sender instanceof Player) {
-                Player player = (Player) sender;
+            if(sender instanceof Player player) {
                 ItemStack stack = player.getInventory().getItemInMainHand();
                 if(TyreManager.isTyre(stack)) {
                     NBTItem item = new NBTItem(stack);
@@ -64,6 +63,7 @@ public class TyreCommand extends CommandUtil implements TabCompleter {
                 case "durability":
                     try {
                         object.setMaxDurability(Double.parseDouble(args[3]));
+                        TyreGuis.reload();
                         return prefix + "Durability changed";
                     } catch (Exception ignored) {
                         return prefix + "Invalid number";
@@ -72,6 +72,7 @@ public class TyreCommand extends CommandUtil implements TabCompleter {
                 case "degradation":
                     try {
                         object.setDegradingRate(Double.parseDouble(args[3]));
+                        TyreGuis.reload();
                         return prefix + "Degradation changed";
                     } catch (Exception ignored) {
                         return prefix + "Invalid number";
@@ -80,6 +81,7 @@ public class TyreCommand extends CommandUtil implements TabCompleter {
                 case "steering":
                     try {
                         object.setSteering(Double.parseDouble(args[3]));
+                        TyreGuis.reload();
                         return prefix + "Steering changed";
                     } catch (Exception ignored) {
                         return prefix + "Invalid number";
@@ -88,6 +90,7 @@ public class TyreCommand extends CommandUtil implements TabCompleter {
                 case "extraspeed":
                     try {
                         object.setExtraSpeed(Double.parseDouble(args[3]));
+                        TyreGuis.reload();
                         return prefix + "Extra speed changed";
                     } catch (Exception ignored) {
                         return prefix + "Invalid number";

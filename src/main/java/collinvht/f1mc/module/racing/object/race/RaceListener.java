@@ -39,7 +39,7 @@ public class RaceListener {
             }
         };
         if(timer == null) timer = new Timer("F1MC RaceListener");
-        timer.scheduleAtFixedRate(task, 0, 1);
+        timer.schedule(task, 0, 1);
     }
 
     public static String startListeningTo(Race race, int mode) {

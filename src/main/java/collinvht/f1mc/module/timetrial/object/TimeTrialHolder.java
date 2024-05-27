@@ -78,7 +78,7 @@ public class TimeTrialHolder {
         this.player.teleport(storage.getTimeTrialSpawn());
         this.seat.enter(player);
         this.isRunning = true;
-        this.timer.scheduleAtFixedRate(new TimerTask() {
+        this.timer.schedule(new TimerTask() {
             @Override
             public void run() {
                 checkSectors();

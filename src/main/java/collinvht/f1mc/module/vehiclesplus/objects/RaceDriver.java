@@ -98,10 +98,6 @@ public class RaceDriver {
         return laptimes.get(race);
     }
 
-    public void addLaptime(Race race, RaceMode mode, LaptimeStorage storage) {
-        laptimes.get(race).addLaptime(storage, mode);
-    }
-
     public void setDriving(boolean driving) {
         isDriving = driving;
         isPassedPitExit = false;

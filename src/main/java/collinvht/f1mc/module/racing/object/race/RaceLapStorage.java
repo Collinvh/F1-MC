@@ -1,5 +1,6 @@
 package collinvht.f1mc.module.racing.object.race;
 
+import collinvht.f1mc.F1MC;
 import collinvht.f1mc.module.racing.manager.managers.RaceManager;
 import collinvht.f1mc.module.racing.module.weather.obj.WeatherTypes;
 import collinvht.f1mc.module.racing.object.Cuboid;
@@ -15,15 +16,14 @@ import collinvht.f1mc.util.Utils;
 import lombok.Getter;
 import lombok.Setter;
 import me.legofreak107.vehiclesplus.vehicles.vehicles.objects.SpawnedVehicle;
+import org.apache.commons.collections4.map.ListOrderedMap;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
-import java.util.LinkedHashMap;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.UUID;
+import java.util.*;
 
 public class RaceLapStorage {
     @Getter
@@ -297,7 +297,29 @@ public class RaceLapStorage {
                     if (!driverLaptimeStorage.isInvalidated()) {
                         player.sendMessage(prefix + ChatColor.GRAY + "Your S3 is " + ChatColor.RESET + Utils.millisToTimeString(laptimeStorage.getS3().getSectorLength()));
                         player.sendMessage(prefix + ChatColor.GRAY + "Your lap time is " + ChatColor.RESET + Utils.millisToTimeString(laptimeStorage.getLapData().getSectorLength()));
-                        driverLaptimeStorage.addLaptime(storage.copy(), raceMode);
+
+                        if(driverLaptimeStorage.addLaptime(storage.copy())) {
+                            HashMap<UUID, RaceDriver> drivers = VPListener.getRACE_DRIVERS();
+                            if(drivers.values().toArray().length > 0) {
+                                LinkedHashMap<RaceDriver, Long> sectors = new LinkedHashMap<>();
+                                drivers.forEach((unused, driver) -> {
+                                    if (driver.getLaptimes(race).getFastestLap() != null) {
+                                        sectors.put(driver, driver.getLaptimes(race).getFastestLap().getLapData().getSectorLength());
+                                    }
+                                });
+
+                                ListOrderedMap<RaceDriver, Long> treeMap = Utils.sortByValueDesc(sectors);
+                                if(treeMap.previousKey(raceDriver) != null) {
+                                    RaceDriver player1 = treeMap.previousKey(raceDriver);
+                                    OfflinePlayer player2 = Bukkit.getOfflinePlayer(player1.getDriverUUID());
+                                    long length = treeMap.get(player1);
+                                    player.sendMessage(prefix + ChatColor.GREEN + "New PB! Your current position is " + treeMap.indexOf(raceDriver) + ChatColor.GRAY + "\nYou are behind " + player2.getName() + Utils.millisToTimeString(length-laptimeStorage.getLapData().getSectorLength()));
+                                } else {
+                                    player.sendMessage(prefix + ChatColor.LIGHT_PURPLE + "You are FASTEST on track!");
+                                }
+                            }
+
+                        }
                     } else {
                         player.sendMessage(prefix + ChatColor.RED + "Your S3 is " + Utils.millisToTimeString(laptimeStorage.getS3().getSectorLength()));
                         player.sendMessage(prefix + ChatColor.RED + "Your lap is invalid | " + Utils.millisToTimeString(laptimeStorage.getLapData().getSectorLength()));

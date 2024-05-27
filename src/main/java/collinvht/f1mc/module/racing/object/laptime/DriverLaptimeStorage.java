@@ -48,7 +48,7 @@ public class DriverLaptimeStorage {
         this.race = race;
     }
 
-    public void addLaptime(LaptimeStorage laptimeOBJ, RaceMode mode) {
+    public boolean addLaptime(LaptimeStorage laptimeOBJ) {
         laptimes.add(laptimeOBJ);
 
         bestS1 = checkSectorTime(bestS1, laptimeOBJ.getS1().getSectorLength());
@@ -61,10 +61,12 @@ public class DriverLaptimeStorage {
             }
         } else {
             fastestLap = laptimeOBJ;
+            return true;
         }
         if(laptimes.size() == 10) {
             laptimes.remove(0);
         }
+        return false;
     }
 
     public long checkSectorTime(long best, long newTime) {

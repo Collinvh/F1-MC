@@ -59,6 +59,10 @@ public class RaceCuboidStorage {
     @Getter
     private Location timeTrialLeaderboard;
 
+    @Setter
+    @Getter
+    private int skullId = 0;
+
 
     public static RaceCuboidStorage fromJson(JsonObject cuboids) {
         try {

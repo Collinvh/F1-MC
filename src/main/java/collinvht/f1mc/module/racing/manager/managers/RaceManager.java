@@ -356,6 +356,18 @@ public class RaceManager extends ModuleBase {
                     case "setspawn":
                         race.getStorage().setTimeTrialSpawn(player.getLocation());
                         return DefaultMessages.PREFIX + "Spawn has been changed.";
+                    case "head":
+                    case "skull":
+                        if(extraInput[4] != null) {
+                            int number = 0;
+                            try {
+                                number = Integer.parseInt(extraInput[4]);
+                            } catch (NumberFormatException e) {
+                                return DefaultMessages.PREFIX + "Invalid number";
+                            }
+                            race.getStorage().setSkullId(number);
+                            return DefaultMessages.PREFIX + "Spawn has been changed.";
+                        } else return DefaultMessages.PREFIX + "Provide an number";
                     case "leader":
                     case "leaderboard":
                     case "setleaderboard":

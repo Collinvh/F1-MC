@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class TimeTrialManager {
     private static final HashMap<UUID, TimeTrialHolder> timeTrialHolders = new HashMap<>();
@@ -149,51 +150,69 @@ public class TimeTrialManager {
     }
 
     public static Gui getGui(Player player) {
+        HashMap<String, Race> races = RaceManager.getRACES();
         if(timeTrialHolders.containsKey(player.getUniqueId())) {
-            if (gui == null) {
-                gui = Gui.normal().setStructure("# # # # # # # # #", "# # B # C # A # #", "! # # # R # # # !")
-                        .addIngredient('A', createTrack("misano", 43759, "&aMisano"))
-                        .addIngredient('B', createTrack("gb", 44709, "&aGB"))
-                        .addIngredient('C', createTrack("hockenheim", 43579, "&aGermany"))
-                        .addIngredient('R', new SimpleItem(Utils.emptyStack(Material.RED_STAINED_GLASS_PANE), (click -> {
-                            timeTrialHolders.get(click.getPlayer().getUniqueId()).stop();
-                            timeTrialHolders.remove(click.getPlayer().getUniqueId());
-                        })))
-                        .addIngredient('!', new SimpleItem(Utils.createSkull(1223, "DLC"), (click) -> click.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&',"&cComing soon!"))))
-                        .addIngredient('#', new SimpleItem(Utils.emptyStack(Material.GRAY_STAINED_GLASS_PANE))).build();
+            Gui.Builder<Gui, Gui.Builder.Normal> builder = Gui.normal().setStructure("# # # # # # # # #", "# # B # C # A # #", "! # # # R # # # !")
+                    .addIngredient('R', new SimpleItem(Utils.emptyStack(Material.RED_STAINED_GLASS_PANE), (click -> {
+                        timeTrialHolders.get(click.getPlayer().getUniqueId()).stop();
+                        timeTrialHolders.remove(click.getPlayer().getUniqueId());
+                    })))
+                    .addIngredient('!', new SimpleItem(Utils.createSkull(1223, "DLC"), (click) -> click.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&',"&cComing soon!"))))
+                    .addIngredient('#', new SimpleItem(Utils.emptyStack(Material.GRAY_STAINED_GLASS_PANE)));
+            AtomicInteger curID = new AtomicInteger();
+            for (Race race : races.values()) {
+                if(race.isTimeTrialStatus()) {
+                    if(curID.get() < 3) {
+                        switch (curID.incrementAndGet()) {
+                            case 1 -> builder.addIngredient('A', createTrack(race));
+                            case 2 -> builder.addIngredient('B', createTrack(race));
+                            case 3 -> builder.addIngredient('C', createTrack(race));
+                        }
+                    } else {
+                        break;
+                    }
+                }
             }
-            return gui;
+            return builder.build();
         } else {
-            if (gui2 == null) {
-                gui2 = Gui.normal().setStructure("# # # # # # # # #", "# # B # C # A # #", "! # # # # # # # !")
-                        .addIngredient('A', createTrack("misano", 43759, "&aMisano"))
-                        .addIngredient('B', createTrack("gb", 44709, "&aGB"))
-                        .addIngredient('C', createTrack("hockenheim", 43579, "&aGermany"))
-                        .addIngredient('!', new SimpleItem(Utils.createSkull(1223, "DLC"), (click) -> click.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&',"&cComing soon!"))))
-                        .addIngredient('#', new SimpleItem(Utils.emptyStack(Material.GRAY_STAINED_GLASS_PANE))).build();
+            Gui.Builder<Gui, Gui.Builder.Normal> builder = Gui.normal().setStructure("# # # # # # # # #", "# # B # C # A # #", "! # # # # # # # !")
+                    .addIngredient('!', new SimpleItem(Utils.createSkull(1223, "DLC"), (click) -> click.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&',"&cComing soon!"))))
+                    .addIngredient('#', new SimpleItem(Utils.emptyStack(Material.GRAY_STAINED_GLASS_PANE)));
+            AtomicInteger curID = new AtomicInteger();
+            for (Race race : races.values()) {
+                if(race.isTimeTrialStatus()) {
+                    if(curID.get() < 3) {
+                        switch (curID.incrementAndGet()) {
+                            case 1 -> builder.addIngredient('A', createTrack(race));
+                            case 2 -> builder.addIngredient('B', createTrack(race));
+                            case 3 -> builder.addIngredient('C', createTrack(race));
+                        }
+                    } else {
+                        break;
+                    }
+                }
             }
-            return gui2;
+            return builder.build();
         }
     }
 
-    private static SimpleItem createTrack(String track, int id, String string) {
-        ItemStack stack = Utils.createSkull(id, string);
+    private static SimpleItem createTrack(Race race) {
+        ItemStack stack = Utils.createSkull(race.getStorage().getSkullId(), "nil");
         ItemMeta meta = stack.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', string));
+            meta.setDisplayName(ChatColor.GREEN + race.getName());
             ArrayList<String> strings = new ArrayList<>();
             strings.add(ChatColor.DARK_GRAY + "Click to start timetrial!");
             meta.setLore(strings);
             stack.setItemMeta(meta);
         }
         stack.setItemMeta(meta);
-        return new SimpleItem(stack, click -> createTrackClick(click, track));
+        return new SimpleItem(stack, click -> createTrackClick(click, race));
     }
 
-    private static void createTrackClick(@NotNull Click click, String track) {
+    private static void createTrackClick(@NotNull Click click, Race race) {
         Optional<BaseVehicle> baseVehicle = VehiclesPlusAPI.getInstance().getBaseVehicleFromString(carPreference.getOrDefault(click.getPlayer().getUniqueId(), "f1base"));
         if(baseVehicle.isPresent()) {
-            Race race = RaceManager.getInstance().getRace(track);
             if(race != null) {
                 if (race.isTimeTrialStatus()) {
                     Player player = click.getPlayer();

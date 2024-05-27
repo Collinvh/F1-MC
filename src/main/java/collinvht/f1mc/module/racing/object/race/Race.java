@@ -65,6 +65,7 @@ public class Race {
         mainObject.addProperty("TimeTrial_Status", timeTrialStatus);
         mainObject.add("TimeTrial_Spawn", storage.ttSpawnJson());
         mainObject.add("TimeTrial_Leaderboard", storage.ttLeaderboardJson());
+        mainObject.addProperty("TimeTrial_skullID", storage.getSkullId());
         mainObject.add("Cuboids", storage.toJson());
         mainObject.add("Flags", flags.toJson());
 
@@ -81,6 +82,9 @@ public class Race {
             if(raceStorage != null) {
                 raceStorage.setTimeTrialSpawnObj(object.get("TimeTrial_Spawn").getAsJsonObject());
                 raceStorage.setTimeTrialLeaderboardObj(object.get("TimeTrial_Leaderboard").getAsJsonObject());
+                if(object.get("TimeTrial_skullID") != null) {
+                    raceStorage.setSkullId(object.get("TimeTrial_skullID").getAsInt());
+                }
                 Race race = new Race(name, laps);
                 race.setFlags(RaceFlags.fromJson(object.get("Flags").getAsJsonObject()));
                 race.setTimeTrialStatus(ttstatus);

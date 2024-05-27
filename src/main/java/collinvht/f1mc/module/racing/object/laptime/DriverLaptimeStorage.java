@@ -63,7 +63,7 @@ public class DriverLaptimeStorage {
             fastestLap = laptimeOBJ;
             return true;
         }
-        if(laptimes.size() == 10) {
+        if(laptimes.size() == 15) {
             laptimes.remove(0);
         }
         return false;

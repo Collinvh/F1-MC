@@ -18,6 +18,8 @@ authors:
   - SBDeveloper
 
 commands:
+  helpfia:
+    description: Help FIA
   discord:
     description: Discord link
   raceteam:

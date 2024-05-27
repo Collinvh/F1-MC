@@ -32,28 +32,33 @@ public abstract class CommandUtil implements CommandExecutor {
                 CommandPart part = parts.get(args[0]);
                 if(part.getExtraArguments() > 0) {
                     if(args.length > part.getExtraArguments()) {
-                        sender.sendMessage(part.execute(sender, command, label, args));
+                        String message = part.execute(sender, command, label, args);
+                        if(!message.isEmpty()) sender.sendMessage(message);
                         return true;
                     } else {
                         sender.sendMessage(DefaultMessages.PREFIX + DefaultMessages.WRONG_USAGE + part.getUsage());
                         return false;
                     }
                 } else {
-                    sender.sendMessage(part.execute(sender, command, label, args));
+
+                    String message = part.execute(sender, command, label, args);
+                    if(!message.isEmpty()) sender.sendMessage(message);
                     return true;
                 }
             } else if(parts.containsKey("%")) {
                 CommandPart part = parts.get("%");
                 if(part.getExtraArguments() > 0) {
                     if(args.length > part.getExtraArguments()) {
-                        sender.sendMessage(part.execute(sender, command, label, args));
+                        String message = part.execute(sender, command, label, args);
+                        if(!message.isEmpty()) sender.sendMessage(message);
                         return true;
                     } else {
                         sender.sendMessage(DefaultMessages.PREFIX + DefaultMessages.WRONG_USAGE + part.getUsage());
                         return false;
                     }
                 } else {
-                    sender.sendMessage(part.execute(sender, command, label, args));
+                    String message = part.execute(sender, command, label, args);
+                    if(!message.isEmpty()) sender.sendMessage(message);
                     return true;
                 }
             } else {
@@ -67,7 +72,8 @@ public abstract class CommandUtil implements CommandExecutor {
                     sender.sendMessage(DefaultMessages.PREFIX + DefaultMessages.WRONG_USAGE + part.getUsage());
                     return false;
                 } else {
-                    sender.sendMessage(part.execute(sender, command, label, args));
+                    String message = part.execute(sender, command, label, args);
+                    if(!message.isEmpty()) sender.sendMessage(message);
                     return true;
                 }
             }

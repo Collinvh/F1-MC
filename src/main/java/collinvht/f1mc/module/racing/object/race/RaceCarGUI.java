@@ -150,11 +150,15 @@ public class RaceCarGUI {
             public void run() {
                 if(player == intialOpenedPlayer) {
                     intialOpenedPlayer = null;
-                    for (Player allCurrentViewer : bandGui.findAllCurrentViewers()) {
-                        allCurrentViewer.closeInventory();
+                    if(bandGui != null) {
+                        for (Player allCurrentViewer : bandGui.findAllCurrentViewers()) {
+                            allCurrentViewer.closeInventory();
+                        }
                     }
-                    for (Player allCurrentViewer : minigameGui.findAllCurrentViewers()) {
-                        allCurrentViewer.closeInventory();
+                    if(minigameGui != null) {
+                        for (Player allCurrentViewer : minigameGui.findAllCurrentViewers()) {
+                            allCurrentViewer.closeInventory();
+                        }
                     }
                 }
             }

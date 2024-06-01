@@ -16,6 +16,7 @@ import net.megavex.scoreboardlibrary.api.sidebar.Sidebar;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import scala.Int;
 
 import java.util.HashMap;
 import java.util.Timer;
@@ -89,9 +90,9 @@ public class RaceDriver {
                     }
                     try {
                         if(raceCar != null) {
-                            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy(ChatColor.GRAY + "| " + vehicle.getCurrentSpeedInKm() + "km/h | " + (raceCar.getCurrentERS()/200*100) + "% | " + vehicle.getStorageVehicle().getVehicleStats().getCurrentFuel() + "/" + vehicle.getStorageVehicle().getVehicleStats().getFuelTank() + "L"));
+                            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy(ChatColor.GRAY + "| " + vehicle.getCurrentSpeedInKm() + "km/h | " + (int) (raceCar.getCurrentERS()/200*100) + "% | " + (int)(double)vehicle.getStorageVehicle().getVehicleStats().getCurrentFuel() + "/" + vehicle.getStorageVehicle().getVehicleStats().getFuelTank() + "L"));
                         } else if(!Utils.isEnableTimeTrial()) {
-                            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy(ChatColor.GRAY + "| " + vehicle.getCurrentSpeedInKm() + "km/h | " + vehicle.getStorageVehicle().getVehicleStats().getCurrentFuel() + "/" + vehicle.getStorageVehicle().getVehicleStats().getFuelTank() + "L"));
+                            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy(ChatColor.GRAY + "| " + vehicle.getCurrentSpeedInKm() + "km/h | " + (int)(double)vehicle.getStorageVehicle().getVehicleStats().getCurrentFuel() + "/" + vehicle.getStorageVehicle().getVehicleStats().getFuelTank() + "L"));
                         } else {
                             player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy(ChatColor.GRAY + "| " + vehicle.getCurrentSpeedInKm() + "km/h | "));
                         }

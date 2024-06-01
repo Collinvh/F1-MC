@@ -37,9 +37,9 @@ public class RaceCar {
     private static final Timer carTimers = new Timer("RaceCar Timers");
 
     @Getter
-    private FMMode currentMode;
+    private FMMode currentMode = FMMode.MEDIUM;
     @Getter
-    private ERSMode currentERSMode;
+    private ERSMode currentERSMode = ERSMode.BALANCED;
 
     @Getter
     private double currentERS = 200;
@@ -57,13 +57,23 @@ public class RaceCar {
 
                 if(curTick == 0) {
                     if(spawnedVehicle.getCurrentSpeedInKm() > 0) {
-                        currentERS -= currentERSMode.getUsage();
-                        currentERS += currentERSMode.getRegain();
-                        curTick++;
+                        if(currentERSMode == ERSMode.OFF && currentERS == 100) {
+                            return;
+                        }
+                        if(currentERS - currentERSMode.getUsage() < 0) {
+                            currentERS = 0;
+                            currentERSMode = ERSMode.OFF;
+                        } else if(currentERS + currentERSMode.getRegain() > 100) {
+                            currentERS = 100;
+                        } else {
+                            currentERS -= currentERSMode.getUsage();
+                            currentERS += currentERSMode.getRegain();
+                            curTick++;
+                        }
                     }
                 } else {
                     curTick++;
-                    if(curTick >= 20) {
+                    if(curTick >= 1000) {
                         curTick = 0;
                     }
                 }
@@ -97,13 +107,12 @@ public class RaceCar {
                     tyreSpeedArray[2] = WeatherTypes.DRY.getSlickSpeedMultiplier();
                 }
                 String tyreName = tyre.getString("f1mc.name");
-                float speedMultiplier;
+                float speedMultiplier = 1.0F;
                 switch (tyreName.toLowerCase()) {
                     case "intermediate" -> speedMultiplier = (float) tyreSpeedArray[0];
                     case "wet" -> speedMultiplier = (float) tyreSpeedArray[1];
                     default -> speedMultiplier = (float) tyreSpeedArray[2];
                 }
-
                 if(dura <= 0) {
                     if(stats.getCurrentSpeed() > 10) stats.setCurrentSpeed(10.0);
                     stats.setSpeed(10);
@@ -117,10 +126,10 @@ public class RaceCar {
                     }
                     stats.setSpeed(60);
                 }
-                stats.setLowSpeedSteering((float) (baseVehicle.getTurningRadiusSettings().getLowSpeed() * tyre.getDouble("f1mc.steering")) * speedMultiplier);
-                stats.setHighSpeedSteering((float) (baseVehicle.getTurningRadiusSettings().getHighSpeed() * tyre.getDouble("f1mc.steering")) * speedMultiplier);
-                stats.setLowSpeedAcceleration((float) (baseVehicle.getAccelerationSettings().getLowSpeed() * tyre.getDouble("f1mc.steering")) * speedMultiplier);
-                stats.setHighSpeedAcceleration((float) (baseVehicle.getAccelerationSettings().getHighSpeed() * tyre.getDouble("f1mc.steering")) * speedMultiplier);
+                stats.setLowSpeedSteering((float) ((baseVehicle.getTurningRadiusSettings().getLowSpeed() * tyre.getDouble("f1mc.steering")) * speedMultiplier));
+                stats.setHighSpeedSteering((float) ((baseVehicle.getTurningRadiusSettings().getHighSpeed() * tyre.getDouble("f1mc.steering")) * speedMultiplier));
+                stats.setLowSpeedAcceleration((float) ((baseVehicle.getAccelerationSettings().getLowSpeed() * tyre.getDouble("f1mc.steering")) * speedMultiplier));
+                stats.setHighSpeedAcceleration((float) ((baseVehicle.getAccelerationSettings().getHighSpeed() * tyre.getDouble("f1mc.steering")) * speedMultiplier));
 
                 tyre.setDouble("f1mc.dura", (dura-(degrate * (getLinkedVehicle().getCurrentSpeedInKm()/100))));
                 ArrayList<String> lore = new ArrayList<>();

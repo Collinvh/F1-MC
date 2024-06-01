@@ -43,12 +43,11 @@ public enum WeatherTypes {
         return Arrays.stream(values()).findAny().get().name;
     }
 
-    public static String fromPercentageAprox(double percentage) {
+    public static WeatherTypes fromPercentageAprox(double percentage) {
         try {
-            WeatherTypes type = Arrays.stream(values()).min(Comparator.comparingDouble(i -> Math.abs(i.getWaterPercentage() - percentage))).orElseThrow(() -> new NoSuchElementException("No value present"));
-            return type.getName();
+            return Arrays.stream(values()).min(Comparator.comparingDouble(i -> Math.abs(i.getWaterPercentage() - percentage))).orElseThrow(() -> new NoSuchElementException("No value present"));
         } catch (NoSuchElementException e) {
-            return "dry";
+            return WeatherTypes.DRY;
         }
     }
 

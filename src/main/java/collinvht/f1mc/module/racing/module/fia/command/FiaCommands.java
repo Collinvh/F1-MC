@@ -11,5 +11,6 @@ public class FiaCommands extends CommandModuleBase {
         registerCommand("penalty", new PenaltyCommand());
         registerCommand("warning", new WarningCommand());
         registerCommand("announcement", new AnnouncementCommand());
+        registerCommand("helpfia", new HelpFIACommand());
     }
 }

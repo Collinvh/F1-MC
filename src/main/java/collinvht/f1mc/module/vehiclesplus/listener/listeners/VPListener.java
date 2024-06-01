@@ -90,7 +90,9 @@ public class VPListener implements Listener {
                         itemEntity.setItemStack(item.getItem());
                     }
                 }
-                car.getPlayer().setRaceCar(null);
+                if(car.getPlayer() != null) {
+                    car.getPlayer().setRaceCar(null);
+                }
                 RACE_CARS.remove(vehicle.getHolder().getUniqueId());
                 spawnedVehicles.remove(vehicle);
             }

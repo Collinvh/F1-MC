@@ -29,7 +29,7 @@ public class TeamChatCommand extends CommandUtil {
                 members.add(teamObj.getOwner());
                 for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
                     if(members.contains(onlinePlayer.getUniqueId())) {
-                        onlinePlayer.sendMessage(ChatColor.GREEN + "TeamChat " + ChatColor.GRAY +  "| " + builder);
+                        onlinePlayer.sendMessage(ChatColor.GREEN + "TeamChat " + ChatColor.GRAY +  "| " + player.getName() + " > " + builder);
                     }
                 }
             }

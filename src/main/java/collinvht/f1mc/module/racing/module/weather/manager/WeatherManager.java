@@ -22,7 +22,7 @@ public class WeatherManager {
         if(race == null) return prefix + "That race doesn't exist";
         if(race.getRaceLapStorage() == null) return prefix + "The race has not been started";
         double percentage = race.getRaceLapStorage().getWaterPercentage();
-        return prefix + "We expect it to be " + WeatherTypes.fromPercentageAprox(percentage) + " for now.";
+        return prefix + "We expect it to be " + WeatherTypes.fromPercentageAprox(percentage).getName() + " for now.";
     }
     public static String getWeather(String raceName) {
         Race race = RaceManager.getRACES().get(raceName);
@@ -60,27 +60,23 @@ public class WeatherManager {
 
     public static double[] currentRotation(Race race) {
         WeatherTypes current = race.getRaceLapStorage().getWeatherType();
-        WeatherTypes next = race.getRaceLapStorage().getNextWeatherType();
-        int idDifference = current.getId() - next.getId();
-        if(idDifference != 1 && idDifference != -1) {
-            if(idDifference < 0) {
-                next = WeatherTypes.fromID(current.getId()-1);
-            } else {
-                next = WeatherTypes.fromID(current.getId()+1);
-            }
-        }
+        WeatherTypes next = WeatherTypes.fromPercentageAprox(race.getRaceLapStorage().getWaterPercentage());
         double[] doubles = new double[3];
         if(next != null) {
-            if(idDifference > 0) {
-                double calculation = ((double) next.getWaterPercentage()) / ((double) current.getWaterPercentage());
+            if(current != next) {
+                float calculation;
+                float currentPercentage = Math.min(1, current.getWaterPercentage());
+                float difference = Math.min(1, Math.abs(current.getWaterPercentage()-next.getWaterPercentage())); //45 = 100%
+                calculation = difference > currentPercentage ? currentPercentage/difference : difference/currentPercentage;
+
                 doubles[0] = Math.lerp(current.getInterSpeedMultiplier(), next.getInterSpeedMultiplier(), calculation);
                 doubles[1] = Math.lerp(current.getWetSpeedMultiplier(), next.getWetSpeedMultiplier(), calculation);
                 doubles[2] = Math.lerp(current.getSlickSpeedMultiplier(), next.getSlickSpeedMultiplier(), calculation);
+                Bukkit.getLogger().warning(doubles[0] + " | " + doubles[1] + " | " + doubles[2] + " | " + next.getName() + " | " + current.getName() + " | " + calculation);
             } else {
-                double calculation = ((double) current.getWaterPercentage()) / ((double) next.getWaterPercentage());
-                doubles[0] = Math.lerp(current.getInterSpeedMultiplier(), next.getInterSpeedMultiplier(), calculation);
-                doubles[1] = Math.lerp(current.getWetSpeedMultiplier(), next.getWetSpeedMultiplier(), calculation);
-                doubles[2] = Math.lerp(current.getSlickSpeedMultiplier(), next.getSlickSpeedMultiplier(), calculation);
+                doubles[0] = current.getInterSpeedMultiplier();
+                doubles[1] = current.getWetSpeedMultiplier();
+                doubles[2] = current.getSlickSpeedMultiplier();
             }
         } else {
             Bukkit.getLogger().severe("Theirs been an issue getting the currentRotation for the tyres");

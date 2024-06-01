@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 public class HelpFIACommand extends CommandUtil {
     @Override
     protected void initializeCommand(@NotNull CommandSender commandSender) {
-        addPart("%", 1, "/helpfia [message]", ((sender, command, label, args) -> {
+        addPart("%", 0, "/helpfia [message]", ((sender, command, label, args) -> {
             if(sender instanceof Player player) {
                 StringBuilder builder = new StringBuilder();
                 for (String arg : args) {
@@ -19,7 +19,7 @@ public class HelpFIACommand extends CommandUtil {
                 }
                 for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
                     if(Permissions.FIA_ADMIN.hasPermission(onlinePlayer)) {
-                        onlinePlayer.sendMessage(ChatColor.RED + "HELPFIA " + ChatColor.GRAY + " | " + builder);
+                        onlinePlayer.sendMessage(ChatColor.RED + "HELPFIA " + ChatColor.GRAY + " | " + player.getName() + " > " + builder);
                     }
                 }
                 return prefix + "Message sent";

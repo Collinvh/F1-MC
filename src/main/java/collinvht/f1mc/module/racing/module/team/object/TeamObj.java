@@ -17,7 +17,6 @@ import net.luckperms.api.node.types.InheritanceNode;
 import net.luckperms.api.node.types.PermissionNode;
 import net.luckperms.api.node.types.PrefixNode;
 import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Bukkit;
 
 import java.io.File;
 import java.nio.file.Paths;
@@ -33,6 +32,7 @@ public class TeamObj {
     private String teamPrefix;
 
     private UUID owner = null;
+    //Todo: fix deprecated
     private ChatColor teamColor = ChatColor.WHITE;
 
     @Setter
@@ -56,7 +56,7 @@ public class TeamObj {
             if (group != null) {
                 User user = luckPerms.getUserManager().getUser(owner);
                 if (user == null) {
-                    Bukkit.getLogger().severe("Owner doesn't exist: " + owner);
+                    F1MC.getLog().severe("Owner doesn't exist: " + owner);
                 } else {
                     user.data().remove(InheritanceNode.builder(group).build());
                     luckPerms.getUserManager().saveUser(user);
@@ -71,7 +71,7 @@ public class TeamObj {
         if(teamGroup != null) luckPerms.getGroupManager().deleteGroup(teamGroup);
 
         File path = Paths.get(F1MC.getInstance().getDataFolder() + "/storage/teams/" + teamName + ".json").toFile();
-        Bukkit.getLogger().warning(String.valueOf(path.delete()));
+        F1MC.getLog().warning(String.valueOf(path.delete()));
     }
 
     public void setTeamName(String teamName) {
@@ -84,6 +84,7 @@ public class TeamObj {
         updateLP();
     }
 
+    //Todo: fix deprecated
     public void setTeamColor(ChatColor teamColor) {
         this.teamColor = teamColor;
         updateLP();
@@ -94,6 +95,7 @@ public class TeamObj {
         Group group = luckPerms.getGroupManager().getGroup(groupName);
         if(group != null) {
             group.getData(DataType.NORMAL).clear();
+            //Todo: fix deprecated
             group.getData(DataType.NORMAL).add(PrefixNode.builder().prefix( ChatColor.DARK_GRAY + "|" + getTeamColor() + getTeamPrefix() + ChatColor.DARK_GRAY +"| " + ChatColor.RESET).withContext("server", "racing").priority(10).build());
             group.getData(DataType.NORMAL).add(PermissionNode.builder("blocklocker.group." + getTeamName()).permission("team." + getTeamName()).withContext("server", "racing").build());
             luckPerms.getGroupManager().saveGroup(group);
@@ -114,6 +116,7 @@ public class TeamObj {
 
 
             TeamObj team = new TeamObj(name.toLowerCase());
+            //Todo: fix deprecated
             team.setTeamColor(ChatColor.getByChar(color.charAt(1)));
             team.setGroupName(groupname);
             if(json.get("Owner") != null) {
@@ -145,6 +148,7 @@ public class TeamObj {
         mainObject.addProperty("Name", teamName);
         mainObject.addProperty("Groupname", groupName);
         mainObject.addProperty("Prefix", teamPrefix);
+        //Todo: fix deprecated
         mainObject.addProperty("TeamColor", teamColor.toString());
         if(owner != null) mainObject.addProperty("Owner", owner.toString());
         JsonArray requests = new JsonArray();
@@ -175,11 +179,12 @@ public class TeamObj {
         Group group = luckPerms.getGroupManager().getGroup("teambaas");
         if(group == null) {
             try {
-                Bukkit.getLogger().info("Teambaas group doesn't exist creating...");
+                F1MC.getLog().info("Teambaas group doesn't exist creating...");
                 group = luckPerms.getGroupManager().createAndLoadGroup("teambaas").get();
+                //Todo: fix deprecated
                 group.getData(DataType.NORMAL).add(PrefixNode.builder().prefix(ChatColor.DARK_GRAY + "[" + ChatColor.DARK_AQUA + "T" + ChatColor.DARK_GRAY + "] " + ChatColor.RESET).withContext("server", "racing").priority(10).build());
             } catch (ExecutionException | InterruptedException e ) {
-                Bukkit.getLogger().severe("Teambaas group couldn't be created");
+                F1MC.getLog().severe("Teambaas group couldn't be created");
                 return;
             }
         }
@@ -187,7 +192,7 @@ public class TeamObj {
 
             User user = luckPerms.getUserManager().getUser(owner);
             if(user == null) {
-                Bukkit.getLogger().severe("Owner doesn't exist: " + owner);
+                F1MC.getLog().severe("Owner doesn't exist: " + owner);
                 return;
             }
             user.data().remove(InheritanceNode.builder(group).build());
@@ -197,7 +202,7 @@ public class TeamObj {
 
         User user = luckPerms.getUserManager().getUser(owner);
         if(user == null) {
-            Bukkit.getLogger().severe("New owner doesn't exist: " + owner);
+            F1MC.getLog().severe("New owner doesn't exist: " + owner);
             return;
         }
         user.data().add(InheritanceNode.builder(group).build());
@@ -210,13 +215,13 @@ public class TeamObj {
 
         Group group = luckPerms.getGroupManager().getGroup(groupName);
         if(group == null) {
-            Bukkit.getLogger().severe("No group for " + getTeamName());
+            F1MC.getLog().severe("No group for " + getTeamName());
             return;
         }
 
         User user = luckPerms.getUserManager().getUser(uuid);
         if(user == null) {
-            Bukkit.getLogger().severe("User with doesn't exist: " + uuid);
+            F1MC.getLog().severe("User with doesn't exist: " + uuid);
             return;
         }
         user.data().add(InheritanceNode.builder(group).build());
@@ -229,13 +234,13 @@ public class TeamObj {
 
         Group group = luckPerms.getGroupManager().getGroup(groupName);
         if(group == null) {
-            Bukkit.getLogger().severe("No group for " + getTeamName());
+            F1MC.getLog().severe("No group for " + getTeamName());
             return;
         }
 
         User user = luckPerms.getUserManager().getUser(uuid);
         if(user == null) {
-            Bukkit.getLogger().severe("User with doesn't exist: " + uuid);
+            F1MC.getLog().severe("User with doesn't exist: " + uuid);
             return;
         }
         user.data().remove(InheritanceNode.builder(group).build());

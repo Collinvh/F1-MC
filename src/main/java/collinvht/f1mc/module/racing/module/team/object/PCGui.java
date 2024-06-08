@@ -1,5 +1,6 @@
 package collinvht.f1mc.module.racing.module.team.object;
 
+import collinvht.f1mc.F1MC;
 import collinvht.f1mc.module.racing.manager.managers.RaceManager;
 import collinvht.f1mc.module.racing.object.race.ERSMode;
 import collinvht.f1mc.module.racing.object.race.FMMode;
@@ -33,7 +34,7 @@ public class PCGui implements Listener {
     public static String prefix = DefaultMessages.PREFIX;
     public static void open(Player player, TeamObj teamObject) {
         if(teamObject != null) {
-            Bukkit.getLogger().warning(teamObject.getTeamPrefix());
+            F1MC.getLog().warning(teamObject.getTeamPrefix());
             ArrayList<RaceCar> raceCars = teamObject.getRaceCars();
 
             if (!raceCars.isEmpty()) {
@@ -88,6 +89,7 @@ public class PCGui implements Listener {
                     });
                     Window window = Window.single()
                             .setViewer(player)
+                            //Todo: fix deprecated
                             .setTitle(ChatColor.of("#767676") + "Computer")
                             .setGui(gui)
                             .build();
@@ -121,6 +123,7 @@ public class PCGui implements Listener {
                         return new ItemBuilder(Utils.emptyStack(Material.YELLOW_WOOL));
                     }
                 }))
+                //Todo: fix deprecated
                 .addIngredient('l', new SimpleItem(namedItemStack(Material.RED_CONCRETE_POWDER, ChatColor.RED + "FM | Low"), (click) -> skullCar.updateFM(FMMode.LOW)))
                 .addIngredient('m', new SimpleItem(namedItemStack(Material.YELLOW_CONCRETE_POWDER, ChatColor.YELLOW + "FM | Medium"), (click) -> skullCar.updateFM(FMMode.MEDIUM)))
                 .addIngredient('h', new SimpleItem(namedItemStack(Material.GREEN_CONCRETE_POWDER, ChatColor.GREEN + "FM | High"), (click) -> skullCar.updateFM(FMMode.HIGH)))
@@ -144,9 +147,11 @@ public class PCGui implements Listener {
         ItemStack stack = new ItemStack(Material.PAPER);
         ItemMeta meta = stack.getItemMeta();
         if (meta != null) {
+            //Todo: fix deprecated
             meta.setDisplayName(ChatColor.GRAY + "ERS Left");
             ArrayList<String> strings = new ArrayList<>();
             strings.add(skullCar.getCurrentERS() + "/200");
+            //Todo: fix deprecated
             meta.setLore(strings);
             stack.setItemMeta(meta);
             return stack;
@@ -159,9 +164,11 @@ public class PCGui implements Listener {
         ItemMeta meta = stack.getItemMeta();
         if(skullCar.getLinkedVehicle() != null) {
             if (meta != null) {
+                //Todo: fix deprecated
                 meta.setDisplayName(ChatColor.GRAY + "ERS Left");
                 ArrayList<String> strings = new ArrayList<>();
                 strings.add(skullCar.getLinkedVehicle().getStorageVehicle().getVehicleStats().getCurrentFuel() + "/" + skullCar.getLinkedVehicle().getStorageVehicle().getVehicleStats().getFuelTank());
+                //Todo: fix deprecated
                 meta.setLore(strings);
                 stack.setItemMeta(meta);
                 return stack;
@@ -174,6 +181,7 @@ public class PCGui implements Listener {
         ItemStack stack = new ItemStack(material);
         if(stack.getItemMeta() != null) {
             ItemMeta meta = stack.getItemMeta();
+            //Todo: fix deprecated
             meta.setDisplayName(name);
             stack.setItemMeta(meta);
         }
@@ -193,15 +201,19 @@ public class PCGui implements Listener {
                                 ItemMeta meta = stack.getItemMeta();
                                 if (meta != null) {
                                     if (race.getRaceLapStorage().getRaceMode().isLapped()) {
+                                        //Todo: fix deprecated
                                         meta.setDisplayName(ChatColor.GRAY + "Lap progress");
                                         ArrayList<String> strings = new ArrayList<>();
                                         strings.add(driver.getCurrentLap() + "/" + race.getLaps());
+                                        //Todo: fix deprecated
                                         meta.setLore(strings);
                                         stack.setItemMeta(meta);
                                     } else {
+                                        //Todo: fix deprecated
                                         meta.setDisplayName(ChatColor.GRAY + "Laps driven");
                                         ArrayList<String> strings = new ArrayList<>();
                                         strings.add(String.valueOf(driver.getCurrentLap()));
+                                        //Todo: fix deprecated
                                         meta.setLore(strings);
                                         stack.setItemMeta(meta);
                                     }
@@ -229,9 +241,11 @@ public class PCGui implements Listener {
                                     ItemStack stack = new ItemStack(Material.PAPER);
                                     ItemMeta meta = stack.getItemMeta();
                                     if (meta != null) {
+                                        //Todo: fix deprecated
                                         meta.setDisplayName(ChatColor.GRAY + "Fastest lap");
                                         ArrayList<String> strings = new ArrayList<>();
                                         strings.add(Utils.millisToTimeString(driver.getLaptimes(race).getFastestLap().getLapData().getSectorLength()));
+                                        //Todo: fix deprecated
                                         meta.setLore(strings);
                                         stack.setItemMeta(meta);
                                         return stack;
@@ -253,6 +267,7 @@ public class PCGui implements Listener {
         if(player != null) {
             if (meta != null) {
                 meta.setOwningPlayer(player);
+                //Todo: fix deprecated
                 meta.setDisplayName(player.getName());
                 pane.setItemMeta(meta);
             }

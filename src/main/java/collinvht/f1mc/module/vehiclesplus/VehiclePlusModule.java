@@ -19,6 +19,8 @@ public class VehiclePlusModule extends ModuleBase {
 
     @Override
     public void saveModule() {
-        RaceDriver.getTimer().cancel();
+        for (RaceDriver value : VPListener.getRACE_DRIVERS().values()) {
+            value.delete();
+        }
     }
 }

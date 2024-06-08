@@ -1,13 +1,12 @@
 package collinvht.f1mc.module.racing.object.race;
 
-import collinvht.f1mc.module.racing.manager.managers.RaceManager;
+import collinvht.f1mc.F1MC;
 import collinvht.f1mc.module.racing.module.team.object.TeamObj;
-import collinvht.f1mc.module.racing.module.weather.manager.WeatherManager;
-import collinvht.f1mc.module.racing.module.weather.obj.WeatherTypes;
 import collinvht.f1mc.module.vehiclesplus.listener.listeners.VPListener;
 import collinvht.f1mc.module.vehiclesplus.objects.RaceDriver;
 import collinvht.f1mc.util.Utils;
 import de.tr7zw.changeme.nbtapi.NBTItem;
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import lombok.Getter;
 import lombok.Setter;
 import me.legofreak107.vehiclesplus.vehicles.vehicles.objects.BaseVehicle;
@@ -20,8 +19,8 @@ import org.joml.Math;
 import xyz.xenondevs.invui.inventory.event.UpdateReason;
 
 import java.util.ArrayList;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 public class RaceCar {
     @Getter
@@ -34,7 +33,7 @@ public class RaceCar {
     private final RaceCarGUI raceCarGUI;
     private BaseVehicle baseVehicle;
     @Getter
-    private static final Timer carTimers = new Timer("RaceCar Timers");
+    private final ScheduledTask task;
 
     @Getter
     private FMMode currentMode = FMMode.MEDIUM;
@@ -49,21 +48,21 @@ public class RaceCar {
         this.linkedTeam = linkedTeam;
         this.raceCarGUI = new RaceCarGUI(this);
         VPListener.getRACE_CARS().put(spawnedVehicle.getHolder().getUniqueId(), this);
-        carTimers.schedule(new TimerTask() {
+        this.task = F1MC.getAsyncScheduler().runAtFixedRate(F1MC.getInstance(), new Consumer<>() {
             int curTick = 0;
             @Override
-            public void run() {
+            public void accept(ScheduledTask scheduledTask) {
                 updateTyre();
 
-                if(curTick == 0) {
-                    if(spawnedVehicle.getCurrentSpeedInKm() > 0) {
-                        if(currentERSMode == ERSMode.OFF && currentERS == 100) {
+                if (curTick == 0) {
+                    if (spawnedVehicle.getCurrentSpeedInKm() > 0) {
+                        if (currentERSMode == ERSMode.OFF && currentERS == 100) {
                             return;
                         }
-                        if(currentERS - currentERSMode.getUsage() < 0) {
+                        if (currentERS - currentERSMode.getUsage() < 0) {
                             currentERS = 0;
                             currentERSMode = ERSMode.OFF;
-                        } else if(currentERS + currentERSMode.getRegain() > 100) {
+                        } else if (currentERS + currentERSMode.getRegain() > 100) {
                             currentERS = 100;
                         } else {
                             currentERS -= currentERSMode.getUsage();
@@ -73,12 +72,12 @@ public class RaceCar {
                     }
                 } else {
                     curTick++;
-                    if(curTick >= 1000) {
+                    if (curTick >= 1000) {
                         curTick = 0;
                     }
                 }
             }
-        }, 0, 1);
+        }, 0, 100, TimeUnit.MILLISECONDS);
     }
 
     public void updateTyre() {
@@ -98,26 +97,26 @@ public class RaceCar {
                 double degrate = tyre.getDouble("f1mc.degradationRate")/20;
                 double maxDura = tyre.getDouble("f1mc.maxdura");
                 double currentWear = dura/maxDura;
-                double[] tyreSpeedArray = new double[3];
-                if(RaceManager.getDrivingPlayers().get(player.getPlayer()) != null) {
-                    tyreSpeedArray = WeatherManager.currentRotation(RaceManager.getDrivingPlayers().get(player.getPlayer()));
-                } else {
-                    tyreSpeedArray[0] = WeatherTypes.DRY.getInterSpeedMultiplier();
-                    tyreSpeedArray[1] = WeatherTypes.DRY.getWetSpeedMultiplier();
-                    tyreSpeedArray[2] = WeatherTypes.DRY.getSlickSpeedMultiplier();
-                }
-                String tyreName = tyre.getString("f1mc.name");
-                float speedMultiplier = 1.0F;
-                switch (tyreName.toLowerCase()) {
-                    case "intermediate" -> speedMultiplier = (float) tyreSpeedArray[0];
-                    case "wet" -> speedMultiplier = (float) tyreSpeedArray[1];
-                    default -> speedMultiplier = (float) tyreSpeedArray[2];
-                }
-                if(dura <= 0) {
-                    if(stats.getCurrentSpeed() > 10) stats.setCurrentSpeed(10.0);
-                    stats.setSpeed(10);
-                    return;
-                }
+//                double[] tyreSpeedArray = new double[3];
+//                if(RaceManager.getDrivingPlayers().get(player.getPlayer()) != null) {
+//                    tyreSpeedArray = WeatherManager.currentRotation(RaceManager.getDrivingPlayers().get(player.getPlayer()));
+//                } else {
+//                    tyreSpeedArray[0] = WeatherTypes.DRY.getInterSpeedMultiplier();
+//                    tyreSpeedArray[1] = WeatherTypes.DRY.getWetSpeedMultiplier();
+//                    tyreSpeedArray[2] = WeatherTypes.DRY.getSlickSpeedMultiplier();
+//                }
+//                String tyreName = tyre.getString("f1mc.name");
+                float speedMultiplier = 1;
+//                switch (tyreName.toLowerCase()) {
+//                    case "intermediate" -> speedMultiplier = (float) tyreSpeedArray[0];
+//                    case "wet" -> speedMultiplier = (float) tyreSpeedArray[1];
+//                    default -> speedMultiplier = (float) tyreSpeedArray[2];
+//                }
+//                if(dura <= 0) {
+//                    if(stats.getCurrentSpeed() > 10) stats.setCurrentSpeed(10.0);
+//                    stats.setSpeed(10);
+//                    return;
+//                }
                 if(!player.isInPit()) {
                     stats.setSpeed((int) (baseVehicle.getSpeedSettings().getBase() + currentERSMode.getExtraSpeed() + currentMode.getExtraSpeed() + Math.lerp(0, tyre.getDouble("f1mc.extraSpeed"), currentWear) * speedMultiplier));
                 } else {
@@ -133,6 +132,7 @@ public class RaceCar {
 
                 tyre.setDouble("f1mc.dura", (dura-(degrate * (getLinkedVehicle().getCurrentSpeedInKm()/100))));
                 ArrayList<String> lore = new ArrayList<>();
+                //Todo: fix deprecated
                 lore.add(ChatColor.GRAY + "Durability left = " + Utils.round(dura - degrate, 1) + "/" + tyre.getDouble("f1mc.maxdura"));
                 lore.add(ChatColor.GRAY + "Extra Speed = " + tyre.getDouble("f1mc.extraSpeed") + "km/h");
                 ItemStack stack = tyre.getItem();
@@ -144,6 +144,13 @@ public class RaceCar {
                 raceCarGUI.getBandInventory().forceSetItem(UpdateReason.SUPPRESSED, 0, stack);
             }
         }
+    }
+
+    public void delete() {
+        if(linkedVehicle != null) {
+            linkedVehicle.despawn(true);
+        }
+        this.task.cancel();
     }
 
     public void updateFM(FMMode fmMode) {

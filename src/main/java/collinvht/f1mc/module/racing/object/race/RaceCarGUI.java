@@ -105,7 +105,7 @@ public class RaceCarGUI {
         if(!canContinue()) return;
 
         if(isWaitingOnTask) {
-            Bukkit.getLogger().warning("isWaiting");
+            F1MC.getLog().warning("isWaiting");
             event.setCancelled(true);
             return;
         }
@@ -120,11 +120,11 @@ public class RaceCarGUI {
             }.runTaskLater(F1MC.getInstance(), 1);
             event.setCancelled(false);
         } else if(event.getPreviousItem() != null) {
-            Bukkit.getLogger().warning("previtem not null");
+            F1MC.getLog().warning("previtem not null");
             startMinigame(true, event.getNewItem());
             event.setCancelled(true);
         } else {
-            Bukkit.getLogger().warning("just cancel it mf");
+            F1MC.getLog().warning("just cancel it mf");
             event.setCancelled(true);
         }
     }
@@ -136,12 +136,14 @@ public class RaceCarGUI {
             window = Window.single()
                     .setViewer(player)
                     .setGui(minigameGui)
+                    //Todo: fix deprecated
                     .setTitle(ChatColor.of("#767676") + "Change Tyre")
                     .build();
         } else {
             window = Window.single()
                     .setViewer(player)
                     .setGui(bandGui)
+                    //Todo: fix deprecated
                     .setTitle(ChatColor.of("#767676") + "Change Tyre")
                     .build();
         }
@@ -182,6 +184,7 @@ public class RaceCarGUI {
             Window window = Window.single()
                     .setViewer(player)
                     .setGui(minigameGui)
+                    //Todo: fix deprecated
                     .setTitle(ChatColor.of("#767676") + "Change Tyre")
                     .build();
             window.open();
@@ -190,6 +193,7 @@ public class RaceCarGUI {
 
     public void checkIfComplete() {
         if(!canContinue()) return;
+        //Todo: fix deprecated
         if(minigame_1.getItem(0).getType() == Material.LIME_STAINED_GLASS_PANE && minigame_2.getItem(0).getType() == Material.LIME_STAINED_GLASS_PANE && minigame_3.getItem(0).getType() == Material.LIME_STAINED_GLASS_PANE && minigame_4.getItem(0).getType() == Material.LIME_STAINED_GLASS_PANE) {
             Set<Player> players = minigameGui.findAllCurrentViewers();
             if(removeTyre) {
@@ -205,6 +209,7 @@ public class RaceCarGUI {
                                 TextChannel channel = jda.getTextChannelById(1217628051853021194L);
                                 if (channel != null) {
                                     EmbedBuilder builder = new EmbedBuilder();
+                                    //Todo: fix deprecated
                                     builder.setColor(teamObj.getTeamColor().getColor());
                                     builder.setTitle("Tyre change | " + teamObj.getTeamName());
                                     builder.addField("Previous Tyre", TyreManager.getTyreName(bandInventory.getItem(0)), true);
@@ -230,6 +235,7 @@ public class RaceCarGUI {
                                 TextChannel channel = jda.getTextChannelById(1217628051853021194L);
                                 if (channel != null) {
                                     EmbedBuilder builder = new EmbedBuilder();
+                                    //Todo: fix deprecated
                                     builder.setColor(teamObj.getTeamColor().getColor());
                                     builder.setTitle("Tyre change | " + teamObj.getTeamName());
                                     builder.addField("New Tyre", TyreManager.getTyreName(newItem), true);
@@ -246,6 +252,7 @@ public class RaceCarGUI {
                 Window window = Window.single()
                         .setViewer(p)
                         .setGui(bandGui)
+                        //Todo: fix deprecated
                         .setTitle(ChatColor.of("#767676") + "Change Tyre")
                         .build();
                 window.open();
@@ -258,6 +265,7 @@ public class RaceCarGUI {
         if(isInMini_game) return null;
         if(bandInventory.getItem(0) != null) {
             if(TyreManager.isTyre(bandInventory.getItem(0))) {
+                //Todo: fix deprecated
                 return new NBTItem(bandInventory.getItem(0));
             }
         }

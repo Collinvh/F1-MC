@@ -37,8 +37,7 @@ public class RacingModule extends ModuleBase {
     @Override
     public void saveModule() {
         for (RaceCar value : VPListener.getRACE_CARS().values()) {
-            value.getLinkedVehicle().despawn(true);
+            value.delete();
         }
-        RaceCar.getCarTimers().cancel();
     }
 }

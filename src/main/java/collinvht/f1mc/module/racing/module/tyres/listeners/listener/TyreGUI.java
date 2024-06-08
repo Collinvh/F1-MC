@@ -1,5 +1,6 @@
 package collinvht.f1mc.module.racing.module.tyres.listeners.listener;
 
+import collinvht.f1mc.F1MC;
 import collinvht.f1mc.module.racing.manager.managers.RaceManager;
 import collinvht.f1mc.module.racing.module.team.object.TeamObj;
 import collinvht.f1mc.module.racing.object.race.Race;
@@ -31,7 +32,7 @@ public class TyreGUI implements Listener {
     public static String prefix = DefaultMessages.PREFIX;
     public static void open(Player player, TeamObj teamObject) {
         if(teamObject != null) {
-            Bukkit.getLogger().warning(teamObject.getTeamPrefix());
+            F1MC.getLog().warning(teamObject.getTeamPrefix());
             ArrayList<RaceCar> raceCars = teamObject.getRaceCars();
 
             if (!raceCars.isEmpty()) {
@@ -115,6 +116,7 @@ public class TyreGUI implements Listener {
                     });
                     Window window = Window.single()
                             .setViewer(player)
+                            //Todo: fix deprecated
                             .setTitle(ChatColor.of("#767676") + "Tyre Tool")
                             .setGui(gui)
                             .build();
@@ -137,6 +139,7 @@ public class TyreGUI implements Listener {
         if(player != null) {
             if (meta != null) {
                 meta.setOwningPlayer(player);
+                //Todo: fix deprecated
                 meta.setDisplayName(player.getName());
                 pane.setItemMeta(meta);
             }

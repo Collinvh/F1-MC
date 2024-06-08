@@ -1,7 +1,6 @@
 package collinvht.f1mc.module.buildingtools.obj;
 
 import collinvht.f1mc.F1MC;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -57,7 +56,7 @@ public class MemorizedEdit {
                 }
                 if(currentRow >= blockHashMap.size()) {
                     cancel();
-                    Bukkit.getLogger().warning("is canceled");
+                    F1MC.getLog().warning("is canceled");
                 }
                 currentRow = 0;
                 currentId += 1;

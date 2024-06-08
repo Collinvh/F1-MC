@@ -100,7 +100,7 @@ public class Utils {
         } catch (NoPacketAdapterAvailableException e) {
             // If no packet adapter was found, you can fallback to the no-op implementation:
             scoreboardLibrary = new NoopScoreboardLibrary();
-            F1MC.getInstance().getLogger().warning("No scoreboard packet adapter available!");
+            F1MC.getInstance().getLog().warning("No scoreboard packet adapter available!");
         }
         return scoreboardLibrary;
     }

@@ -37,6 +37,7 @@ public class CountryManager extends ModuleBase {
                 click.getPlayer().sendMessage(DefaultMessages.PREFIX + "Changed your country!");
             })));
         }
+        //Todo: fix deprecated
         items.sort(Comparator.comparing(o -> Objects.requireNonNull(o.getItemProvider().get().getItemMeta()).getDisplayName()));
         return items;
     }

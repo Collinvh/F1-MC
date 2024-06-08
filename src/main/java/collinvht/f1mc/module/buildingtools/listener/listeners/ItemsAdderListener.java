@@ -21,6 +21,7 @@ public class ItemsAdderListener implements Listener {
         ItemStack stack = event.getCustomBlockItem();
         if(stack.getItemMeta() != null) {
             ItemMeta meta = stack.getItemMeta();
+            //Todo: fix deprecated
             String stripped = ChatColor.stripColor(meta.getDisplayName());
             if(!stripped.contains("Slab") && !stripped.contains("Curbstone")) return;
             Location location = event.getBlock().getLocation();
@@ -47,6 +48,7 @@ public class ItemsAdderListener implements Listener {
         ItemStack stack = event.getCustomBlockItem();
         if(stack.getItemMeta() != null) {
             ItemMeta meta = stack.getItemMeta();
+            //Todo: fix deprecated
             if(meta.getDisplayName().contains("Slab") || meta.getDisplayName().contains("Curbstone")) {
                 event.getBlock().getWorld().setBlockData(event.getBlock().getLocation().clone().add(0, -1,0), Material.AIR.createBlockData());
             }

@@ -1,5 +1,6 @@
 package collinvht.f1mc.module.racing.object;
 
+import collinvht.f1mc.F1MC;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -136,7 +137,7 @@ public class Cuboid implements Cloneable, ConfigurationSerializable, Iterable<Bl
 
             return new Cuboid(worldName, xPos1, yPos1, zPos1, xPos2, yPos2, zPos2);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            F1MC.getLog().severe(ex.getMessage());
             return null;
         }
     }

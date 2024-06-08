@@ -1,5 +1,6 @@
 package collinvht.f1mc.module.racing.object.race;
 
+import collinvht.f1mc.F1MC;
 import collinvht.f1mc.module.racing.object.Cuboid;
 import collinvht.f1mc.module.racing.object.NamedCuboid;
 import collinvht.f1mc.module.racing.object.PenaltyCuboid;
@@ -9,7 +10,6 @@ import com.google.gson.JsonObject;
 import com.sk89q.worldedit.regions.Region;
 import lombok.Getter;
 import lombok.Setter;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 
@@ -17,50 +17,47 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+@Getter
 public class RaceCuboidStorage {
     /*
     Sectors
      */
-    @Setter @Getter
+    @Setter
     private HashMap<String, NamedCuboid> S1_mini = new HashMap<>();
-    @Setter @Getter
+    @Setter
     private NamedCuboid S1;
-    @Setter @Getter
+    @Setter
     private HashMap<String, NamedCuboid> S2_mini = new HashMap<>();
-    @Setter @Getter
+    @Setter
     private NamedCuboid S2;
-    @Setter @Getter
+    @Setter
     private HashMap<String, NamedCuboid> S3_mini = new HashMap<>();
-    @Setter @Getter
+    @Setter
     private NamedCuboid S3;
 
     /*
     Pit
      */
-    @Setter @Getter
+    @Setter
     private NamedCuboid pitEntry;
-    @Setter @Getter
+    @Setter
     private NamedCuboid pitExit;
 
     /*
     Track limits
      */
-    @Getter
     private HashMap<String, PenaltyCuboid> limits = new HashMap<>();
 
     /*
     Time trial
      */
     @Setter
-    @Getter
     private Location timeTrialSpawn;
 
     @Setter
-    @Getter
     private Location timeTrialLeaderboard;
 
     @Setter
-    @Getter
     private int skullId = 0;
 
 
@@ -108,7 +105,7 @@ public class RaceCuboidStorage {
                     }
                     Cuboid cuboid = Cuboid.deserialize(serializableMap);
                     int flags = object.get("extraFlags").getAsInt();
-                    storage.getLimits().put(cuboidName, new PenaltyCuboid(cuboid, cuboidName, 0));
+                    storage.getLimits().put(cuboidName, new PenaltyCuboid(cuboid, cuboidName, flags));
                 }
             }
 
@@ -162,7 +159,7 @@ public class RaceCuboidStorage {
             }
             return storage;
         } catch (Exception e) {
-            e.printStackTrace();
+            F1MC.getLog().severe(e.getMessage());
             return null;
         }
     }
@@ -226,13 +223,13 @@ public class RaceCuboidStorage {
 
     public NamedCuboid createNamedCuboidFromSelection(World world, Region region, String name) {
         Cuboid cuboid = new Cuboid(Utils.blockVectorToLocation(world, region.getMinimumPoint()), Utils.blockVectorToLocation(world, region.getMaximumPoint()));
-        Bukkit.getLogger().warning(name);
+        F1MC.getLog().warning(name);
         return new NamedCuboid(cuboid, name);
     }
 
     public PenaltyCuboid createPenaltyCuboidFromSelection(World world, Region region, String name, int extraFlags) {
         Cuboid cuboid = new Cuboid(Utils.blockVectorToLocation(world, region.getMinimumPoint()), Utils.blockVectorToLocation(world, region.getMaximumPoint()));
-        Bukkit.getLogger().warning(name);
+        F1MC.getLog().warning(name);
         return new PenaltyCuboid(cuboid, name, extraFlags);
     }
 

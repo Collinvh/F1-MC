@@ -2,25 +2,32 @@ package collinvht.f1mc;
 
 import collinvht.f1mc.module.ModuleManager;
 import collinvht.f1mc.util.Utils;
+import io.papermc.paper.threadedregions.scheduler.AsyncScheduler;
 import lombok.Getter;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.Timer;
+import org.bukkit.scheduler.BukkitScheduler;
+import java.util.logging.Logger;
 
 public final class F1MC extends JavaPlugin {
     @Getter
     private static F1MC instance;
     @Getter
-    private static final Timer F1Timer = new Timer("F1MC_GENERAL_TIMER");
+    private static AsyncScheduler asyncScheduler;
+    @Getter
+    private static BukkitScheduler scheduler;
+    @Getter
+    private static Logger log;
     @Override
     public void onEnable() {
         instance = this;
+        asyncScheduler = getServer().getAsyncScheduler();
+        scheduler = getServer().getScheduler();
+        log = getLogger();
         Utils.setupConfig(this);
         ModuleManager.loadModules();
     }
     @Override
     public void onDisable() {
         ModuleManager.saveModules();
-        F1Timer.cancel();
     }
 }

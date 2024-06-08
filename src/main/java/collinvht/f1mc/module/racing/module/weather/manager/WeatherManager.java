@@ -1,20 +1,21 @@
 package collinvht.f1mc.module.racing.module.weather.manager;
 
+import collinvht.f1mc.F1MC;
 import collinvht.f1mc.module.racing.manager.managers.RaceManager;
 import collinvht.f1mc.module.racing.module.weather.obj.WeatherTransitionSpeed;
 import collinvht.f1mc.module.racing.module.weather.obj.WeatherTypes;
 import collinvht.f1mc.module.racing.object.race.Race;
 import collinvht.f1mc.util.DefaultMessages;
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import org.bukkit.Bukkit;
 import org.joml.Math;
 
 import java.util.Random;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 public class WeatherManager {
     private static final String prefix = DefaultMessages.PREFIX;
-    private static final Timer weatherTimer = new Timer();
+    private static ScheduledTask weatherTask;
     private static final Random rng = new Random();
 
     public static String getForecast(String raceName) {
@@ -52,8 +53,24 @@ public class WeatherManager {
         if(transitionSpeed == WeatherTransitionSpeed.INSTANT) {
             race.getRaceLapStorage().setWaterPercentage(type.getWaterPercentage());
         } else {
-            TimerTask timerTask = getWeatherTask(race, transitionSpeed, type);
-            weatherTimer.schedule(timerTask, delay, 100);
+            weatherTask = F1MC.getAsyncScheduler().runAtFixedRate(F1MC.getInstance(), scheduledTask -> {
+                double addedAmount = transitionSpeed.getExtraTransitionTicks();
+                int goal = type.getWaterPercentage();
+                double waterPercentage = race.getRaceLapStorage().getWaterPercentage();
+                if(waterPercentage > type.getWaterPercentage()) {
+                    double value = Math.max(waterPercentage - addedAmount, 0);
+                    race.getRaceLapStorage().setWaterPercentage(Math.max(value, goal));
+                    F1MC.getLog().warning(String.valueOf(waterPercentage - addedAmount));
+                } else {
+                    double value = Math.min(waterPercentage + addedAmount, 100);
+                    race.getRaceLapStorage().setWaterPercentage(Math.min(value, goal));
+                    F1MC.getLog().warning(String.valueOf(waterPercentage + addedAmount));
+                }
+                if(race.getRaceLapStorage().getWaterPercentage() == type.getWaterPercentage()) {
+                    race.getRaceLapStorage().setWeatherType(type);
+                    weatherTask.cancel();
+                }
+            }, 0, 500, TimeUnit.MILLISECONDS);
         }
         return prefix + "Weather is being adjusted";
     }
@@ -85,29 +102,5 @@ public class WeatherManager {
             doubles[2] = WeatherTypes.DRY.getSlickSpeedMultiplier();;
         }
         return doubles;
-    }
-
-    private static TimerTask getWeatherTask(Race race, WeatherTransitionSpeed transitionSpeed, WeatherTypes type) {
-        double addedAmount = transitionSpeed.getExtraTransitionTicks();
-        int goal = type.getWaterPercentage();
-        return new TimerTask() {
-            @Override
-            public void run() {
-                double waterPercentage = race.getRaceLapStorage().getWaterPercentage();
-                if(waterPercentage > type.getWaterPercentage()) {
-                    double value = Math.max(waterPercentage - addedAmount, 0);
-                    race.getRaceLapStorage().setWaterPercentage(Math.max(value, goal));
-                    Bukkit.getLogger().warning(String.valueOf(waterPercentage - addedAmount));
-                } else {
-                    double value = Math.min(waterPercentage + addedAmount, 100);
-                    race.getRaceLapStorage().setWaterPercentage(Math.min(value, goal));
-                    Bukkit.getLogger().warning(String.valueOf(waterPercentage + addedAmount));
-                }
-                if(race.getRaceLapStorage().getWaterPercentage() == type.getWaterPercentage()) {
-                    race.getRaceLapStorage().setWeatherType(type);
-                    cancel();
-                }
-            }
-        };
     }
 }

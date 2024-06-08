@@ -10,6 +10,7 @@ import java.util.UUID;
 public class SectorData {
     private final UUID driver;
 
+    //Todo: fix deprecated
     @Setter
     private ChatColor sectorColor = ChatColor.RESET;
 

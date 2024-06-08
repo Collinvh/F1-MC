@@ -12,7 +12,6 @@ import de.tr7zw.changeme.nbtapi.NBTItem;
 import lombok.Getter;
 import lombok.Setter;
 import net.md_5.bungee.api.ChatColor;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -38,7 +37,7 @@ public class TyreManager extends ModuleBase {
                 return item.getString("f1mc.track").equalsIgnoreCase(track);
             }
         }
-        Bukkit.getLogger().warning("notyre");
+        F1MC.getLog().warning("notyre");
         return false;
     }
 
@@ -53,7 +52,8 @@ public class TyreManager extends ModuleBase {
             } else {
                 ItemMeta meta = stack.getItemMeta();
                 if(meta != null) {
-                    Bukkit.getLogger().warning(meta.getDisplayName().replace("Tyre", "").replace(" ", "").replace("§7", ""));
+                    //Todo: fix deprecated
+                    F1MC.getLog().warning(meta.getDisplayName().replace("Tyre", "").replace(" ", "").replace("§7", ""));
                     return meta.getDisplayName().replace("Tyre", "").replace(" ", "").replace("§7", "");
                 }
                 return "Null";
@@ -69,6 +69,7 @@ public class TyreManager extends ModuleBase {
         if(meta != null) {
             meta.setCustomModelData(tyreBaseObject.getModelData());
             ArrayList<String> lore = new ArrayList<>();
+            //Todo: fix deprecated
             lore.add(ChatColor.GRAY + "Durability left = " + tyreBaseObject.getMaxDurability() + "/" + tyreBaseObject.getMaxDurability());
             lore.add(ChatColor.GRAY + "Extra Speed = " + tyreBaseObject.getExtraSpeed() + "km/h");
             meta.setLore(lore);

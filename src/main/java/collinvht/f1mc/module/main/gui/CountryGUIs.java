@@ -68,6 +68,7 @@ public class CountryGUIs {
                 new BukkitRunnable() {
                     @Override
                     public void run() {
+                        //Todo: fix deprecated
                         Window.single().setTitle(org.bukkit.ChatColor.GRAY + "Select your country!").setGui(gui).build(player).open();
                     }
                 }.runTask(F1MC.getInstance());

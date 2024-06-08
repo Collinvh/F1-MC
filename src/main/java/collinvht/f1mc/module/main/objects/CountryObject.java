@@ -30,6 +30,7 @@ public class CountryObject {
         this.countryName = countryName;
         this.countryShort = countryShort;
         this.countryImg = countryImg;
+        //Todo: fix deprecated
         String name = ChatColor.RESET + "" + ChatColor.GRAY + countryName.substring(0, 1).toUpperCase() + countryName.substring(1).replace("_", " ");
         if(id == 0) {
             List<Head> heads = HeadAPI.getHeadsByName(countryName.replace("_", " "));
@@ -60,6 +61,7 @@ public class CountryObject {
                 }
             }
         }
+        //Todo: fix deprecated
         String name = ChatColor.RESET + "" + ChatColor.GRAY + countryName.substring(0, 1).toUpperCase() + countryName.substring(1).replace("_", " ");
         this.stack = Utils.createSkull(headID, name);
         return stack;

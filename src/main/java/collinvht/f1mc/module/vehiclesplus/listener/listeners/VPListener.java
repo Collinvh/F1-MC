@@ -49,6 +49,7 @@ public class VPListener implements Listener {
             }
             if(RACE_CARS.get(vehicle.getHolder().getUniqueId()) != null) {
                 RACE_CARS.get(vehicle.getHolder().getUniqueId()).setPlayer(driver);
+                driver.setRaceCar(RACE_CARS.get(vehicle.getHolder().getUniqueId()));
             }
             driver.setVehicle(vehicle);
             driver.setDriving(true);

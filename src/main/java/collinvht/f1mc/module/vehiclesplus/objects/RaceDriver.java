@@ -1,5 +1,6 @@
 package collinvht.f1mc.module.vehiclesplus.objects;
 
+import collinvht.f1mc.F1MC;
 import collinvht.f1mc.module.racing.object.laptime.DriverLaptimeStorage;
 import collinvht.f1mc.module.racing.object.laptime.LaptimeStorage;
 import collinvht.f1mc.module.racing.object.race.Race;
@@ -7,6 +8,7 @@ import collinvht.f1mc.module.racing.object.race.RaceCar;
 import collinvht.f1mc.module.racing.object.race.RaceListener;
 import collinvht.f1mc.module.racing.object.race.RaceMode;
 import collinvht.f1mc.util.Utils;
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import lombok.Getter;
 import lombok.Setter;
 import me.legofreak107.vehiclesplus.vehicles.vehicles.objects.SpawnedVehicle;
@@ -19,9 +21,9 @@ import org.bukkit.entity.Player;
 import scala.Int;
 
 import java.util.HashMap;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 public class RaceDriver {
 
@@ -76,14 +78,12 @@ public class RaceDriver {
         this.instace = this;
     }
 
-    private static TimerTask task;
-    @Getter
-    private static Timer timer;
+    private ScheduledTask task;
 
     private void initialize() {
-        task = new TimerTask() {
+        task = F1MC.getAsyncScheduler().runAtFixedRate(F1MC.getInstance(), new Consumer<ScheduledTask>() {
             @Override
-            public void run() {
+            public void accept(ScheduledTask scheduledTask) {
                 if(isDriving) {
                     for (Race race : RaceListener.getLISTENING()) {
                         race.getRaceLapStorage().update(instace);
@@ -99,9 +99,7 @@ public class RaceDriver {
                     } catch (Exception ignored) {}
                 }
             }
-        };
-        if(timer == null) timer = new Timer("F1MC RaceListener Player | " + driverName);
-        timer.schedule(task, 0, 1);
+        }, 0, 100, TimeUnit.MILLISECONDS);
     }
 
     public DriverLaptimeStorage getLaptimes(Race race) {

@@ -19,6 +19,7 @@ public class HelpFIACommand extends CommandUtil {
                 }
                 for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
                     if(Permissions.FIA_ADMIN.hasPermission(onlinePlayer)) {
+                        //Todo: fix deprecated
                         onlinePlayer.sendMessage(ChatColor.RED + "HELPFIA " + ChatColor.GRAY + " | " + player.getName() + " > " + builder);
                     }
                 }

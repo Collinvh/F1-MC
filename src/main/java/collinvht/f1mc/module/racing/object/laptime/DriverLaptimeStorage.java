@@ -7,41 +7,39 @@ import lombok.Setter;
 
 import java.util.LinkedList;
 
+@Getter
 public class DriverLaptimeStorage {
 
-    @Getter
     private LinkedList<LaptimeStorage> laptimes = new LinkedList<>();
 
-    @Getter
     private int sectors;
 
-    @Getter @Setter
+    @Setter
     private long bestS1 = 0;
-    @Getter @Setter
+    @Setter
     private long bestS2 = 0;
-    @Getter @Setter
+    @Setter
     private long bestS3 = 0;
 
-    @Getter @Setter
+    @Setter
     private LaptimeStorage currentLap;
 
     @Setter
-    @Getter
     private Race race;
 
-    @Getter @Setter
+    @Setter
     private boolean invalidated;
 
-    @Getter @Setter
+    @Setter
     private LaptimeStorage fastestLap;
 
-    @Getter @Setter
+    @Setter
     private int invalidCooldown = 3;
 
-    @Getter @Setter
+    @Setter
     private int invalidFlags = 0;
 
-    @Getter @Setter
+    @Setter
     private int penalty = 0;
 
     public DriverLaptimeStorage(Race race) {
@@ -81,7 +79,7 @@ public class DriverLaptimeStorage {
         } else return true;
     }
 
-    @Getter @Setter
+    @Setter
     private long lastPassedSectorTime = -1;
     public void addSector() {
         sectors += 1;

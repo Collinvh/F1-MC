@@ -115,6 +115,7 @@ public class Race {
             Connection connection = dataSource.getConnection();
             PreparedStatement stmt = connection.prepareStatement("SELECT * FROM timetrial_laps WHERE `track_name` = '"+ name +"' ORDER BY `lap_length` ASC LIMIT 20;");
             ResultSet rs = stmt.executeQuery();
+            //Todo: fix deprecated
             DHAPI.addHologramLine(leaderBoard, DefaultMessages.PREFIX + "Fastest laps at " + ChatColor.GRAY + name + ChatColor.RESET + ":");
             int curNumber = 1;
             while (rs.next()) {
@@ -122,6 +123,7 @@ public class Race {
                 OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
                 String vehicleName = rs.getString("vehicle_name").replace("f1mc.", "");
                 String finalVehicleName = (vehicleName.substring(0, 1).toUpperCase() + vehicleName.substring(1)).replace(".", " ").replace("_", " ");
+                //Todo: fix deprecated
                 DHAPI.addHologramLine(leaderBoard, curNumber + ". " + ChatColor.GRAY + finalVehicleName + " " + player.getName() + " : " + ChatColor.RESET + Utils.millisToTimeString(rs.getLong("lap_length")));
                 curNumber += 1;
             }

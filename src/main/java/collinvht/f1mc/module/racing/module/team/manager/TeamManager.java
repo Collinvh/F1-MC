@@ -108,6 +108,7 @@ public class TeamManager extends ModuleBase {
         if(group == null) {
             try {
                 group = luckPerms.getGroupManager().createAndLoadGroup(team.getGroupName()).get();
+                //Todo: fix deprecated
                 group.getData(DataType.NORMAL).add(PrefixNode.builder().prefix( ChatColor.DARK_GRAY + "|" + team.getTeamColor() + team.getTeamPrefix() + ChatColor.DARK_GRAY +"| " + ChatColor.RESET).withContext("server", "racing").priority(10).build());
                 group.getData(DataType.NORMAL).add(PermissionNode.builder("blocklocker." + team.getGroupName()).permission("team." + team.getGroupName()).withContext("server", "racing").build());
                 luckPerms.getGroupManager().saveGroup(group);
@@ -133,7 +134,7 @@ public class TeamManager extends ModuleBase {
 
 
             } catch (ExecutionException | InterruptedException e ) {
-                Bukkit.getLogger().severe(team.getTeamName() + " their group couldn't be created");
+                F1MC.getLog().severe(team.getTeamName() + " their group couldn't be created");
                 return "Something went wrong.";
             }
         }
@@ -163,6 +164,7 @@ public class TeamManager extends ModuleBase {
                     teamObj.setOwner(player.getUniqueId());
                     return "Owner changed";
                 case "color":
+                    //Todo: fix deprecated
                     ChatColor color = ChatColor.getByChar(input.toLowerCase().charAt(0));
                     if(color == null) return "Color code is incorrect.";
                     teamObj.setTeamColor(color);
@@ -309,7 +311,7 @@ public class TeamManager extends ModuleBase {
                             TEAMS.put(team.getTeamName().toLowerCase(), team);
                         }
                     } catch (Exception e) {
-                        Bukkit.getLogger().warning(teamFile.getAbsolutePath() + " failed to load.");
+                        F1MC.getLog().warning(teamFile.getAbsolutePath() + " failed to load.");
                     }
                 }
             }

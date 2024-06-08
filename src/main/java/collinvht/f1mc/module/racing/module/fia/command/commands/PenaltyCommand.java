@@ -33,6 +33,7 @@ public class PenaltyCommand extends CommandUtil {
                             for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
                                 onlinePlayer.sendMessage(prefix + player.getName() + " +" + ChatColor.RED + length + "s penalty\nREASON: " + builder);
                             }
+                            //Todo: fix deprecated
                             player.sendTitle(ChatColor.RED + "PENALTY", "You've gotten a penalty.", 2, 15, 2);
                             player.sendMessage(prefix + " You've gotten a " + length + "s penalty!");
                             return prefix + "Penalty applied";

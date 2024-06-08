@@ -9,6 +9,7 @@ import collinvht.f1mc.module.timetrial.manager.TimeTrialManager;
 import collinvht.f1mc.util.DefaultMessages;
 import collinvht.f1mc.util.Utils;
 import com.mysql.cj.jdbc.MysqlDataSource;
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import me.legofreak107.vehiclesplus.vehicles.api.VehiclesPlusAPI;
 import me.legofreak107.vehiclesplus.vehicles.api.objects.spawn.SpawnMode;
 import me.legofreak107.vehiclesplus.vehicles.vehicles.objects.BaseVehicle;
@@ -24,9 +25,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class TimeTrialHolder {
     private final Player player;
@@ -37,7 +37,7 @@ public class TimeTrialHolder {
     private final Location oldLocation;
     private RivalObject rival;
     private Seat seat;
-    private final Timer timer;
+    private ScheduledTask task;
     private boolean isRunning;
     private final TimeTrialLap timeTrialLap;
     private final String prefix = DefaultMessages.PREFIX;
@@ -49,7 +49,6 @@ public class TimeTrialHolder {
         this.isHotLapStart = true;
         this.storage = race.getStorage();
         this.vehicle = vehicle;
-        this.timer = new Timer(player.getName() + "_timetrial_timer");
         this.timeTrialLap = TimeTrialLap.fromUUID(player.getUniqueId(), race.getName());
         this.timeTrialLap.setPassedS1(true);
         this.timeTrialLap.setPassedS2(true);
@@ -62,8 +61,8 @@ public class TimeTrialHolder {
             }
         }
         for (Part part : this.spawnedVehicle.getPartList()) {
-            if(part instanceof Seat seat) {
-                this.seat = seat;
+            if(part instanceof Seat seat2) {
+                this.seat = seat2;
             }
         }
         if(seat != null) {
@@ -78,13 +77,7 @@ public class TimeTrialHolder {
         this.player.teleport(storage.getTimeTrialSpawn());
         this.seat.enter(player);
         this.isRunning = true;
-        this.timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                checkSectors();
-//                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy("Speed: " + spawnedVehicle.getCurrentSpeedInKm()));
-            }
-        }, 0, 1);
+        this.task = F1MC.getAsyncScheduler().runAtFixedRate(F1MC.getInstance(), scheduledTask -> checkSectors(), 0, 100, TimeUnit.MILLISECONDS);
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
             if(onlinePlayer != this.player) {
                 hide(onlinePlayer);
@@ -95,7 +88,7 @@ public class TimeTrialHolder {
         if(!isRunning) {
             return;
         }
-        timer.cancel();
+        task.cancel();
         player.teleport(oldLocation);
         if(spawnedVehicle.getStorageVehicle() != null) {
             if(VehiclesPlusAPI.getVehicleManager().getPlayerVehicleHashMap().containsKey(player.getUniqueId())) {

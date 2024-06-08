@@ -1,45 +1,38 @@
 package collinvht.f1mc.module.racing.object.race;
 
+import collinvht.f1mc.F1MC;
 import collinvht.f1mc.module.vehiclesplus.listener.listeners.VPListener;
-import collinvht.f1mc.module.vehiclesplus.objects.RaceDriver;
 import collinvht.f1mc.module.racing.manager.managers.RaceManager;
 import collinvht.f1mc.util.DefaultMessages;
-import collinvht.f1mc.util.Permissions;
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import lombok.Getter;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 
 public class RaceListener {
     @Getter
     private static final ArrayList<Race> LISTENING = new ArrayList<>();
-    private static Timer timer;
+    private static ScheduledTask task;
 
     public static void initialize() {
-        TimerTask task = new TimerTask() {
-            @Override
-            public void run() {
-                ArrayList<Race> removingRaces = new ArrayList<>();
-                for (Race race : LISTENING) {
-                    if (race.getRaceTimer() != null) {
-                        race.getRaceTimer().update();
-                        if (race.getRaceTimer().isFinished()) {
-                            removingRaces.add(race);
-                            Bukkit.getLogger().warning(RaceManager.getInstance().getRaceResult(race.getName(), "fastest", null));
-                            break;
-                        }
+        task = F1MC.getAsyncScheduler().runAtFixedRate(F1MC.getInstance(), scheduledTask -> {
+            ArrayList<Race> removingRaces = new ArrayList<>();
+            for (Race race : LISTENING) {
+                if (race.getRaceTimer() != null) {
+                    race.getRaceTimer().update();
+                    if (race.getRaceTimer().isFinished()) {
+                        removingRaces.add(race);
+                        F1MC.getLog().warning(RaceManager.getInstance().getRaceResult(race.getName(), "fastest", null));
+                        break;
                     }
                 }
-                if (!removingRaces.isEmpty()) {
-                    LISTENING.removeAll(removingRaces);
-                }
             }
-        };
-        if(timer == null) timer = new Timer("F1MC RaceListener");
-        timer.schedule(task, 0, 1);
+            if (!removingRaces.isEmpty()) {
+                LISTENING.removeAll(removingRaces);
+            }
+        }, 0, 100, TimeUnit.MILLISECONDS);
     }
 
     public static String startListeningTo(Race race, int mode) {
@@ -63,10 +56,10 @@ public class RaceListener {
     }
 
     public static void stopListening(boolean b) {
-        if(timer == null) {
+        if(task == null) {
             return;
         }
-        timer.cancel();
+        task.cancel();
         if(b) resetAll();
     }
 

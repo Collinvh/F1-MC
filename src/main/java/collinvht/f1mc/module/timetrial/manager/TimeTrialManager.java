@@ -13,6 +13,7 @@ import com.google.gson.JsonObject;
 import com.mysql.cj.jdbc.MysqlDataSource;
 import me.legofreak107.vehiclesplus.vehicles.api.VehiclesPlusAPI;
 import me.legofreak107.vehiclesplus.vehicles.vehicles.objects.BaseVehicle;
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -200,7 +201,7 @@ public class TimeTrialManager {
         ItemStack stack = Utils.createSkull(race.getStorage().getSkullId(), "nil");
         ItemMeta meta = stack.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(ChatColor.GREEN + race.getName());
+            meta.setDisplayName(ChatColor.GREEN + StringUtils.capitalize(race.getName()));
             ArrayList<String> strings = new ArrayList<>();
             strings.add(ChatColor.DARK_GRAY + "Click to start timetrial!");
             meta.setLore(strings);

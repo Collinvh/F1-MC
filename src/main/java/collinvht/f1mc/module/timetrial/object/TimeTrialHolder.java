@@ -19,7 +19,9 @@ import me.legofreak107.vehiclesplus.vehicles.vehicles.objects.addons.seats.Seat;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -75,7 +77,18 @@ public class TimeTrialHolder {
             return;
         }
         this.player.teleport(storage.getTimeTrialSpawn());
-        this.seat.enter(player);
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                float yRot = storage.getTimeTrialSpawn().getYaw();
+                spawnedVehicle.getHolder().setRotation(yRot, spawnedVehicle.getHolder().getPitch());
+                for (Part part : spawnedVehicle.getPartList()) {
+                    ArmorStand holder = part.getHolder();
+                    holder.setRotation(yRot, holder.getPitch());
+                }
+                seat.enter(player);
+            }
+        }.run();
         this.isRunning = true;
         this.task = F1MC.getAsyncScheduler().runAtFixedRate(F1MC.getInstance(), scheduledTask -> checkSectors(), 0, 100, TimeUnit.MILLISECONDS);
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {

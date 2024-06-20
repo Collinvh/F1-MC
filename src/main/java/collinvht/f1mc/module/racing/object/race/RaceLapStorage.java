@@ -318,7 +318,7 @@ public class RaceLapStorage {
                                     RaceDriver player1 = treeMap.previousKey(raceDriver);
                                     OfflinePlayer player2 = Bukkit.getOfflinePlayer(player1.getDriverUUID());
                                     long length = treeMap.get(player1);
-                                    player.sendMessage(prefix + ChatColor.GREEN + "New PB! Your current position is " + treeMap.indexOf(raceDriver) + ChatColor.GRAY + "\nYou are behind " + player2.getName() + Utils.millisToTimeString(length-laptimeStorage.getLapData().getSectorLength()));
+                                    player.sendMessage(prefix + ChatColor.GREEN + "New PB! Your current position is " + (treeMap.indexOf(raceDriver) + 1) + ChatColor.GRAY + "\nYou are behind " + player2.getName() + Utils.millisToTimeString(length-laptimeStorage.getLapData().getSectorLength()));
                                 } else {
                                     player.sendMessage(prefix + ChatColor.LIGHT_PURPLE + "You are FASTEST on track!");
                                 }

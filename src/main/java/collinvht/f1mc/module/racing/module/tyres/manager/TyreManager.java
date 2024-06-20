@@ -88,6 +88,19 @@ public class TyreManager extends ModuleBase {
         return nbtTyre.getItem();
     }
 
+    public static String getTyrePercentage(NBTItem tyre) {
+        if(isTyre(tyre.getItem())) {
+            double maxDura = tyre.getDouble("f1mc.maxdura");
+            double curDura = tyre.getDouble("f1mc.dura");
+            if(curDura <= 0) {
+                return "0";
+            }
+            return String.valueOf(((int) (curDura/maxDura * 100)));
+        } else {
+            return "0";
+        }
+    }
+
     @Override
     public void load() {
         File files = Paths.get(F1MC.getInstance().getDataFolder() + "/storage/tyres.json").toFile();
@@ -108,20 +121,32 @@ public class TyreManager extends ModuleBase {
                 throw new RuntimeException(e);
             }
         }
+        if(!tyres.containsKey("hypersoft")) {
+            tyres.put("hypersoft", new TyreBaseObject("hypersoft", 10020, 2132, 2, 1.15, 20));
+        }
+        if(!tyres.containsKey("ultrasoft")) {
+            tyres.put("ultrasoft", new TyreBaseObject("ultrasoft", 10018, 2661, 1.8, 1.1, 17));
+        }
+        if(!tyres.containsKey("supersoft")) {
+            tyres.put("supersoft", new TyreBaseObject("supersoft", 10019, 3088, 1.6, 1.05, 14));
+        }
         if(!tyres.containsKey("soft")) {
-            tyres.put("soft", new TyreBaseObject("soft", 10012, 1500, 1.15, 1.1, 15));
+            tyres.put("soft", new TyreBaseObject("soft", 10012, 3566, 1.4, 1, 10));
         }
         if(!tyres.containsKey("medium")) {
-            tyres.put("medium", new TyreBaseObject("medium", 10013, 1650, 1.10, 1.05, 7.5));
+            tyres.put("medium", new TyreBaseObject("medium", 10013, 4044, 1.2, 0.95, 7));
         }
         if(!tyres.containsKey("hard")) {
-            tyres.put("hard", new TyreBaseObject("soft", 10014, 1800, 1.05, 1, 0));
+            tyres.put("hard", new TyreBaseObject("hard", 10014, 4522, 1.0, 0.9, 4));
+        }
+        if(!tyres.containsKey("superhard")) {
+            tyres.put("superhard", new TyreBaseObject("superhard", 10021, 5000, 0.85, 0.8, 0));
         }
         if(!tyres.containsKey("wet")) {
-            tyres.put("wet", new TyreBaseObject("wet", 10016, 1800, 1.05, 1, 0));
+            tyres.put("wet", new TyreBaseObject("wet", 10016, 5500, 1, 1, 0));
         }
         if(!tyres.containsKey("intermediate")) {
-            tyres.put("intermediate", new TyreBaseObject("intermediate", 10017, 1800, 1.05, 1, 0));
+            tyres.put("intermediate", new TyreBaseObject("intermediate", 10017, 4044, 1.2, 1, 0));
         }
         attachModule(new TyreListeners());
     }

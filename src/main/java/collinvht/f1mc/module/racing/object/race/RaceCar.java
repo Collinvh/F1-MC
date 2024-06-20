@@ -56,13 +56,13 @@ public class RaceCar {
 
                 if (curTick == 0) {
                     if (spawnedVehicle.getCurrentSpeedInKm() > 0) {
-                        if (currentERSMode == ERSMode.OFF && currentERS == 100) {
+                        if (currentERSMode == ERSMode.OFF && currentERS == 200) {
                             return;
                         }
                         if (currentERS - currentERSMode.getUsage() < 0) {
                             currentERS = 0;
                             currentERSMode = ERSMode.OFF;
-                        } else if (currentERS + currentERSMode.getRegain() > 100) {
+                        } else if (currentERS + currentERSMode.getRegain() > 200) {
                             currentERS = 100;
                         } else {
                             currentERS -= currentERSMode.getUsage();
@@ -72,7 +72,7 @@ public class RaceCar {
                     }
                 } else {
                     curTick++;
-                    if (curTick >= 1000) {
+                    if (curTick >= 250) {
                         curTick = 0;
                     }
                 }

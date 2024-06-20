@@ -124,10 +124,14 @@ public class PCGui implements Listener {
                     }
                 }))
                 //Todo: fix deprecated
-                .addIngredient('l', new SimpleItem(namedItemStack(Material.RED_CONCRETE_POWDER, ChatColor.RED + "FM | Low"), (click) -> skullCar.updateFM(FMMode.LOW)))
-                .addIngredient('m', new SimpleItem(namedItemStack(Material.YELLOW_CONCRETE_POWDER, ChatColor.YELLOW + "FM | Medium"), (click) -> skullCar.updateFM(FMMode.MEDIUM)))
-                .addIngredient('h', new SimpleItem(namedItemStack(Material.GREEN_CONCRETE_POWDER, ChatColor.GREEN + "FM | High"), (click) -> skullCar.updateFM(FMMode.HIGH)))
-                .addIngredient('H', new SimpleItem(namedItemStack(Material.PURPLE_CONCRETE_POWDER, ChatColor.DARK_PURPLE + "FM | Hotlap"), (click) -> skullCar.updateFM(FMMode.HOTLAP)))
+//                .addIngredient('l', new SimpleItem(namedItemStack(Material.RED_CONCRETE_POWDER, ChatColor.RED + "FM | Low"), (click) -> skullCar.updateFM(FMMode.LOW)))
+//                .addIngredient('m', new SimpleItem(namedItemStack(Material.YELLOW_CONCRETE_POWDER, ChatColor.YELLOW + "FM | Medium"), (click) -> skullCar.updateFM(FMMode.MEDIUM)))
+//                .addIngredient('h', new SimpleItem(namedItemStack(Material.GREEN_CONCRETE_POWDER, ChatColor.GREEN + "FM | High"), (click) -> skullCar.updateFM(FMMode.HIGH)))
+//                .addIngredient('H', new SimpleItem(namedItemStack(Material.PURPLE_CONCRETE_POWDER, ChatColor.DARK_PURPLE + "FM | Hotlap"), (click) -> skullCar.updateFM(FMMode.HOTLAP)))
+                .addIngredient('l', new SimpleItem(new ItemBuilder(Utils.emptyStack(Material.RED_STAINED_GLASS_PANE))))
+                .addIngredient('m', new SimpleItem(new ItemBuilder(Utils.emptyStack(Material.RED_STAINED_GLASS_PANE))))
+                .addIngredient('h', new SimpleItem(new ItemBuilder(Utils.emptyStack(Material.RED_STAINED_GLASS_PANE))))
+                .addIngredient('H', new SimpleItem(new ItemBuilder(Utils.emptyStack(Material.RED_STAINED_GLASS_PANE))))
                 .addIngredient('o', new SimpleItem(namedItemStack(Material.RED_CONCRETE, ChatColor.RED + "ERS | Off"), (click) -> skullCar.updateERS(ERSMode.OFF)))
                 .addIngredient('M', new SimpleItem(namedItemStack(Material.YELLOW_CONCRETE, ChatColor.YELLOW + "ERS | Balanced"), (click) -> skullCar.updateERS(ERSMode.BALANCED)))
                 .addIngredient('D', new SimpleItem(namedItemStack(Material.GREEN_CONCRETE, ChatColor.GREEN + "ERS | Hotlap"), (click) -> skullCar.updateERS(ERSMode.HOTLAP)))

@@ -386,7 +386,7 @@ public class RaceManager extends ModuleBase {
                                 return DefaultMessages.PREFIX + "Invalid number";
                             }
                             race.getStorage().setSkullId(number);
-                            return DefaultMessages.PREFIX + "Spawn has been changed.";
+                            return DefaultMessages.PREFIX + "Skull has been changed.";
                         } else return DefaultMessages.PREFIX + "Provide an number";
                     case "leader":
                     case "leaderboard":

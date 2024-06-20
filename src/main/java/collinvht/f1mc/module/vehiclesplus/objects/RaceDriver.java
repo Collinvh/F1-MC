@@ -1,6 +1,7 @@
 package collinvht.f1mc.module.vehiclesplus.objects;
 
 import collinvht.f1mc.F1MC;
+import collinvht.f1mc.module.racing.module.tyres.manager.TyreManager;
 import collinvht.f1mc.module.racing.object.laptime.DriverLaptimeStorage;
 import collinvht.f1mc.module.racing.object.laptime.LaptimeStorage;
 import collinvht.f1mc.module.racing.object.race.Race;
@@ -89,12 +90,10 @@ public class RaceDriver {
                         race.getRaceLapStorage().update(instace);
                     }
                     try {
-                        if(raceCar != null) {
-                            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy(ChatColor.GRAY + "| " + vehicle.getCurrentSpeedInKm() + "km/h | " + (int) (raceCar.getCurrentERS()/200*100) + "% | " + (int)(double)vehicle.getStorageVehicle().getVehicleStats().getCurrentFuel() + "/" + vehicle.getStorageVehicle().getVehicleStats().getFuelTank() + "L"));
-                        } else if(!Utils.isEnableTimeTrial()) {
-                            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy(ChatColor.GRAY + "| " + vehicle.getCurrentSpeedInKm() + "km/h | " + (int)(double)vehicle.getStorageVehicle().getVehicleStats().getCurrentFuel() + "/" + vehicle.getStorageVehicle().getVehicleStats().getFuelTank() + "L"));
+                        if(raceCar != null && raceCar.getRaceCarGUI().getTyre() != null) {
+                            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy(ChatColor.GRAY + "Speed: " + vehicle.getCurrentSpeedInKm() + "km/h | Ers:" + (int) (raceCar.getCurrentERS()/200*100) + "% | Tyre: " + TyreManager.getTyrePercentage(raceCar.getRaceCarGUI().getTyre()) + "%"));
                         } else {
-                            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy(ChatColor.GRAY + "| " + vehicle.getCurrentSpeedInKm() + "km/h | "));
+                            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy(ChatColor.GRAY + "Speed: " + vehicle.getCurrentSpeedInKm() + "km/h"));
                         }
                     } catch (Exception ignored) {}
                 }

@@ -122,31 +122,31 @@ public class TyreManager extends ModuleBase {
             }
         }
         if(!tyres.containsKey("hypersoft")) {
-            tyres.put("hypersoft", new TyreBaseObject("hypersoft", 10020, 2132, 2, 1.15, 20));
+            tyres.put("hypersoft", new TyreBaseObject("hypersoft", 10020, 2132, 12, 1.15, 20));
         }
         if(!tyres.containsKey("ultrasoft")) {
-            tyres.put("ultrasoft", new TyreBaseObject("ultrasoft", 10018, 2661, 1.8, 1.1, 17));
+            tyres.put("ultrasoft", new TyreBaseObject("ultrasoft", 10018, 2661, 10.8, 1.1, 17));
         }
         if(!tyres.containsKey("supersoft")) {
-            tyres.put("supersoft", new TyreBaseObject("supersoft", 10019, 3088, 1.6, 1.05, 14));
+            tyres.put("supersoft", new TyreBaseObject("supersoft", 10019, 3088, 9.6, 1.05, 14));
         }
         if(!tyres.containsKey("soft")) {
-            tyres.put("soft", new TyreBaseObject("soft", 10012, 3566, 1.4, 1, 10));
+            tyres.put("soft", new TyreBaseObject("soft", 10012, 3566, 8.4, 1, 10));
         }
         if(!tyres.containsKey("medium")) {
-            tyres.put("medium", new TyreBaseObject("medium", 10013, 4044, 1.2, 0.95, 7));
+            tyres.put("medium", new TyreBaseObject("medium", 10013, 4044, 7.2, 0.95, 7));
         }
         if(!tyres.containsKey("hard")) {
-            tyres.put("hard", new TyreBaseObject("hard", 10014, 4522, 1.0, 0.9, 4));
+            tyres.put("hard", new TyreBaseObject("hard", 10014, 4522, 6, 0.9, 4));
         }
         if(!tyres.containsKey("superhard")) {
-            tyres.put("superhard", new TyreBaseObject("superhard", 10021, 5000, 0.85, 0.8, 0));
+            tyres.put("superhard", new TyreBaseObject("superhard", 10021, 5000, 5.1, 0.8, 0));
         }
         if(!tyres.containsKey("wet")) {
-            tyres.put("wet", new TyreBaseObject("wet", 10016, 5500, 1, 1, 0));
+            tyres.put("wet", new TyreBaseObject("wet", 10016, 5500, 6, 1, 0));
         }
         if(!tyres.containsKey("intermediate")) {
-            tyres.put("intermediate", new TyreBaseObject("intermediate", 10017, 4044, 1.2, 1, 0));
+            tyres.put("intermediate", new TyreBaseObject("intermediate", 10017, 4044, 7, 1, 0));
         }
         attachModule(new TyreListeners());
     }

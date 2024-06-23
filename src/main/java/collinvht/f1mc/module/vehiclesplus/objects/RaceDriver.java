@@ -90,15 +90,21 @@ public class RaceDriver {
                         race.getRaceLapStorage().update(instace);
                     }
                     try {
-                        if(raceCar != null && raceCar.getRaceCarGUI().getTyre() != null) {
-                            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy(ChatColor.GRAY + "Speed: " + vehicle.getCurrentSpeedInKm() + "km/h | Ers:" + (int) (raceCar.getCurrentERS()/200*100) + "% | Tyre: " + TyreManager.getTyrePercentage(raceCar.getRaceCarGUI().getTyre()) + "%"));
+                        if(raceCar != null) {
+                            if(raceCar.getRaceCarGUI() != null) {
+                                if(raceCar.getRaceCarGUI().getTyre() != null) {
+                                    player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy(ChatColor.GRAY + "Speed: " + vehicle.getCurrentSpeedInKm() + "km/h | Ers:" + (int) (raceCar.getCurrentERS()/200*100) + "% | Tyre: " + TyreManager.getTyrePercentage(raceCar.getRaceCarGUI().getTyre()) + "%"));
+                                    return;
+                                }
+                            }
+                            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy(ChatColor.GRAY + "Speed: " + vehicle.getCurrentSpeedInKm() + "km/h | Ers:" + (int) (raceCar.getCurrentERS()/200*100) + "%"));
                         } else {
                             player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy(ChatColor.GRAY + "Speed: " + vehicle.getCurrentSpeedInKm() + "km/h"));
                         }
                     } catch (Exception ignored) {}
                 }
             }
-        }, 0, 100, TimeUnit.MILLISECONDS);
+        }, 0, 50, TimeUnit.MILLISECONDS);
     }
 
     public DriverLaptimeStorage getLaptimes(Race race) {

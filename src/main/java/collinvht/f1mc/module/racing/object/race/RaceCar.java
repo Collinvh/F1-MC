@@ -72,12 +72,12 @@ public class RaceCar {
                     }
                 } else {
                     curTick++;
-                    if (curTick >= 250) {
+                    if (curTick >= 150) {
                         curTick = 0;
                     }
                 }
             }
-        }, 0, 100, TimeUnit.MILLISECONDS);
+        }, 0, 50, TimeUnit.MILLISECONDS);
     }
 
     public void updateTyre() {
@@ -97,6 +97,13 @@ public class RaceCar {
                 double degrate = tyre.getDouble("f1mc.degradationRate")/20;
                 double maxDura = tyre.getDouble("f1mc.maxdura");
                 double currentWear = dura/maxDura;
+                if(dura <= 0) {
+                    if(stats.getCurrentSpeed() > 10.05D) {
+                        stats.setCurrentSpeed(10.00);
+                    }
+                    stats.setSpeed(10);
+                    return;
+                }
 //                double[] tyreSpeedArray = new double[3];
 //                if(RaceManager.getDrivingPlayers().get(player.getPlayer()) != null) {
 //                    tyreSpeedArray = WeatherManager.currentRotation(RaceManager.getDrivingPlayers().get(player.getPlayer()));
@@ -118,7 +125,7 @@ public class RaceCar {
 //                    return;
 //                }
                 if(!player.isInPit()) {
-                    stats.setSpeed((int) (baseVehicle.getSpeedSettings().getBase() + currentERSMode.getExtraSpeed() + currentMode.getExtraSpeed() + Math.lerp(0, tyre.getDouble("f1mc.extraSpeed"), currentWear) * speedMultiplier));
+                    stats.setSpeed((int) (baseVehicle.getSpeedSettings().getBase() + currentERSMode.getExtraSpeed() + currentMode.getExtraSpeed() + Math.lerp(0, tyre.getDouble("f1mc.extraSpeed"), currentWear) /* * speedMultiplier*/));
                 } else {
                     if(stats.getCurrentSpeed() > 60.5D) {
                         stats.setCurrentSpeed(60.00D);
@@ -130,7 +137,7 @@ public class RaceCar {
                 stats.setLowSpeedAcceleration((float) ((baseVehicle.getAccelerationSettings().getLowSpeed() * tyre.getDouble("f1mc.steering")) * speedMultiplier));
                 stats.setHighSpeedAcceleration((float) ((baseVehicle.getAccelerationSettings().getHighSpeed() * tyre.getDouble("f1mc.steering")) * speedMultiplier));
 
-                tyre.setDouble("f1mc.dura", (dura-(degrate * (getLinkedVehicle().getCurrentSpeedInKm()/100))));
+                tyre.setDouble("f1mc.dura", (dura-(degrate * (getLinkedVehicle().getCurrentSpeedInKm()/100) * getLinkedVehicle().getStorageVehicle().getVehicleStats().getCurrentSteer())));
                 ArrayList<String> lore = new ArrayList<>();
                 //Todo: fix deprecated
                 lore.add(ChatColor.GRAY + "Durability left = " + Utils.round(dura - degrate, 1) + "/" + tyre.getDouble("f1mc.maxdura"));

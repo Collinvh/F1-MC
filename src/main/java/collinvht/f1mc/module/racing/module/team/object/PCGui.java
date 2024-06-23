@@ -154,7 +154,7 @@ public class PCGui implements Listener {
             //Todo: fix deprecated
             meta.setDisplayName(ChatColor.GRAY + "ERS Left");
             ArrayList<String> strings = new ArrayList<>();
-            strings.add(skullCar.getCurrentERS() + "/200");
+            strings.add((int) (skullCar.getCurrentERS()/200*100) + "%");
             //Todo: fix deprecated
             meta.setLore(strings);
             stack.setItemMeta(meta);
@@ -169,11 +169,11 @@ public class PCGui implements Listener {
         if(skullCar.getLinkedVehicle() != null) {
             if (meta != null) {
                 //Todo: fix deprecated
-                meta.setDisplayName(ChatColor.GRAY + "ERS Left");
-                ArrayList<String> strings = new ArrayList<>();
-                strings.add(skullCar.getLinkedVehicle().getStorageVehicle().getVehicleStats().getCurrentFuel() + "/" + skullCar.getLinkedVehicle().getStorageVehicle().getVehicleStats().getFuelTank());
+                meta.setDisplayName(ChatColor.RED + "Disabled");
+//                ArrayList<String> strings = new ArrayList<>();
+//                strings.add(skullCar.getLinkedVehicle().getStorageVehicle().getVehicleStats().getCurrentFuel() + "/" + skullCar.getLinkedVehicle().getStorageVehicle().getVehicleStats().getFuelTank());
                 //Todo: fix deprecated
-                meta.setLore(strings);
+//                meta.setLore(strings);
                 stack.setItemMeta(meta);
                 return stack;
             }

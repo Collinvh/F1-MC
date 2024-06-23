@@ -322,6 +322,8 @@ public class RaceLapStorage {
                                 } else {
                                     player.sendMessage(prefix + ChatColor.LIGHT_PURPLE + "You are FASTEST on track!");
                                 }
+                            } else {
+                                player.sendMessage(prefix + ChatColor.LIGHT_PURPLE + "You are FASTEST on track!");
                             }
 
                         }

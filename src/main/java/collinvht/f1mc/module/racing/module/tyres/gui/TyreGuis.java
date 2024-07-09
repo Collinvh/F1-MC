@@ -12,7 +12,7 @@ public class TyreGuis {
     public static Gui allTyres = Gui.normal().setStructure(
             "# # # # # # # # #",
             "# A U Z S M H R #",
-            "# I # # # # # W #",
+            "# I # # K # # W #",
             "# # # # # # # # #").addIngredient('#', new SimpleItem(Utils.emptyStack(Material.GRAY_STAINED_GLASS_PANE)))
             .addIngredient('I', new SimpleItem(TyreManager.getTyre("intermediate"), click -> click.getPlayer().getInventory().addItem(TyreManager.getTyre("intermediate"))))
             .addIngredient('W', new SimpleItem(TyreManager.getTyre("wet"), click -> click.getPlayer().getInventory().addItem(TyreManager.getTyre("wet"))))
@@ -23,6 +23,7 @@ public class TyreGuis {
             .addIngredient('M', new SimpleItem(TyreManager.getTyre("medium"), click -> click.getPlayer().getInventory().addItem(TyreManager.getTyre("medium"))))
             .addIngredient('H', new SimpleItem(TyreManager.getTyre("hard"), click -> click.getPlayer().getInventory().addItem(TyreManager.getTyre("hard"))))
             .addIngredient('R', new SimpleItem(TyreManager.getTyre("superhard"), click -> click.getPlayer().getInventory().addItem(TyreManager.getTyre("superhard"))))
+            .addIngredient('K', new SimpleItem(TyreManager.getTyre("kart"), click -> click.getPlayer().getInventory().addItem(TyreManager.getTyre("kart"))))
             .build();
     public static void reload() {
         for (Player allCurrentViewer : allTyres.findAllCurrentViewers()) {
@@ -42,6 +43,7 @@ public class TyreGuis {
                 .addIngredient('M', new SimpleItem(TyreManager.getTyre("medium"), click -> click.getPlayer().getInventory().addItem(TyreManager.getTyre("medium"))))
                 .addIngredient('H', new SimpleItem(TyreManager.getTyre("hard"), click -> click.getPlayer().getInventory().addItem(TyreManager.getTyre("hard"))))
                 .addIngredient('R', new SimpleItem(TyreManager.getTyre("superhard"), click -> click.getPlayer().getInventory().addItem(TyreManager.getTyre("superhard"))))
+                .addIngredient('K', new SimpleItem(TyreManager.getTyre("kart"), click -> click.getPlayer().getInventory().addItem(TyreManager.getTyre("kart"))))
                 .build();
     }
 }

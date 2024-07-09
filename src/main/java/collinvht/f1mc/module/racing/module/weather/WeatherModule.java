@@ -6,6 +6,6 @@ import collinvht.f1mc.util.modules.ModuleBase;
 public class WeatherModule extends ModuleBase {
     @Override
     public void load() {
-//        attachModule(new WeatherCommands());
+        attachModule(new WeatherCommands());
     }
 }

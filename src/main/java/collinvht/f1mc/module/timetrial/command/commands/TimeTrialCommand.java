@@ -1,6 +1,9 @@
 package collinvht.f1mc.module.timetrial.command.commands;
 
 import collinvht.f1mc.module.racing.manager.managers.RaceManager;
+import collinvht.f1mc.module.racing.module.tyres.TyreModule;
+import collinvht.f1mc.module.racing.module.tyres.manager.TyreManager;
+import collinvht.f1mc.module.racing.module.tyres.obj.TyreBaseObject;
 import collinvht.f1mc.module.racing.object.race.Race;
 import collinvht.f1mc.module.timetrial.manager.TimeTrialManager;
 import collinvht.f1mc.util.Utils;
@@ -67,6 +70,18 @@ public class TimeTrialCommand extends CommandUtil implements TabCompleter {
             }
             return prefix + "Changed Preference";
         }));
+        addPart("tyre", 1, "/timetrial tyre [name]", ((sender, command, label, args) -> {
+            if(sender instanceof Player player) {
+                TyreBaseObject object = TyreManager.getTyres().get(args[1].toLowerCase());
+                if(object == null) {
+                    return prefix + "Invalid tyre.";
+                }
+                TimeTrialManager.getTyrePreference().put(player.getUniqueId(), args[1].toLowerCase());
+                return prefix + "Tyre changed.";
+            }
+            return prefix + "Changed Preference";
+        }));
+
         addPart("fastest", 1, "/timetrial fastest [name] {page}", ((sender, command, label, args) -> {
             MysqlDataSource dataSource = Utils.getDatabase();
             try {
@@ -125,6 +140,10 @@ public class TimeTrialCommand extends CommandUtil implements TabCompleter {
                         VehiclesPlusAPI.getVehicleManager().getBaseVehicleMap().forEach((s1, baseVehicle) -> list.add(s1));
                         yield list;
                     }
+                    case "tyre" -> {
+                        TyreManager.getTyres().forEach((s1, tyreBaseObject) -> list.add(s1));
+                        yield list;
+                    }
                 };
             }
             if(args.length == 3) {
@@ -141,10 +160,10 @@ public class TimeTrialCommand extends CommandUtil implements TabCompleter {
             }
             if (args.length == 1){
                 list.add("fastest");
-                list.add("fastest");
                 list.add("car");
                 list.add("reset");
                 list.add("rival");
+                list.add("tyre");
                 return list;
             }
         }

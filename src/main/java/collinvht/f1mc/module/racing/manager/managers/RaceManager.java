@@ -6,6 +6,7 @@ import collinvht.f1mc.module.main.command.managers.CountryManager;
 import collinvht.f1mc.module.main.objects.CountryObject;
 import collinvht.f1mc.module.racing.module.team.manager.TeamManager;
 import collinvht.f1mc.module.racing.module.team.object.TeamObj;
+import collinvht.f1mc.module.racing.module.tyres.manager.TyreManager;
 import collinvht.f1mc.module.racing.object.PenaltyCuboid;
 import collinvht.f1mc.module.racing.object.race.RaceTimer;
 import collinvht.f1mc.module.vehiclesplus.listener.listeners.VPListener;
@@ -21,6 +22,7 @@ import collinvht.f1mc.util.modules.ModuleBase;
 import com.google.gson.JsonObject;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.regions.Region;
+import de.tr7zw.changeme.nbtapi.NBTItem;
 import lombok.Getter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -260,25 +262,11 @@ public class RaceManager extends ModuleBase {
                 if(!drivers.isEmpty()) {
                     builder.append(RacingMessages.RACE_POSITION);
 
-                    LinkedHashMap<RaceDriver, Integer> sectors = new LinkedHashMap<>();
+                    LinkedHashMap<RaceDriver, Long> sectors = new LinkedHashMap<>();
 
-                    drivers.forEach((unused, driver) -> sectors.put(driver, driver.getLaptimes(race).getSectors()));
+                    drivers.forEach((unused, driver) -> sectors.put(driver, (long) driver.getLaptimes(race).getSectors()));
 
-                    ListOrderedMap<RaceDriver, Integer> treeMap = Utils.sortByValueDescInt(sectors);
-
-                    LinkedHashMap<RaceDriver, Long> gap = new LinkedHashMap<>();
-
-                    drivers.forEach((uuid, raceDriver) -> {
-                        LaptimeStorage curLap = raceDriver.getLaptimes(race).getCurrentLap();
-                        if(curLap.isPassedS1() && !curLap.isPassedS2()) {
-                            gap.put(raceDriver, curLap.getS1().getSectorStart());
-                        } else if(curLap.isPassedS2() && !curLap.isPassedS3()) {
-                            gap.put(raceDriver, curLap.getS2().getSectorStart());
-                        } else if(curLap.isPassedS3()) {
-                            gap.put(raceDriver, curLap.getS3().getSectorStart());
-                        }
-                    });
-                    ListOrderedMap<RaceDriver, Long> gapOrdered = Utils.sortByValueDesc(gap);
+                    ListOrderedMap<RaceDriver, Long> treeMap = Utils.sortByValueDesc(sectors);
 
 
                     if (!treeMap.isEmpty()) {
@@ -288,12 +276,22 @@ public class RaceManager extends ModuleBase {
                         treeMap.forEach((driver, integer) -> {
                             if (integer > 0) {
                                 OfflinePlayer player = Bukkit.getOfflinePlayer(driver.getDriverUUID());
-                                if (pos.get() == 0) {
-                                    builder.append(pos.incrementAndGet()).append(". ").append(player.getName()).append(" : ").append(integer).append("\n");
+                                if(driver.getRaceCar() != null) {
+                                    if(driver.getRaceCar().getLinkedVehicle() != null) {
+                                        if(driver.getRaceCar().getRaceCarGUI() != null) {
+                                            NBTItem tyre = driver.getRaceCar().getRaceCarGUI().getTyre();
+                                            if(tyre != null) {
+                                                if (TyreManager.isTyre(tyre.getItem())) {
+                                                    String tyreName = tyre.getString("f1mc.name");
+                                                    if(tyreName != null) {
+                                                        builder.append(pos.incrementAndGet()).append(". ").append(player.getName()).append(" : ").append(integer).append(" [").append(tyreName).append("]").append("\n");
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
                                 } else {
                                     builder.append(pos.incrementAndGet()).append(". ").append(player.getName()).append(" : ").append(integer).append("\n");
-                                    long gapToNext = gapOrdered.get(driver);
-                                    builder.append(pos.incrementAndGet()).append(". ").append(player.getName()).append(" : ").append(Utils.millisToTimeString(gapToNext)).append("\n");
                                 }
                             }
                         });

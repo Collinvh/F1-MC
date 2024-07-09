@@ -82,29 +82,32 @@ public class RaceDriver {
     private ScheduledTask task;
 
     private void initialize() {
-        task = F1MC.getAsyncScheduler().runAtFixedRate(F1MC.getInstance(), new Consumer<ScheduledTask>() {
-            @Override
-            public void accept(ScheduledTask scheduledTask) {
-                if(isDriving) {
-                    for (Race race : RaceListener.getLISTENING()) {
-                        race.getRaceLapStorage().update(instace);
-                    }
-                    try {
-                        if(raceCar != null) {
-                            if(raceCar.getRaceCarGUI() != null) {
-                                if(raceCar.getRaceCarGUI().getTyre() != null) {
-                                    player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy(ChatColor.GRAY + "Speed: " + vehicle.getCurrentSpeedInKm() + "km/h | Ers:" + (int) (raceCar.getCurrentERS()/200*100) + "% | Tyre: " + TyreManager.getTyrePercentage(raceCar.getRaceCarGUI().getTyre()) + "%"));
-                                    return;
+        task = F1MC.getAsyncScheduler().runAtFixedRate(F1MC.getInstance(), scheduledTask -> {
+            if (isDriving) {
+                for (Race race : RaceListener.getLISTENING()) {
+                    race.getRaceLapStorage().update(instace);
+                }
+                try {
+                    if (raceCar != null) {
+                        if (raceCar.getRaceCarGUI() != null) {
+                            if (raceCar.getRaceCarGUI().getTyre() != null) {
+                                if (raceCar.getRaceCarGUI().getTyre().getString("f1mc.name").equals("kart")) {
+                                    player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy(ChatColor.GRAY + "Speed: " + vehicle.getCurrentSpeedInKm() + "km/h"));
+                                } else {
+                                    player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy(ChatColor.GRAY + "Speed: " + vehicle.getCurrentSpeedInKm() + "km/h | Ers:" + (int) (raceCar.getCurrentERS() / 200 * 100) + "% | Tyre: " + TyreManager.getTyrePercentage(raceCar.getRaceCarGUI().getTyre()) + "%"));
                                 }
+                                return;
                             }
-                            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy(ChatColor.GRAY + "Speed: " + vehicle.getCurrentSpeedInKm() + "km/h | Ers:" + (int) (raceCar.getCurrentERS()/200*100) + "%"));
-                        } else {
-                            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy(ChatColor.GRAY + "Speed: " + vehicle.getCurrentSpeedInKm() + "km/h"));
                         }
-                    } catch (Exception ignored) {}
+                        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy(ChatColor.GRAY + "Speed: " + vehicle.getCurrentSpeedInKm() + "km/h | Ers:" + (int) (raceCar.getCurrentERS() / 200 * 100) + "%"));
+                    } else {
+                        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy(ChatColor.GRAY + "Speed: " + vehicle.getCurrentSpeedInKm() + "km/h"));
+                    }
+                } catch (Exception ignored) {
+                    ignored.printStackTrace();
                 }
             }
-        }, 0, 50, TimeUnit.MILLISECONDS);
+        }, 0, 10, TimeUnit.MILLISECONDS);
     }
 
     public DriverLaptimeStorage getLaptimes(Race race) {

@@ -28,7 +28,7 @@ public class VPListener implements Listener {
     private static final HashMap<UUID, RaceCar> RACE_CARS = new HashMap<>();
     private static final ArrayList<SpawnedVehicle> spawnedVehicles = new ArrayList<>();
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public static void vehicleEnterEvent(@NotNull VehicleEnterEvent event) {
         Player player = event.getDriver();
         SpawnedVehicle vehicle = (SpawnedVehicle) event.getVehicle();
@@ -100,7 +100,7 @@ public class VPListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public static void vehicleDestroyEvent(@NotNull PlayerQuitEvent event) {
         RaceDriver raceDriver = getRACE_DRIVERS().get(event.getPlayer().getUniqueId());
         if(raceDriver != null) {

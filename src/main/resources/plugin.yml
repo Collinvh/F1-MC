@@ -18,6 +18,8 @@ authors:
   - SBDeveloper
 
 commands:
+  chunkloader:
+    aliases: test
   teamchat:
     aliases: teammsg
     description: Teamchat

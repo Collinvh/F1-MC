@@ -4,10 +4,10 @@ import lombok.Getter;
 
 @Getter
 public enum ERSMode {
-    OFF(0, 2.1, 0, 0),
-    BALANCED(1, 0, 1.6, 9),
-    HOTLAP(2, 0, 3, 13.5),
-    OVERTAKE(3, 0, 6, 15);
+    OFF(0, 3.6, 0, 0),
+    BALANCED(1, 0, 1.0, 4),
+    HOTLAP(2, 0, 4.3, 8),
+    OVERTAKE(3, 0, 8, 10);
 
     private final int id;
     private final double regain;

@@ -5,19 +5,11 @@ import lombok.Setter;
 import org.bukkit.Material;
 
 @Getter
-public class SlowdownObject {
+public class SlowdownObject extends SlowdownBase {
     private final Material mat;
-    @Setter
-    private double maxSpeed;
-    @Setter
-    private double slowdownSpeed;
-    @Setter
-    private double steeringPercent;
 
     public SlowdownObject(Material mat, double maxSpeedPercent, double slowDownSpeed, double steeringPercent) {
+        super(maxSpeedPercent, slowDownSpeed, steeringPercent);
         this.mat = mat;
-        this.maxSpeed = maxSpeedPercent;
-        this.slowdownSpeed = slowDownSpeed;
-        this.steeringPercent = steeringPercent;
     }
 }

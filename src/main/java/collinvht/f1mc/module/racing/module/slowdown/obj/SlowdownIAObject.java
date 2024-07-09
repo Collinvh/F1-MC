@@ -4,19 +4,11 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Getter
-public class SlowdownIAObject {
+public class SlowdownIAObject extends SlowdownBase {
     private final String id;
-    @Setter
-    private double maxSpeed;
-    @Setter
-    private double slowdownSpeed;
-    @Setter
-    private double steeringPercent;
 
     public SlowdownIAObject(String id, double maxSpeedPercent, double slowDownSpeed, double steeringPercent) {
+        super(maxSpeedPercent, slowDownSpeed, steeringPercent);
         this.id = id;
-        this.maxSpeed = maxSpeedPercent;
-        this.slowdownSpeed = slowDownSpeed;
-        this.steeringPercent = steeringPercent;
     }
 }

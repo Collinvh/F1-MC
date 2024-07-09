@@ -47,6 +47,7 @@ public class TeamObj {
         this.teamName = name;
         this.groupName = name.replace(" ", "_").toLowerCase();
         this.teamPrefix = name;
+        updateLP();
     }
     public void delete() {
         LuckPerms luckPerms = Utils.getLuckperms();
@@ -97,7 +98,8 @@ public class TeamObj {
             group.getData(DataType.NORMAL).clear();
             //Todo: fix deprecated
             group.getData(DataType.NORMAL).add(PrefixNode.builder().prefix( ChatColor.DARK_GRAY + "|" + getTeamColor() + getTeamPrefix() + ChatColor.DARK_GRAY +"| " + ChatColor.RESET).withContext("server", "racing").priority(10).build());
-            group.getData(DataType.NORMAL).add(PermissionNode.builder("blocklocker.group." + getTeamName()).permission("team." + getTeamName()).withContext("server", "racing").build());
+            group.getData(DataType.NORMAL).add(PermissionNode.builder("team." + getGroupName()).withContext("server", "racing").build());
+            group.getData(DataType.NORMAL).add(PermissionNode.builder("blocklocker.group." + getGroupName()).build());
             luckPerms.getGroupManager().saveGroup(group);
         } else {
             TeamManager.createTeam(this);

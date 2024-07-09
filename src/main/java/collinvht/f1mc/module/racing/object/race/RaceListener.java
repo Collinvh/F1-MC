@@ -32,7 +32,7 @@ public class RaceListener {
             if (!removingRaces.isEmpty()) {
                 LISTENING.removeAll(removingRaces);
             }
-        }, 0, 50, TimeUnit.MILLISECONDS);
+        }, 0, 1, TimeUnit.MILLISECONDS);
     }
 
     public static String startListeningTo(Race race, int mode) {

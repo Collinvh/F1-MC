@@ -1,37 +1,47 @@
 package collinvht.f1mc.module.timetrial.object;
 
 import collinvht.f1mc.F1MC;
+import collinvht.f1mc.module.racing.module.slowdown.obj.SlowdownBase;
+import collinvht.f1mc.module.racing.module.tyres.manager.TyreManager;
+import collinvht.f1mc.module.racing.module.tyres.obj.TyreBaseObject;
 import collinvht.f1mc.module.racing.object.Cuboid;
 import collinvht.f1mc.module.racing.object.NamedCuboid;
+import collinvht.f1mc.module.racing.object.race.ERSMode;
 import collinvht.f1mc.module.racing.object.race.Race;
 import collinvht.f1mc.module.racing.object.race.RaceCuboidStorage;
 import collinvht.f1mc.module.timetrial.manager.TimeTrialManager;
 import collinvht.f1mc.util.DefaultMessages;
 import collinvht.f1mc.util.Utils;
 import com.mysql.cj.jdbc.MysqlDataSource;
+import dev.lone.itemsadder.api.CustomBlock;
+import io.netty.buffer.Unpooled;
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import me.legofreak107.vehiclesplus.vehicles.api.VehiclesPlusAPI;
 import me.legofreak107.vehiclesplus.vehicles.api.objects.spawn.SpawnMode;
 import me.legofreak107.vehiclesplus.vehicles.vehicles.objects.BaseVehicle;
 import me.legofreak107.vehiclesplus.vehicles.vehicles.objects.SpawnedVehicle;
+import me.legofreak107.vehiclesplus.vehicles.vehicles.objects.VehicleStats;
 import me.legofreak107.vehiclesplus.vehicles.vehicles.objects.addons.Part;
 import me.legofreak107.vehiclesplus.vehicles.vehicles.objects.addons.seats.Seat;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.entity.ArmorStand;
+import net.minecraft.network.PacketDataSerializer;
+import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import static collinvht.f1mc.module.racing.module.slowdown.manager.SlowdownManager.customslowDowns;
+import static collinvht.f1mc.module.racing.module.slowdown.manager.SlowdownManager.slowDowns;
+
 public class TimeTrialHolder {
     private final Player player;
+    private final World world;
     private final Race race;
     private final RaceCuboidStorage storage;
     private final BaseVehicle vehicle;
@@ -45,8 +55,10 @@ public class TimeTrialHolder {
     private final String prefix = DefaultMessages.PREFIX;
     private boolean isInvalidated;
     private boolean isHotLapStart;
+    private TyreBaseObject tyre;
     public TimeTrialHolder(Player player, Race race, BaseVehicle vehicle) {
         this.player = player;
+        this.world = player.getWorld();
         this.race = race;
         this.isHotLapStart = true;
         this.storage = race.getStorage();
@@ -55,7 +67,7 @@ public class TimeTrialHolder {
         this.timeTrialLap.setPassedS1(true);
         this.timeTrialLap.setPassedS2(true);
         this.oldLocation = player.getLocation();
-        this.spawnedVehicle = VehiclesPlusAPI.getInstance().createVehicle(vehicle, player).spawnVehicle(storage.getTimeTrialSpawn(), SpawnMode.GARAGE);
+        this.spawnedVehicle = VehiclesPlusAPI.getInstance().createVehicle(vehicle, player).spawnVehicle(storage.getTimeTrialSpawn(), SpawnMode.FORCE);
         this.rival = TimeTrialManager.getRivalObject(this.race.getName(), this.player.getUniqueId());
         if (this.rival != null) {
             if(this.rival.getRival() != null) {
@@ -68,6 +80,11 @@ public class TimeTrialHolder {
             }
         }
         if(seat != null) {
+            this.tyre = TyreManager.getTyres().get(TimeTrialManager.getTyrePreference().getOrDefault(player.getUniqueId(), "soft"));
+            PacketDataSerializer wrappedBuffer = new PacketDataSerializer(Unpooled.buffer());
+            wrappedBuffer.writeInt(spawnedVehicle.getHolder().getEntityId());
+
+            player.sendPluginMessage(F1MC.getInstance(),  "formula:setcar", wrappedBuffer.array());
             start();
         }
     }
@@ -77,20 +94,9 @@ public class TimeTrialHolder {
             return;
         }
         this.player.teleport(storage.getTimeTrialSpawn());
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                float yRot = storage.getTimeTrialSpawn().getYaw();
-                spawnedVehicle.getHolder().setRotation(yRot, spawnedVehicle.getHolder().getPitch());
-                for (Part part : spawnedVehicle.getPartList()) {
-                    ArmorStand holder = part.getHolder();
-                    holder.setRotation(yRot, holder.getPitch());
-                }
-                seat.enter(player);
-            }
-        }.run();
+        seat.enter(player);
         this.isRunning = true;
-        this.task = F1MC.getAsyncScheduler().runAtFixedRate(F1MC.getInstance(), scheduledTask -> checkSectors(), 0, 100, TimeUnit.MILLISECONDS);
+        this.task = F1MC.getAsyncScheduler().runAtFixedRate(F1MC.getInstance(), scheduledTask -> checkSectors(), 0, 1, TimeUnit.MILLISECONDS);
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
             if(onlinePlayer != this.player) {
                 hide(onlinePlayer);
@@ -114,7 +120,61 @@ public class TimeTrialHolder {
         isRunning = false;
         //wrapper.setVisible(false);
     }
+
+    public void updateTyre() {
+        if (player == null) {
+            return;
+        }
+
+        VehicleStats stats = spawnedVehicle.getStorageVehicle().getVehicleStats();
+
+        if (tyre == null) {
+            stats.setCurrentSpeed(0.0);
+            stats.setSpeed(0);
+            stats.setHighSpeedAcceleration(0.0f);
+            stats.setLowSpeedAcceleration(0.0f);
+            stats.setLowSpeedSteering(0.0f);
+            stats.setHighSpeedSteering(0.0f);
+        } else {
+            float speedMultiplier = 1;
+            stats.setSpeed((int) (vehicle.getSpeedSettings().getBase() + ERSMode.OVERTAKE.getExtraSpeed() + tyre.getExtraSpeed()));
+
+            Block block = player.getPlayer().getLocation().clone().add(0, -0.2, 0).getBlock();
+            float steering = vehicle.getTurningRadiusSettings().getLowSpeed();
+            float steeringHigh = vehicle.getTurningRadiusSettings().getHighSpeed();
+            float acceleration = vehicle.getAccelerationSettings().getLowSpeed();
+            float accelerationHigh = vehicle.getAccelerationSettings().getHighSpeed();
+            float braking = vehicle.getBrakeSettings().getBase();
+
+            SlowdownBase slowdown = null;
+
+            if (block.getType() == Material.NOTE_BLOCK) {
+                CustomBlock customBlock = CustomBlock.byAlreadyPlaced(block);
+                if (customBlock != null) {
+                    slowdown = customslowDowns.get(customBlock.getNamespacedID());
+                }
+            } else if (slowDowns.containsKey(block.getType())) {
+                slowdown = slowDowns.get(block.getType());
+            }
+
+            if (slowdown != null) {
+                float steeringPercent = (float) slowdown.getSteeringPercent();
+                steering *= steeringPercent;
+                steeringHigh *= steeringPercent;
+                acceleration *= steeringPercent * 2;
+                accelerationHigh *= steeringPercent * 2;
+                braking *= steeringPercent * 2;
+            }
+
+            stats.setBrakeForce(braking);
+            stats.setLowSpeedSteering((float) (steering * tyre.getSteering() * speedMultiplier));
+            stats.setHighSpeedSteering((float) (steeringHigh * tyre.getSteering() * speedMultiplier));
+            stats.setLowSpeedAcceleration((float) (acceleration * tyre.getSteering() * speedMultiplier));
+            stats.setHighSpeedAcceleration((float) (accelerationHigh * tyre.getSteering() * speedMultiplier));
+        }
+    }
     private void checkSectors() {
+        updateTyre();
         Location location = spawnedVehicle.getHolder().getLocation();
         Cuboid s1 = storage.getS1().getCuboid();
         Cuboid s2 = storage.getS2().getCuboid();
@@ -122,19 +182,32 @@ public class TimeTrialHolder {
         boolean hasRival = rival != null && rival.getLap() != null;
         if(!isInvalidated) {
             for (NamedCuboid cuboid : storage.getLimits().values()) {
-                if (cuboid.getCuboid().containsLocation(location)) {
+                if (cuboid.getCuboid().containsVector(location.toVector())) {
                     isInvalidated = true;
                     player.sendMessage(prefix + ChatColor.RED + "You've invalidated your lap.");
+                    PacketDataSerializer wrappedBuffer = new PacketDataSerializer(Unpooled.buffer());
+                    player.sendPluginMessage(F1MC.getInstance(),  "formula:invalidatelap", wrappedBuffer.array());
                 }
             }
         }
-        if (s1.containsLocation(location)) {
+        if (s1.containsVector(location.toVector())) {
             if (!timeTrialLap.isPassedS1()) {
                 timeTrialLap.setPassedS1(true);
                 timeTrialLap.setPassedS3(false);
                 timeTrialLap.setS1L(System.currentTimeMillis());
                 long diff = hasRival ? rival.getLap().getS1().getSectorLength()-timeTrialLap.getS1().getSectorLength() : 0;
                 if (!isInvalidated) {
+                    PacketDataSerializer wrappedBuffer = new PacketDataSerializer(Unpooled.buffer());
+                    if(hasRival) {
+                        if(diff > 0 ) {
+                            wrappedBuffer.writeInt(0);
+                        } else {
+                            wrappedBuffer.writeInt(-1);
+                        }
+                    } else {
+                        wrappedBuffer.writeInt(0);
+                    }
+                    player.sendPluginMessage(F1MC.getInstance(),  "formula:completes1", wrappedBuffer.array());
                     player.sendMessage(prefix + ChatColor.GRAY + "Your S1 is " + ChatColor.RESET + Utils.millisToTimeString(timeTrialLap.getS1().getSectorLength()) + (hasRival ? " | " + (diff < 0 ? ChatColor.RED : ChatColor.GREEN + "-") + Utils.millisToTimeString(diff) : ""));
                 } else {
                     player.sendMessage(prefix + ChatColor.RED + "Your S1 is " + Utils.millisToTimeString(timeTrialLap.getS1().getSectorLength()) + (hasRival ? " | " + (diff < 0 ? "" : "-") + Utils.millisToTimeString(diff) : ""));
@@ -143,12 +216,23 @@ public class TimeTrialHolder {
                 return;
             }
         }
-        if (s2.containsLocation(location)) {
+        if (s2.containsVector(location.toVector())) {
             if (timeTrialLap.isPassedS1() && !timeTrialLap.isPassedS2()) {
                 timeTrialLap.setPassedS2(true);
                 timeTrialLap.setS2L(System.currentTimeMillis());
                 long diff = hasRival ? rival.getLap().getS2().getSectorLength()-timeTrialLap.getS2().getSectorLength() : 0;
                 if (!isInvalidated) {
+                    PacketDataSerializer wrappedBuffer = new PacketDataSerializer(Unpooled.buffer());
+                    if(hasRival) {
+                        if(diff > 0 ) {
+                            wrappedBuffer.writeInt(0);
+                        } else {
+                            wrappedBuffer.writeInt(-1);
+                        }
+                    } else {
+                        wrappedBuffer.writeInt(0);
+                    }
+                    player.sendPluginMessage(F1MC.getInstance(),  "formula:completes2", wrappedBuffer.array());
                     player.sendMessage(prefix + ChatColor.GRAY + "Your S2 is " + ChatColor.RESET + Utils.millisToTimeString(timeTrialLap.getS2().getSectorLength()) + (hasRival ? " | " + (diff < 0 ? ChatColor.RED : ChatColor.GREEN + "-") + Utils.millisToTimeString(diff) : ""));
                 } else {
                     player.sendMessage(prefix + ChatColor.RED + "Your S2 is " + Utils.millisToTimeString(timeTrialLap.getS2().getSectorLength()) + (hasRival ? " | " + (diff < 0 ? "" : "-") + Utils.millisToTimeString(diff) : ""));
@@ -157,15 +241,27 @@ public class TimeTrialHolder {
                 return;
             }
         }
-        if (s3.containsLocation(location)) {
+        if (s3.containsVector(location.toVector())) {
             if (timeTrialLap.isPassedS1() && timeTrialLap.isPassedS2() && !timeTrialLap.isPassedS3()) {
                 timeTrialLap.setPassedS3(true);
                 timeTrialLap.setS3L(System.currentTimeMillis());
                 if(!isHotLapStart) {
+
                     timeTrialLap.setLapL(timeTrialLap.getS1().getSectorLength() + timeTrialLap.getS2().getSectorLength() + timeTrialLap.getS3().getSectorLength());
                     long diff = hasRival ? rival.getLap().getS3().getSectorLength()-timeTrialLap.getS3().getSectorLength() : 0;
                     long diffLap = hasRival ? rival.getLap().getLapData().getSectorLength()-timeTrialLap.getLapData().getSectorLength() : 0;
                     if (!isInvalidated) {
+                        PacketDataSerializer wrappedBuffer = new PacketDataSerializer(Unpooled.buffer());
+                        if(hasRival) {
+                            if(diff > 0 ) {
+                                wrappedBuffer.writeInt(0);
+                            } else {
+                                wrappedBuffer.writeInt(-1);
+                            }
+                        } else {
+                            wrappedBuffer.writeInt(0);
+                        }
+                        player.sendPluginMessage(F1MC.getInstance(),  "formula:completes2", wrappedBuffer.array());
                         player.sendMessage(prefix + ChatColor.GRAY + "Your S3 is " + ChatColor.RESET + Utils.millisToTimeString(timeTrialLap.getS3().getSectorLength()) + (hasRival ? " | " + (diff < 0 ? ChatColor.RED : ChatColor.GREEN + "-") + Utils.millisToTimeString(diff) : ""));
                         player.sendMessage(prefix + ChatColor.GRAY + "Your lap time is " + ChatColor.RESET + Utils.millisToTimeString(timeTrialLap.getLapData().getSectorLength()) + (hasRival ? " | " + (diffLap < 0 ? ChatColor.RED : ChatColor.GREEN + "-") + Utils.millisToTimeString(diffLap) : ""));
                         dataBaseCheck();
@@ -178,6 +274,10 @@ public class TimeTrialHolder {
                 timeTrialLap.setPassedS1(false);
                 timeTrialLap.setPassedS2(false);
                 timeTrialLap.setPassedS3(true);
+
+                PacketDataSerializer wrappedBuffer2 = new PacketDataSerializer(Unpooled.buffer());
+                wrappedBuffer2.writeLong(Instant.now().toEpochMilli());
+                player.sendPluginMessage(F1MC.getInstance(),  "formula:startlap", wrappedBuffer2.array());
             }
         }
      }

@@ -1,11 +1,14 @@
 package collinvht.f1mc.module.racing.object.race;
 
 import collinvht.f1mc.F1MC;
+import collinvht.f1mc.module.racing.module.slowdown.obj.SlowdownBase;
+import collinvht.f1mc.module.racing.module.slowdown.obj.SlowdownIAObject;
 import collinvht.f1mc.module.racing.module.team.object.TeamObj;
 import collinvht.f1mc.module.vehiclesplus.listener.listeners.VPListener;
 import collinvht.f1mc.module.vehiclesplus.objects.RaceDriver;
 import collinvht.f1mc.util.Utils;
 import de.tr7zw.changeme.nbtapi.NBTItem;
+import dev.lone.itemsadder.api.CustomBlock;
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,6 +16,9 @@ import me.legofreak107.vehiclesplus.vehicles.vehicles.objects.BaseVehicle;
 import me.legofreak107.vehiclesplus.vehicles.vehicles.objects.SpawnedVehicle;
 import me.legofreak107.vehiclesplus.vehicles.vehicles.objects.VehicleStats;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.data.type.Slab;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.joml.Math;
@@ -21,6 +27,9 @@ import xyz.xenondevs.invui.inventory.event.UpdateReason;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+
+import static collinvht.f1mc.module.racing.module.slowdown.manager.SlowdownManager.customslowDowns;
+import static collinvht.f1mc.module.racing.module.slowdown.manager.SlowdownManager.slowDowns;
 
 public class RaceCar {
     @Getter
@@ -63,7 +72,7 @@ public class RaceCar {
                             currentERS = 0;
                             currentERSMode = ERSMode.OFF;
                         } else if (currentERS + currentERSMode.getRegain() > 200) {
-                            currentERS = 100;
+                            currentERS = 200;
                         } else {
                             currentERS -= currentERSMode.getUsage();
                             currentERS += currentERSMode.getRegain();
@@ -72,12 +81,12 @@ public class RaceCar {
                     }
                 } else {
                     curTick++;
-                    if (curTick >= 150) {
+                    if (curTick >= 1500) {
                         curTick = 0;
                     }
                 }
             }
-        }, 0, 50, TimeUnit.MILLISECONDS);
+        }, 0, 1, TimeUnit.MILLISECONDS);
     }
 
     public void updateTyre() {
@@ -93,11 +102,13 @@ public class RaceCar {
                 stats.setLowSpeedSteering(0.0f);
                 stats.setHighSpeedSteering(0.0f);
             } else {
+                String name = tyre.getString("f1mc.name");
+                boolean canDura = !(name.equals("kart"));
                 double dura = tyre.getDouble("f1mc.dura");
-                double degrate = tyre.getDouble("f1mc.degradationRate")/20;
+                double degrate = (tyre.getDouble("f1mc.degradationRate")/20)/50D;
                 double maxDura = tyre.getDouble("f1mc.maxdura");
                 double currentWear = dura/maxDura;
-                if(dura <= 0) {
+                if(currentWear <= 0.0D) {
                     if(stats.getCurrentSpeed() > 10.05D) {
                         stats.setCurrentSpeed(10.00);
                     }
@@ -132,23 +143,55 @@ public class RaceCar {
                     }
                     stats.setSpeed(60);
                 }
-                stats.setLowSpeedSteering((float) ((baseVehicle.getTurningRadiusSettings().getLowSpeed() * tyre.getDouble("f1mc.steering")) * speedMultiplier));
-                stats.setHighSpeedSteering((float) ((baseVehicle.getTurningRadiusSettings().getHighSpeed() * tyre.getDouble("f1mc.steering")) * speedMultiplier));
-                stats.setLowSpeedAcceleration((float) ((baseVehicle.getAccelerationSettings().getLowSpeed() * tyre.getDouble("f1mc.steering")) * speedMultiplier));
-                stats.setHighSpeedAcceleration((float) ((baseVehicle.getAccelerationSettings().getHighSpeed() * tyre.getDouble("f1mc.steering")) * speedMultiplier));
-
-                tyre.setDouble("f1mc.dura", (dura-(degrate * (getLinkedVehicle().getCurrentSpeedInKm()/100) * getLinkedVehicle().getStorageVehicle().getVehicleStats().getCurrentSteer())));
-                ArrayList<String> lore = new ArrayList<>();
-                //Todo: fix deprecated
-                lore.add(ChatColor.GRAY + "Durability left = " + Utils.round(dura - degrate, 1) + "/" + tyre.getDouble("f1mc.maxdura"));
-                lore.add(ChatColor.GRAY + "Extra Speed = " + tyre.getDouble("f1mc.extraSpeed") + "km/h");
-                ItemStack stack = tyre.getItem();
-                if(stack.getItemMeta() != null) {
-                    ItemMeta meta = stack.getItemMeta();
-                    meta.setLore(lore);
-                    stack.setItemMeta(meta);
+                Block block = player.getPlayer().getLocation().clone().add(0, -0.2, 0).getBlock();
+                if(block.getBlockData() instanceof Slab) {
+                    block = player.getPlayer().getLocation().clone().add(0, -1.2, 0).getBlock();
                 }
-                raceCarGUI.getBandInventory().forceSetItem(UpdateReason.SUPPRESSED, 0, stack);
+                float steering = linkedVehicle.getBaseVehicle().getTurningRadiusSettings().getLowSpeed();
+                float steeringHigh = linkedVehicle.getBaseVehicle().getTurningRadiusSettings().getHighSpeed();
+                float acceleration = linkedVehicle.getBaseVehicle().getAccelerationSettings().getLowSpeed();
+                float accelerationHigh = linkedVehicle.getBaseVehicle().getAccelerationSettings().getHighSpeed();
+                float braking = linkedVehicle.getBaseVehicle().getBrakeSettings().getBase();
+                if(block.getType() == Material.NOTE_BLOCK) {
+                    CustomBlock customBlock = CustomBlock.byAlreadyPlaced(block);
+                    if(customBlock != null) {
+                        if (customslowDowns.get(customBlock.getNamespacedID()) != null) {
+                            SlowdownIAObject obj = customslowDowns.get(customBlock.getNamespacedID());
+                            steering *= (float) obj.getSteeringPercent();
+                            steeringHigh *= (float) obj.getSteeringPercent();
+                            acceleration *= (float) (obj.getSteeringPercent()*2);
+                            accelerationHigh *= (float) (obj.getSteeringPercent()*2);
+                            braking *= (float) (obj.getSteeringPercent()*2);
+                        }
+                    }
+                } else if (slowDowns.containsKey(block.getType())) {
+                    SlowdownBase obj = slowDowns.get(block.getType());
+                    steering *= (float) obj.getSteeringPercent();
+                    steeringHigh *= (float) obj.getSteeringPercent();
+                    acceleration *= (float) (obj.getSteeringPercent()*2);
+                    accelerationHigh *= (float) (obj.getSteeringPercent()*2);
+                    braking *= (float) (obj.getSteeringPercent()*2);
+                }
+                stats.setBrakeForce(braking);
+                stats.setLowSpeedSteering((float) ((steering * tyre.getDouble("f1mc.steering")) * speedMultiplier));
+                stats.setHighSpeedSteering((float) ((steeringHigh * tyre.getDouble("f1mc.steering")) * speedMultiplier));
+                stats.setLowSpeedAcceleration((float) ((acceleration * tyre.getDouble("f1mc.steering")) * speedMultiplier));
+                stats.setHighSpeedAcceleration((float) ((accelerationHigh * tyre.getDouble("f1mc.steering")) * speedMultiplier));
+
+                if(canDura) {
+                    tyre.setDouble("f1mc.dura", (dura - (degrate * (getLinkedVehicle().getCurrentSpeedInKm() / 100))));
+                    ArrayList<String> lore = new ArrayList<>();
+                    //Todo: fix deprecated
+                    lore.add(ChatColor.GRAY + "Durability left = " + Utils.round(dura - degrate, 1) + "/" + tyre.getDouble("f1mc.maxdura"));
+                    lore.add(ChatColor.GRAY + "Extra Speed = " + tyre.getDouble("f1mc.extraSpeed") + "km/h");
+                    ItemStack stack = tyre.getItem();
+                    if (stack.getItemMeta() != null) {
+                        ItemMeta meta = stack.getItemMeta();
+                        meta.setLore(lore);
+                        stack.setItemMeta(meta);
+                    }
+                    raceCarGUI.getBandInventory().forceSetItem(UpdateReason.SUPPRESSED, 0, stack);
+                }
             }
         }
     }

@@ -24,6 +24,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import scala.Int;
 import tsp.headdb.core.api.HeadAPI;
 
 import java.io.File;
@@ -185,7 +186,6 @@ public class Utils {
     public static ListOrderedMap<RaceDriver, Long> sortByValueDesc(Map<RaceDriver, Long> map) {
         List<Map.Entry<RaceDriver, Long>> list = new LinkedList<>(map.entrySet());
         list.sort((o1, o2) -> o2.getValue().compareTo(o1.getValue()));
-        Collections.reverse(list);
 
         ListOrderedMap<RaceDriver, Long> result = new ListOrderedMap<>();
         for (Map.Entry<RaceDriver, Long> entry : list) {
@@ -241,8 +241,12 @@ public class Utils {
         }
     }
 
+    private static final HashMap<Integer, ItemStack> skullStacks = new HashMap<>();
     public static ItemStack createSkull(int id, String name) {
         if(HeadAPI.getHeadById(id).isPresent()) {
+            if(skullStacks.containsKey(id)) {
+                return skullStacks.get(id);
+            }
             ItemStack stack = HeadAPI.getHeadById(id).get().getItem(UUID.randomUUID());
             ItemMeta meta = stack.getItemMeta();
             if (meta != null) {
@@ -252,6 +256,7 @@ public class Utils {
                 meta.setLore(strings);
                 stack.setItemMeta(meta);
             }
+            skullStacks.put(id, stack);
             return stack;
         } else return new ItemStack(Material.AIR);
     }

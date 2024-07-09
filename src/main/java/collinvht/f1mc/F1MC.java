@@ -25,6 +25,12 @@ public final class F1MC extends JavaPlugin {
         log = getLogger();
         Utils.setupConfig(this);
         ModuleManager.loadModules();
+        getServer().getMessenger().registerOutgoingPluginChannel(this, "formula:setcar");
+        getServer().getMessenger().registerOutgoingPluginChannel(this, "formula:startlap");
+        getServer().getMessenger().registerOutgoingPluginChannel(this, "formula:invalidatelap");
+        getServer().getMessenger().registerOutgoingPluginChannel(this, "formula:completes1");
+        getServer().getMessenger().registerOutgoingPluginChannel(this, "formula:completes2");
+        getServer().getMessenger().registerOutgoingPluginChannel(this, "formula:completes3");
     }
     @Override
     public void onDisable() {

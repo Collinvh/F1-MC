@@ -25,10 +25,10 @@ public class RacingModule extends ModuleBase {
             attachModule(new FiaModule());
         }
         attachModule(new RacingListeners());
+        attachModule(new TyreModule());
         attachModule(new SlowdownModule());
         if(Utils.isEnableFIAModule()) {
             attachModule(new TeamModule());
-            attachModule(new TyreModule());
             attachModule(new WeatherModule());
         }
         Bukkit.getLogger().info("[F1MC] [Racing] Enabled Racing Modules");

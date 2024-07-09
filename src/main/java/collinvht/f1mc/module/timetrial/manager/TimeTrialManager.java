@@ -11,6 +11,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mysql.cj.jdbc.MysqlDataSource;
+import lombok.Getter;
 import me.legofreak107.vehiclesplus.vehicles.api.VehiclesPlusAPI;
 import me.legofreak107.vehiclesplus.vehicles.vehicles.objects.BaseVehicle;
 import org.apache.commons.lang3.StringUtils;
@@ -42,10 +43,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class TimeTrialManager {
     private static final HashMap<UUID, TimeTrialHolder> timeTrialHolders = new HashMap<>();
     private static final HashMap<UUID, String> carPreference = new HashMap<>();
+    @Getter
+    private static final HashMap<UUID, String> tyrePreference = new HashMap<>();
     private static final HashMap<String, HashMap<UUID, UUID>> rivalPreference = new HashMap<>();
 
-    private static Gui gui;
-    private static Gui gui2;
     public static String openGUI(Player player) {
         Window.single().setGui(getGui(player)).build(player).open();
         return "Time trial opened";
@@ -90,6 +91,18 @@ public class TimeTrialManager {
             } catch (Exception ignored) {
             }
         }
+        File files3 = Paths.get(F1MC.getInstance().getDataFolder() + "/storage/timetrial_tyres.json").toFile();
+        if(files3.exists()) {
+            try {
+                JsonObject object = (JsonObject) Utils.readJson(files3.getAbsolutePath());
+                JsonArray array = object.getAsJsonArray("array");
+                for (JsonElement jsonElement : array) {
+                    JsonObject object2 = jsonElement.getAsJsonObject();
+                    tyrePreference.put(UUID.fromString(object2.get("UUID").getAsString()), object2.get("TyreName").getAsString());
+                }
+            } catch (Exception ignored) {
+            }
+        }
 
         File files2 = Paths.get(F1MC.getInstance().getDataFolder() + "/storage/timetrial_rivals.json").toFile();
         if(files2.exists()) {
@@ -127,13 +140,22 @@ public class TimeTrialManager {
             mainObject.add(object2);
         });
         object.add("array", mainObject);
+        JsonObject object3 = new JsonObject();
+        JsonArray mainObject3 = new JsonArray();
+        tyrePreference.forEach((uuid, carName) -> {
+            JsonObject object2 = new JsonObject();
+            object2.addProperty("UUID", uuid.toString());
+            object2.addProperty("TyreName", carName);
+            mainObject3.add(object2);
+        });
+        object3.add("array", mainObject3);
 
         File path2 = Paths.get(F1MC.getInstance().getDataFolder() + "/storage/").toFile();
         JsonObject object2 = new JsonObject();
         JsonArray mainObject2 = new JsonArray();
         rivalPreference.forEach((uuid, carName) -> {
-            JsonObject object3 = new JsonObject();
-            object3.addProperty("TrackName", uuid);
+            JsonObject object33 = new JsonObject();
+            object33.addProperty("TrackName", uuid);
             JsonArray a = new JsonArray();
             carName.forEach((uuid1, uuid2) -> {
                 JsonObject object1 = new JsonObject();
@@ -141,58 +163,35 @@ public class TimeTrialManager {
                 object1.addProperty("rivalUUID", uuid2.toString());
                 a.add(object1);
             });
-            object3.add("rivals", a);
-            mainObject2.add(object3);
+            object33.add("rivals", a);
+            mainObject2.add(object33);
         });
         object2.add("array", mainObject2);
 
         Utils.saveJSON(path2, "timetrial_rivals", object2);
+        Utils.saveJSON(path2, "timetrial_tyres", object3);
         Utils.saveJSON(path, "timetrial", object);
     }
 
     public static Gui getGui(Player player) {
         HashMap<String, Race> races = RaceManager.getRACES();
         if(timeTrialHolders.containsKey(player.getUniqueId())) {
-            Gui.Builder<Gui, Gui.Builder.Normal> builder = Gui.normal().setStructure("# # # # # # # # #", "# # B # C # A # #", "! # # # R # # # !")
+            Gui.Builder<Gui, Gui.Builder.Normal> builder = Gui.normal().setStructure("# # # # # # # # #", "T # # # A # # # #", "D # # # R # # # D")
+                    .addIngredient('D', createChallengeTrack(RaceManager.getRACES().get("canada")))
                     .addIngredient('R', new SimpleItem(Utils.emptyStack(Material.RED_STAINED_GLASS_PANE), (click -> {
                         timeTrialHolders.get(click.getPlayer().getUniqueId()).stop();
                         timeTrialHolders.remove(click.getPlayer().getUniqueId());
                     })))
-                    .addIngredient('!', new SimpleItem(Utils.createSkull(1223, "DLC"), (click) -> click.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&',"&cComing soon!"))))
+                    .addIngredient('T', new SimpleItem(Utils.createSkull(1223, "All Tracks"), (click) -> click.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&',"&cComing soon!"))))
                     .addIngredient('#', new SimpleItem(Utils.emptyStack(Material.GRAY_STAINED_GLASS_PANE)));
-            AtomicInteger curID = new AtomicInteger();
-            for (Race race : races.values()) {
-                if(race.isTimeTrialStatus()) {
-                    if(curID.get() < 3) {
-                        switch (curID.incrementAndGet()) {
-                            case 1 -> builder.addIngredient('A', createTrack(race));
-                            case 2 -> builder.addIngredient('B', createTrack(race));
-                            case 3 -> builder.addIngredient('C', createTrack(race));
-                        }
-                    } else {
-                        break;
-                    }
-                }
-            }
+            builder.addIngredient('A', createTrack(races.values().stream().filter(Race::isTimeTrialStatus).findFirst().get()));
             return builder.build();
         } else {
-            Gui.Builder<Gui, Gui.Builder.Normal> builder = Gui.normal().setStructure("# # # # # # # # #", "# # B # C # A # #", "! # # # # # # # !")
-                    .addIngredient('!', new SimpleItem(Utils.createSkull(1223, "DLC"), (click) -> click.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&',"&cComing soon!"))))
+            Gui.Builder<Gui, Gui.Builder.Normal> builder = Gui.normal().setStructure("# # # # # # # # #", "T # # # A # # # #", "D # # # # # # # D")
+                    .addIngredient('D', createChallengeTrack(RaceManager.getRACES().get("canada")))
+                    .addIngredient('T', new SimpleItem(Utils.createSkull(1223, "All Tracks"), (click) -> click.getPlayer().sendMessage(ChatColor.translateAlternateColorCodes('&',"&cComing soon!"))))
                     .addIngredient('#', new SimpleItem(Utils.emptyStack(Material.GRAY_STAINED_GLASS_PANE)));
-            AtomicInteger curID = new AtomicInteger();
-            for (Race race : races.values()) {
-                if(race.isTimeTrialStatus()) {
-                    if(curID.get() < 3) {
-                        switch (curID.incrementAndGet()) {
-                            case 1 -> builder.addIngredient('A', createTrack(race));
-                            case 2 -> builder.addIngredient('B', createTrack(race));
-                            case 3 -> builder.addIngredient('C', createTrack(race));
-                        }
-                    } else {
-                        break;
-                    }
-                }
-            }
+            builder.addIngredient('A', createTrack(races.values().stream().filter(Race::isTimeTrialStatus).findFirst().get()));
             return builder.build();
         }
     }
@@ -211,6 +210,21 @@ public class TimeTrialManager {
         return new SimpleItem(stack, click -> createTrackClick(click, race));
     }
 
+    private static SimpleItem createChallengeTrack(Race race) {
+        ItemStack stack = Utils.createSkull(race.getStorage().getSkullId(), "nil");
+        ItemMeta meta = stack.getItemMeta();
+        if (meta != null) {
+            meta.setDisplayName(ChatColor.GREEN + StringUtils.capitalize(race.getName()));
+            ArrayList<String> strings = new ArrayList<>();
+            strings.add(ChatColor.GOLD + "CHALLENGE TRACK");
+            strings.add(ChatColor.DARK_GRAY + "Click to start challenge!");
+            meta.setLore(strings);
+            stack.setItemMeta(meta);
+        }
+        stack.setItemMeta(meta);
+        return new SimpleItem(stack, click -> createChallenge(click, race));
+    }
+
     private static void createTrackClick(@NotNull Click click, Race race) {
         Optional<BaseVehicle> baseVehicle = VehiclesPlusAPI.getInstance().getBaseVehicleFromString(carPreference.getOrDefault(click.getPlayer().getUniqueId(), "f1base"));
         if(baseVehicle.isPresent()) {
@@ -224,6 +238,23 @@ public class TimeTrialManager {
                 } else {
                     click.getPlayer().sendMessage(DefaultMessages.PREFIX + "This track has been disabled.");
                 }
+            } else {
+                click.getPlayer().sendMessage(DefaultMessages.PREFIX + "Theirs been an issue loading this track\nReport it to staff please.");
+            }
+        } else {
+            click.getPlayer().sendMessage(DefaultMessages.PREFIX + "Error loading vehicle.");
+        }
+    }
+
+    private static void createChallenge(@NotNull Click click, Race race) {
+        Optional<BaseVehicle> baseVehicle = VehiclesPlusAPI.getInstance().getBaseVehicleFromString("prototype");
+        if(baseVehicle.isPresent()) {
+            if(race != null) {
+                Player player = click.getPlayer();
+                if (timeTrialHolders.containsKey(player.getUniqueId())) {
+                    timeTrialHolders.get(player.getUniqueId()).stop();
+                }
+                timeTrialHolders.put(player.getUniqueId(), new TimeTrialHolder(player, race, baseVehicle.get()));
             } else {
                 click.getPlayer().sendMessage(DefaultMessages.PREFIX + "Theirs been an issue loading this track\nReport it to staff please.");
             }

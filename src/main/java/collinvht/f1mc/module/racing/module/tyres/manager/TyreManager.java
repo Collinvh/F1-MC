@@ -142,6 +142,9 @@ public class TyreManager extends ModuleBase {
         if(!tyres.containsKey("superhard")) {
             tyres.put("superhard", new TyreBaseObject("superhard", 10021, 5000, 5.1, 0.8, 0));
         }
+        if(!tyres.containsKey("kart")) {
+            tyres.put("kart", new TyreBaseObject("kart", 10021, Integer.MAX_VALUE, 1, 1, 0));
+        }
         if(!tyres.containsKey("wet")) {
             tyres.put("wet", new TyreBaseObject("wet", 10016, 5500, 6, 1, 0));
         }

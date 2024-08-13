@@ -23,7 +23,7 @@ public class DiscordModule extends ModuleBase {
             @Override
             public void run() {
                 try {
-                    jda = JDABuilder.createDefault("MTA1MDU0MjgzOTA4OTYwNjcyNw.GdCG1P.VUDZJzQft9ogs2yfvAfJaQ-qB44su_rEzJ4yAs").build();
+                    jda = JDABuilder.createDefault("").build();
                     jda.awaitReady();
                     jda.getPresence().setActivity(Activity.watching("https://discord.gg/xR3NAbCxJR"));
                     F1MC.getLog().info("[F1MC] [Discord] Enabled Discord Module");

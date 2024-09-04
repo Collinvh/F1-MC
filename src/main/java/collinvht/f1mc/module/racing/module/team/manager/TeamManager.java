@@ -109,7 +109,7 @@ public class TeamManager extends ModuleBase {
             try {
                 group = luckPerms.getGroupManager().createAndLoadGroup(team.getGroupName()).get();
                 //Todo: fix deprecated
-                group.getData(DataType.NORMAL).add(PrefixNode.builder().prefix( ChatColor.DARK_GRAY + "|" + team.getTeamColor() + team.getTeamPrefix() + ChatColor.DARK_GRAY +"| " + ChatColor.RESET).withContext("server", "racing").priority(10).build());
+                group.getData(DataType.NORMAL).add(PrefixNode.builder().prefix( ChatColor.DARK_GRAY + "|" + team.getTeamColor() + team.getTeamPrefix() + ChatColor.DARK_GRAY +"| " + ChatColor.RESET).priority(10).build());
                 group.getData(DataType.NORMAL).add(PermissionNode.builder("team." + team.getGroupName()).withContext("server", "racing").build());
                 group.getData(DataType.NORMAL).add(PermissionNode.builder("blocklocker.group." + team.getGroupName()).build());
                 luckPerms.getGroupManager().saveGroup(group);

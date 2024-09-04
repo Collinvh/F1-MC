@@ -142,7 +142,7 @@
             <artifactId>VehiclesPlusPro</artifactId>
             <version>2.4.3</version>
             <scope>system</scope>
-            <systemPath>${pom.basedir}/lib/VehiclesPlus-2.4.3.jar</systemPath>
+            <systemPath>${pom.basedir}/lib/VehiclesPlus-2.4.3 (1).jar</systemPath>
         </dependency>
         <dependency>
             <groupId>net.dv8tion</groupId>
@@ -167,7 +167,7 @@
             <artifactId>api-itemsadder</artifactId>
             <version>3.4</version>
             <scope>system</scope>
-            <systemPath>${pom.basedir}/lib/ItemsAdder_3.6.4-release-2.jar</systemPath>
+            <systemPath>${pom.basedir}/lib/ItemsAdder_3.6.4-release-3 (1).jar</systemPath>
         </dependency>
         <dependency>
             <groupId>tsp.headdb.core</groupId>

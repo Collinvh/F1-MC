@@ -15,6 +15,7 @@ import collinvht.f1mc.util.Utils;
 import com.mysql.cj.jdbc.MysqlDataSource;
 import dev.lone.itemsadder.api.CustomBlock;
 import io.netty.buffer.Unpooled;
+import io.papermc.lib.PaperLib;
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import me.legofreak107.vehiclesplus.vehicles.api.VehiclesPlusAPI;
 import me.legofreak107.vehiclesplus.vehicles.api.objects.spawn.SpawnMode;
@@ -56,6 +57,7 @@ public class TimeTrialHolder {
     private boolean isInvalidated;
     private boolean isHotLapStart;
     private TyreBaseObject tyre;
+    private int flags;
     public TimeTrialHolder(Player player, Race race, BaseVehicle vehicle) {
         this.player = player;
         this.world = player.getWorld();
@@ -67,7 +69,7 @@ public class TimeTrialHolder {
         this.timeTrialLap.setPassedS1(true);
         this.timeTrialLap.setPassedS2(true);
         this.oldLocation = player.getLocation();
-        this.spawnedVehicle = VehiclesPlusAPI.getInstance().createVehicle(vehicle, player).spawnVehicle(storage.getTimeTrialSpawn(), SpawnMode.FORCE);
+        this.spawnedVehicle = VehiclesPlusAPI.getInstance().createVehicle(vehicle, player).spawnVehicle(storage.getTimeTrialSpawn().clone(), SpawnMode.FORCE);
         this.rival = TimeTrialManager.getRivalObject(this.race.getName(), this.player.getUniqueId());
         if (this.rival != null) {
             if(this.rival.getRival() != null) {
@@ -128,49 +130,51 @@ public class TimeTrialHolder {
 
         VehicleStats stats = spawnedVehicle.getStorageVehicle().getVehicleStats();
 
-        if (tyre == null) {
-            stats.setCurrentSpeed(0.0);
-            stats.setSpeed(0);
-            stats.setHighSpeedAcceleration(0.0f);
-            stats.setLowSpeedAcceleration(0.0f);
-            stats.setLowSpeedSteering(0.0f);
-            stats.setHighSpeedSteering(0.0f);
-        } else {
-            float speedMultiplier = 1;
-            stats.setSpeed((int) (vehicle.getSpeedSettings().getBase() + ERSMode.OVERTAKE.getExtraSpeed() + tyre.getExtraSpeed()));
+        if(!vehicle.getName().contains("lmp")) {
+            if (tyre == null) {
+                stats.setCurrentSpeed(0.0);
+                stats.setSpeed(0);
+                stats.setHighSpeedAcceleration(0.0f);
+                stats.setLowSpeedAcceleration(0.0f);
+                stats.setLowSpeedSteering(0.0f);
+                stats.setHighSpeedSteering(0.0f);
+            } else {
+                float speedMultiplier = 1;
+                stats.setSpeed((int) (vehicle.getSpeedSettings().getBase() + ERSMode.OVERTAKE.getExtraSpeed() + tyre.getExtraSpeed()));
+                Material material = player.getWorld().getType(player.getLocation().clone().add(0, -0.2, 0));
+                float steering = vehicle.getTurningRadiusSettings().getLowSpeed();
+                float steeringHigh = vehicle.getTurningRadiusSettings().getHighSpeed();
+                float acceleration = vehicle.getAccelerationSettings().getLowSpeed();
+                float accelerationHigh = vehicle.getAccelerationSettings().getHighSpeed();
+                float braking = vehicle.getBrakeSettings().getBase();
+                SlowdownBase slowdown = null;
 
-            Block block = player.getPlayer().getLocation().clone().add(0, -0.2, 0).getBlock();
-            float steering = vehicle.getTurningRadiusSettings().getLowSpeed();
-            float steeringHigh = vehicle.getTurningRadiusSettings().getHighSpeed();
-            float acceleration = vehicle.getAccelerationSettings().getLowSpeed();
-            float accelerationHigh = vehicle.getAccelerationSettings().getHighSpeed();
-            float braking = vehicle.getBrakeSettings().getBase();
-
-            SlowdownBase slowdown = null;
-
-            if (block.getType() == Material.NOTE_BLOCK) {
-                CustomBlock customBlock = CustomBlock.byAlreadyPlaced(block);
-                if (customBlock != null) {
-                    slowdown = customslowDowns.get(customBlock.getNamespacedID());
+/*            if (material == Material.NOTE_BLOCK) {
+//                Block block = player.getPlayer().getLocation().clone().add(0, -0.2, 0).getBlock();
+//                CustomBlock customBlock = CustomBlock.byAlreadyPlaced(block);
+//                if (customBlock != null) {
+//                    slowdown = customslowDowns.get(customBlock.getNamespacedID());
+//                }
+//            } else */
+                if (slowDowns.containsKey(material)) {
+                    slowdown = slowDowns.get(material);
                 }
-            } else if (slowDowns.containsKey(block.getType())) {
-                slowdown = slowDowns.get(block.getType());
-            }
 
-            if (slowdown != null) {
-                float steeringPercent = (float) slowdown.getSteeringPercent();
-                steering *= steeringPercent;
-                steeringHigh *= steeringPercent;
-                acceleration *= steeringPercent * 2;
-                accelerationHigh *= steeringPercent * 2;
-                braking *= steeringPercent * 2;
-            }
+                if (slowdown != null) {
+                    float steeringPercent = (float) slowdown.getSteeringPercent();
+                    steering *= steeringPercent;
+                    steeringHigh *= steeringPercent;
+                    acceleration *= steeringPercent * 2;
+                    accelerationHigh *= steeringPercent * 2;
+                    braking *= steeringPercent * 2;
+                }
 
-            stats.setBrakeForce(braking);
-            stats.setLowSpeedSteering((float) (steering * tyre.getSteering() * speedMultiplier));
-            stats.setHighSpeedSteering((float) (steeringHigh * tyre.getSteering() * speedMultiplier));
-            stats.setLowSpeedAcceleration((float) (acceleration * tyre.getSteering() * speedMultiplier));
-            stats.setHighSpeedAcceleration((float) (accelerationHigh * tyre.getSteering() * speedMultiplier));
+                stats.setBrakeForce(braking);
+                stats.setLowSpeedSteering((float) (steering * tyre.getSteering() * speedMultiplier));
+                stats.setHighSpeedSteering((float) (steeringHigh * tyre.getSteering() * speedMultiplier));
+                stats.setLowSpeedAcceleration((float) (acceleration * tyre.getSteering() * speedMultiplier));
+                stats.setHighSpeedAcceleration((float) (accelerationHigh * tyre.getSteering() * speedMultiplier));
+            }
         }
     }
     private void checkSectors() {
@@ -183,10 +187,14 @@ public class TimeTrialHolder {
         if(!isInvalidated) {
             for (NamedCuboid cuboid : storage.getLimits().values()) {
                 if (cuboid.getCuboid().containsVector(location.toVector())) {
-                    isInvalidated = true;
-                    player.sendMessage(prefix + ChatColor.RED + "You've invalidated your lap.");
-                    PacketDataSerializer wrappedBuffer = new PacketDataSerializer(Unpooled.buffer());
-                    player.sendPluginMessage(F1MC.getInstance(),  "formula:invalidatelap", wrappedBuffer.array());
+                    flags+=1;
+                    if(flags >= 90) {
+                        isInvalidated = true;
+                        player.sendMessage(prefix + ChatColor.RED + "You've invalidated your lap.");
+                        PacketDataSerializer wrappedBuffer = new PacketDataSerializer(Unpooled.buffer());
+                        player.sendPluginMessage(F1MC.getInstance(), "formula:invalidatelap", wrappedBuffer.array());
+                        flags = 0;
+                    }
                 }
             }
         }
@@ -246,7 +254,6 @@ public class TimeTrialHolder {
                 timeTrialLap.setPassedS3(true);
                 timeTrialLap.setS3L(System.currentTimeMillis());
                 if(!isHotLapStart) {
-
                     timeTrialLap.setLapL(timeTrialLap.getS1().getSectorLength() + timeTrialLap.getS2().getSectorLength() + timeTrialLap.getS3().getSectorLength());
                     long diff = hasRival ? rival.getLap().getS3().getSectorLength()-timeTrialLap.getS3().getSectorLength() : 0;
                     long diffLap = hasRival ? rival.getLap().getLapData().getSectorLength()-timeTrialLap.getLapData().getSectorLength() : 0;
@@ -288,7 +295,7 @@ public class TimeTrialHolder {
         MysqlDataSource dataSource = Utils.getDatabase();
         try {
             Connection connection = dataSource.getConnection();
-            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM timetrial_laps WHERE `player_uuid` = \""+ player.getUniqueId() +"\" AND `vehicle_name` = \""+ (vehicle.getPermissions().getRidePermission().contains("team.") ? "f1car" : vehicle.getPermissions().getRidePermission()) + "\" AND `track_name` = \"" + race.getName() + "\";");
+            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM timetrial_laps WHERE `player_uuid` = \""+ player.getUniqueId() +"\" AND `vehicle_name` = \""+ (vehicle.getPermissions().getRidePermission().contains("team.") ? vehicle.getName().contains("lmp") ? "lmp" : "f1car" : vehicle.getPermissions().getRidePermission()) + "\" AND `track_name` = \"" + race.getName() + "\";");
             ResultSet rs = stmt.executeQuery();
             String id = null;
             long length = 0;
@@ -323,7 +330,7 @@ public class TimeTrialHolder {
                     }
                 }
             } else {
-                PreparedStatement nextStmt = connection.prepareStatement("INSERT INTO timetrial_laps (`player_uuid`, `lap_length`, `s1_length`, `s2_length`, `s3_length`, `track_name`, `vehicle_name`) VALUES ('"+ player.getUniqueId() +"', "+ timeTrialLap.getLapData().getSectorLength() + ","+ timeTrialLap.getS1().getSectorLength() + ","+ timeTrialLap.getS2().getSectorLength() + ","+ timeTrialLap.getS3().getSectorLength() +",'" + race.getName() + "', '"+ (vehicle.getPermissions().getRidePermission().contains("team.") ? "f1car" : vehicle.getPermissions().getRidePermission()) + "');");
+                PreparedStatement nextStmt = connection.prepareStatement("INSERT INTO timetrial_laps (`player_uuid`, `lap_length`, `s1_length`, `s2_length`, `s3_length`, `track_name`, `vehicle_name`) VALUES ('"+ player.getUniqueId() +"', "+ timeTrialLap.getLapData().getSectorLength() + ","+ timeTrialLap.getS1().getSectorLength() + ","+ timeTrialLap.getS2().getSectorLength() + ","+ timeTrialLap.getS3().getSectorLength() +",'" + race.getName() + "', '"+ (vehicle.getPermissions().getRidePermission().contains("team.") ? vehicle.getName().contains("lmp") ? "lmp" : "f1car" : vehicle.getPermissions().getRidePermission()) + "');");
                 nextStmt.execute();
                 race.updateLeaderboard();
                 player.sendMessage(prefix + "New personal best!");
